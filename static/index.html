@@ -894,7 +894,7 @@
     <!-- STATS BAR -->
     <div class="stats-bar">
       <div class="stat-item">
-        <div class="stat-num" id="statPatterns">21</div>
+        <div class="stat-num" id="statPatterns">65</div>
         <div class="stat-label">Candlestick patterns</div>
       </div>
       <div class="stat-item">
@@ -946,8 +946,8 @@
       <div class="features-grid">
         <div class="feature-card">
           <span class="feature-icon">&#x1f4ca;</span>
-          <div class="feature-title">21 Candlestick patterns</div>
-          <div class="feature-desc">From Doji to Three White Soldiers — every major reversal and continuation pattern is covered.</div>
+          <div class="feature-title">65 Candlestick patterns</div>
+          <div class="feature-desc">From Doji to Kicking and Abandoned Baby — every major reversal, continuation and rare pattern is covered.</div>
         </div>
         <div class="feature-card">
           <span class="feature-icon">&#x1f3af;</span>
@@ -1251,6 +1251,7 @@
         if (res.ok) {
           const data = await res.json();
           document.getElementById('strategyCount').textContent = data.count;
+          document.getElementById('statPatterns').textContent = data.count;
         }
       } catch (_) {}
     })();
