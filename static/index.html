@@ -119,6 +119,23 @@
       padding: 5px 13px;
       border-radius: 20px;
       letter-spacing: 0.3px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .pill-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      flex-shrink: 0;
+      animation: blink 2.4s ease-in-out infinite;
+    }
+
+    #strategyCount {
+      color: var(--white);
+      font-weight: 700;
     }
 
     /* ── Hero ── */
@@ -794,7 +811,10 @@
             <div class="logo-sub">AI Trade Analysis</div>
           </div>
         </a>
-        <div class="nav-pill">Claude Vision</div>
+        <div class="nav-pill" id="strategyPill">
+          <span class="pill-dot"></span>
+          <span id="strategyCount">—</span> strategies loaded
+        </div>
       </nav>
     </div>
   </header>
@@ -988,6 +1008,17 @@
 
   <script>
     'use strict';
+
+    // Load strategy count on startup
+    (async () => {
+      try {
+        const res = await fetch('/api/strategies');
+        if (res.ok) {
+          const data = await res.json();
+          document.getElementById('strategyCount').textContent = data.count;
+        }
+      } catch (_) {}
+    })();
 
     const uploadZone       = document.getElementById('uploadZone');
     const uploadPlaceholder= document.getElementById('uploadPlaceholder');

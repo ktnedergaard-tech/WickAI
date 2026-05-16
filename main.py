@@ -14,6 +14,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from analyzer import analyze_chart, get_analysis_error_response
+from patterns import get_pattern_names
 
 # Load environment variables from .env file if present
 load_dotenv()
@@ -76,6 +77,13 @@ async def serve_frontend():
     if not index_path.exists():
         raise HTTPException(status_code=404, detail="Frontend not found")
     return FileResponse(str(index_path), media_type="text/html")
+
+
+@app.get("/api/strategies")
+async def get_strategies():
+    """Return the list of loaded candlestick strategies."""
+    names = get_pattern_names()
+    return {"count": len(names), "strategies": names}
 
 
 @app.get("/health")
