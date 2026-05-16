@@ -3,34 +3,39 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WickAI — AI-Powered Trade Analysis</title>
+  <title>WickAI — AI Trade Analysis</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
-    /* =============================================
-       RESET & BASE
-    ============================================= */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:          #0a0e1a;
-      --card:        #1a2035;
-      --card-alt:    #111827;
-      --border:      #2a3550;
-      --accent:      #00d4ff;
-      --accent-glow: rgba(0, 212, 255, 0.25);
-      --accent-dim:  rgba(0, 212, 255, 0.12);
-      --green:       #00e676;
-      --green-dim:   rgba(0, 230, 118, 0.15);
-      --red:         #ff3d5a;
-      --red-dim:     rgba(255, 61, 90, 0.15);
-      --yellow:      #ffcc00;
-      --yellow-dim:  rgba(255, 204, 0, 0.15);
-      --text:        #e2e8f0;
-      --text-muted:  #8892a4;
-      --text-dim:    #4a5568;
-      --radius:      12px;
-      --radius-sm:   8px;
-      --shadow:      0 4px 24px rgba(0,0,0,0.4);
-      --transition:  0.2s ease;
+      --bg:           #08090d;
+      --surface:      #0d1119;
+      --card:         #111827;
+      --card-2:       #0f1520;
+      --border:       #1a2438;
+      --border-light: #222f44;
+      --accent:       #3d7eff;
+      --accent-dim:   rgba(61,126,255,0.09);
+      --accent-mid:   rgba(61,126,255,0.18);
+      --green:        #34a869;
+      --green-dim:    rgba(52,168,105,0.12);
+      --red:          #c94545;
+      --red-dim:      rgba(201,69,69,0.12);
+      --amber:        #c9943a;
+      --amber-dim:    rgba(201,148,58,0.12);
+      --text:         #c4cedf;
+      --text-muted:   #566a85;
+      --text-dim:     #2d3d55;
+      --white:        #e8edf6;
+      --radius:       10px;
+      --radius-sm:    7px;
+      --radius-xs:    5px;
+      --shadow:       0 2px 16px rgba(0,0,0,0.35);
+      --shadow-sm:    0 1px 6px rgba(0,0,0,0.25);
+      --t:            0.18s ease;
     }
 
     html { scroll-behavior: smooth; }
@@ -38,36 +43,27 @@
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      font-size: 15px;
-      line-height: 1.6;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+      line-height: 1.65;
       min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* =============================================
-       SCROLLBAR
-    ============================================= */
-    ::-webkit-scrollbar { width: 6px; }
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+    ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
 
-    /* =============================================
-       LAYOUT
-    ============================================= */
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 0 20px;
-    }
+    /* ── Layout ── */
+    .container { max-width: 1060px; margin: 0 auto; padding: 0 24px; }
 
-    /* =============================================
-       HEADER / NAV
-    ============================================= */
+    /* ── Header ── */
     header {
       border-bottom: 1px solid var(--border);
-      background: rgba(10, 14, 26, 0.95);
-      backdrop-filter: blur(12px);
+      background: rgba(8,9,13,0.9);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       position: sticky;
       top: 0;
       z-index: 100;
@@ -77,139 +73,125 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 16px 0;
+      height: 58px;
     }
 
     .logo {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 11px;
+      text-decoration: none;
     }
 
-    .logo-icon {
-      width: 38px;
-      height: 38px;
-      background: linear-gradient(135deg, var(--accent), #0080ff);
-      border-radius: 10px;
+    .logo-mark {
+      width: 34px;
+      height: 34px;
+      background: var(--accent);
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
-      box-shadow: 0 0 20px var(--accent-glow);
+      flex-shrink: 0;
     }
 
-    .logo-text h1 {
-      font-size: 22px;
+    .logo-mark svg { display: block; }
+
+    .logo-name {
+      font-size: 17px;
       font-weight: 700;
-      color: #fff;
-      letter-spacing: -0.5px;
+      color: var(--white);
+      letter-spacing: -0.4px;
     }
 
-    .logo-text span {
+    .logo-sub {
       font-size: 11px;
-      color: var(--accent);
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.2px;
+      font-weight: 400;
     }
 
-    .nav-badge {
-      background: var(--accent-dim);
-      color: var(--accent);
-      border: 1px solid rgba(0, 212, 255, 0.3);
-      padding: 5px 12px;
+    .nav-pill {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 5px 13px;
       border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.3px;
     }
 
-    /* =============================================
-       HERO
-    ============================================= */
+    /* ── Hero ── */
     .hero {
+      padding: 60px 0 44px;
       text-align: center;
-      padding: 52px 0 40px;
     }
 
-    .hero-eyebrow {
+    .hero-tag {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
       background: var(--accent-dim);
-      border: 1px solid rgba(0, 212, 255, 0.2);
+      border: 1px solid rgba(61,126,255,0.2);
       color: var(--accent);
-      padding: 6px 14px;
+      padding: 5px 13px;
       border-radius: 20px;
-      font-size: 12px;
+      font-size: 11.5px;
       font-weight: 600;
-      letter-spacing: 1px;
+      letter-spacing: 0.8px;
       text-transform: uppercase;
-      margin-bottom: 20px;
+      margin-bottom: 22px;
     }
 
-    .hero-eyebrow .dot {
-      width: 6px;
-      height: 6px;
+    .hero-tag .dot {
+      width: 5px;
+      height: 5px;
       background: var(--accent);
       border-radius: 50%;
-      animation: pulse 2s infinite;
+      animation: blink 2.4s ease-in-out infinite;
     }
 
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50%       { opacity: 0.5; transform: scale(0.8); }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.3; }
     }
 
     .hero h2 {
-      font-size: clamp(28px, 5vw, 44px);
+      font-size: clamp(26px, 4.5vw, 42px);
       font-weight: 800;
-      line-height: 1.2;
-      color: #fff;
+      color: var(--white);
       letter-spacing: -1px;
+      line-height: 1.15;
       margin-bottom: 14px;
     }
 
-    .hero h2 .gradient {
-      background: linear-gradient(90deg, var(--accent), #7c6fff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+    .hero h2 em {
+      font-style: normal;
+      color: var(--accent);
     }
 
     .hero p {
       color: var(--text-muted);
-      font-size: 16px;
-      max-width: 520px;
+      font-size: 15px;
+      max-width: 480px;
       margin: 0 auto;
+      font-weight: 400;
+      line-height: 1.7;
     }
 
-    /* =============================================
-       UPLOAD SECTION
-    ============================================= */
-    .upload-section {
-      margin-bottom: 36px;
-    }
+    /* ── Upload ── */
+    .upload-section { margin-bottom: 14px; }
 
     .upload-zone {
-      border: 2px dashed var(--border);
+      border: 1.5px dashed var(--border-light);
       border-radius: var(--radius);
-      padding: 48px 24px;
+      padding: 52px 24px;
       text-align: center;
       cursor: pointer;
-      transition: var(--transition);
-      background: var(--card-alt);
+      transition: var(--t);
+      background: var(--card-2);
       position: relative;
       overflow: hidden;
-    }
-
-    .upload-zone::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at center, var(--accent-dim) 0%, transparent 70%);
-      opacity: 0;
-      transition: var(--transition);
     }
 
     .upload-zone:hover,
@@ -218,65 +200,59 @@
       background: var(--card);
     }
 
-    .upload-zone:hover::before,
-    .upload-zone.dragover::before {
-      opacity: 1;
-    }
-
-    .upload-zone.dragover {
-      box-shadow: 0 0 30px var(--accent-glow);
-    }
+    .upload-zone.dragover { box-shadow: inset 0 0 0 2px var(--accent-mid); }
 
     .upload-zone.has-image {
-      padding: 16px;
-      border-color: var(--accent);
+      padding: 14px;
       border-style: solid;
+      border-color: var(--border-light);
     }
 
-    .upload-icon {
-      font-size: 48px;
-      margin-bottom: 16px;
-      display: block;
+    .upload-icon-wrap {
+      width: 56px;
+      height: 56px;
+      background: var(--card);
+      border: 1px solid var(--border-light);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 18px;
+      font-size: 24px;
     }
 
     .upload-title {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 600;
-      color: #fff;
-      margin-bottom: 8px;
+      color: var(--white);
+      margin-bottom: 7px;
     }
 
-    .upload-subtitle {
+    .upload-sub {
       color: var(--text-muted);
-      font-size: 14px;
-      margin-bottom: 16px;
+      font-size: 13px;
+      margin-bottom: 18px;
+      line-height: 1.6;
     }
 
-    .upload-btn {
+    .upload-btn-label {
       display: inline-block;
       background: var(--accent-dim);
       color: var(--accent);
-      border: 1px solid rgba(0, 212, 255, 0.3);
-      padding: 8px 20px;
-      border-radius: 20px;
+      border: 1px solid rgba(61,126,255,0.28);
+      padding: 7px 18px;
+      border-radius: 7px;
       font-size: 13px;
       font-weight: 600;
       cursor: pointer;
-      transition: var(--transition);
+      transition: var(--t);
     }
 
-    .upload-btn:hover {
-      background: rgba(0, 212, 255, 0.2);
-    }
+    .upload-btn-label:hover { background: var(--accent-mid); }
 
     #fileInput { display: none; }
 
-    /* Image preview */
-    .preview-container {
-      display: none;
-      position: relative;
-    }
-
+    .preview-container { display: none; position: relative; }
     .preview-container.visible { display: block; }
 
     #previewImage {
@@ -291,330 +267,278 @@
       position: absolute;
       top: 8px;
       right: 8px;
-      background: rgba(255, 61, 90, 0.85);
+      background: rgba(201,69,69,0.82);
       color: #fff;
       border: none;
-      width: 30px;
-      height: 30px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
-      font-size: 16px;
+      font-size: 14px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: var(--transition);
-      line-height: 1;
+      transition: var(--t);
     }
 
-    .preview-remove:hover { background: var(--red); transform: scale(1.1); }
+    .preview-remove:hover { background: var(--red); }
 
     .upload-placeholder { display: block; }
     .upload-placeholder.hidden { display: none; }
 
-    /* =============================================
-       ANALYZE BUTTON
-    ============================================= */
+    /* ── Analyze button ── */
     .analyze-btn {
       width: 100%;
-      padding: 16px;
-      background: linear-gradient(135deg, var(--accent), #0080ff);
-      color: #000;
+      padding: 14px;
+      background: var(--accent);
+      color: #fff;
       border: none;
       border-radius: var(--radius);
-      font-size: 16px;
-      font-weight: 700;
+      font-size: 15px;
+      font-weight: 600;
       cursor: pointer;
-      letter-spacing: 0.5px;
-      transition: var(--transition);
+      letter-spacing: -0.1px;
+      transition: var(--t);
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      box-shadow: 0 4px 20px var(--accent-glow);
+      gap: 9px;
+      margin-top: 12px;
+      font-family: inherit;
     }
 
-    .analyze-btn:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 30px rgba(0, 212, 255, 0.45);
-    }
+    .analyze-btn:hover:not(:disabled) { background: #2d6fe8; }
+    .analyze-btn:active:not(:disabled) { transform: scale(0.99); }
+    .analyze-btn:disabled { opacity: 0.38; cursor: not-allowed; }
 
-    .analyze-btn:active:not(:disabled) { transform: translateY(0); }
-
-    .analyze-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    /* =============================================
-       SPINNER
-    ============================================= */
+    /* ── Spinner ── */
     .spinner {
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(0,0,0,0.3);
-      border-top-color: #000;
+      width: 17px;
+      height: 17px;
+      border: 2.5px solid rgba(255,255,255,0.25);
+      border-top-color: #fff;
       border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+      animation: spin 0.75s linear infinite;
       display: none;
     }
 
     .spinner.visible { display: block; }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    .btn-text { transition: var(--transition); }
-
-    /* =============================================
-       LOADING OVERLAY
-    ============================================= */
-    .loading-overlay {
-      display: none;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 48px 24px;
-      text-align: center;
-      margin-top: 24px;
-    }
-
-    .loading-overlay.visible { display: block; }
-
-    .loading-chart {
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      gap: 5px;
-      height: 60px;
-      margin-bottom: 24px;
-    }
-
-    .loading-bar {
-      width: 8px;
-      background: var(--accent);
-      border-radius: 4px 4px 0 0;
-      animation: chartAnim 1.2s ease-in-out infinite;
-    }
-
-    .loading-bar:nth-child(1) { height: 30%; animation-delay: 0s; }
-    .loading-bar:nth-child(2) { height: 65%; animation-delay: 0.1s; }
-    .loading-bar:nth-child(3) { height: 45%; animation-delay: 0.2s; }
-    .loading-bar:nth-child(4) { height: 80%; animation-delay: 0.3s; }
-    .loading-bar:nth-child(5) { height: 55%; animation-delay: 0.4s; }
-    .loading-bar:nth-child(6) { height: 90%; animation-delay: 0.5s; }
-    .loading-bar:nth-child(7) { height: 40%; animation-delay: 0.6s; }
-    .loading-bar:nth-child(8) { height: 70%; animation-delay: 0.7s; }
-
-    @keyframes chartAnim {
-      0%, 100% { opacity: 0.4; transform: scaleY(0.6); }
-      50%       { opacity: 1;   transform: scaleY(1); }
-    }
-
-    .loading-title {
-      font-size: 18px;
-      font-weight: 700;
-      color: #fff;
-      margin-bottom: 8px;
-    }
-
-    .loading-subtitle {
-      color: var(--text-muted);
-      font-size: 14px;
-    }
-
-    .loading-steps {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-top: 20px;
-      text-align: left;
-      max-width: 320px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .loading-step {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 13px;
-      color: var(--text-muted);
-      opacity: 0;
-      transform: translateX(-10px);
-      transition: all 0.4s ease;
-    }
-
-    .loading-step.active {
-      opacity: 1;
-      transform: translateX(0);
-      color: var(--text);
-    }
-
-    .loading-step.done { color: var(--green); }
-
-    .step-icon { font-size: 14px; width: 20px; text-align: center; }
-
-    /* =============================================
-       ERROR
-    ============================================= */
+    /* ── Error ── */
     .error-box {
-      display: none;
       background: var(--red-dim);
-      border: 1px solid rgba(255, 61, 90, 0.4);
-      border-radius: var(--radius);
-      padding: 16px 20px;
-      margin-top: 16px;
-      color: var(--red);
-      font-size: 14px;
+      border: 1px solid rgba(201,69,69,0.3);
+      border-radius: var(--radius-sm);
+      padding: 13px 16px;
+      margin-top: 14px;
+      color: #e07070;
+      font-size: 13.5px;
       display: flex;
       align-items: flex-start;
       gap: 10px;
     }
 
-    .error-box.hidden { display: none !important; }
-    .error-box.visible { display: flex; }
+    .error-box.hidden { display: none; }
+    .error-icon { flex-shrink: 0; margin-top: 1px; }
 
-    .error-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    /* ── Loading overlay ── */
+    .loading-overlay {
+      display: none;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 44px 24px;
+      text-align: center;
+      margin-top: 20px;
+    }
 
-    /* =============================================
-       RESULTS SECTION
-    ============================================= */
+    .loading-overlay.visible { display: block; }
+
+    .loading-bars {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 5px;
+      height: 48px;
+      margin-bottom: 22px;
+    }
+
+    .loading-bar {
+      width: 6px;
+      background: var(--accent);
+      border-radius: 3px 3px 0 0;
+      opacity: 0.7;
+      animation: barPulse 1.3s ease-in-out infinite;
+    }
+
+    .loading-bar:nth-child(1) { height: 28%; animation-delay: 0s; }
+    .loading-bar:nth-child(2) { height: 60%; animation-delay: 0.1s; }
+    .loading-bar:nth-child(3) { height: 42%; animation-delay: 0.2s; }
+    .loading-bar:nth-child(4) { height: 80%; animation-delay: 0.3s; }
+    .loading-bar:nth-child(5) { height: 52%; animation-delay: 0.4s; }
+    .loading-bar:nth-child(6) { height: 90%; animation-delay: 0.5s; }
+    .loading-bar:nth-child(7) { height: 38%; animation-delay: 0.6s; }
+    .loading-bar:nth-child(8) { height: 68%; animation-delay: 0.7s; }
+
+    @keyframes barPulse {
+      0%, 100% { opacity: 0.35; transform: scaleY(0.65); }
+      50%       { opacity: 0.9;  transform: scaleY(1); }
+    }
+
+    .loading-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: 6px;
+    }
+
+    .loading-sub {
+      color: var(--text-muted);
+      font-size: 13px;
+      margin-bottom: 20px;
+    }
+
+    .loading-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      max-width: 280px;
+      margin: 0 auto;
+      text-align: left;
+    }
+
+    .loading-step {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 13px;
+      color: var(--text-dim);
+      opacity: 0;
+      transform: translateX(-8px);
+      transition: all 0.35s ease;
+    }
+
+    .loading-step.active  { opacity: 1; transform: translateX(0); color: var(--text); }
+    .loading-step.done    { opacity: 1; transform: translateX(0); color: var(--green); }
+
+    .step-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      flex-shrink: 0;
+    }
+
+    /* ── Results ── */
     #results {
       display: none;
-      animation: fadeInUp 0.5s ease forwards;
+      animation: fadeUp 0.45s ease forwards;
     }
 
     #results.visible { display: block; }
 
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 28px 0;
+    }
+
+    /* Results header */
     .results-header {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
       flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 24px;
-      padding-bottom: 20px;
+      gap: 14px;
+      margin-bottom: 28px;
+      padding-bottom: 22px;
       border-bottom: 1px solid var(--border);
     }
 
     .results-title {
-      font-size: 22px;
+      font-size: 21px;
       font-weight: 700;
-      color: #fff;
+      color: var(--white);
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
     }
 
-    .results-badges {
+    .detect-row {
       display: flex;
-      align-items: center;
-      gap: 8px;
+      gap: 14px;
       flex-wrap: wrap;
     }
 
-    /* =============================================
-       BADGES
-    ============================================= */
+    .detect-item {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .detect-item strong { color: var(--text); font-weight: 500; }
+
+    .badges-row {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    /* ── Badges ── */
     .badge {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 5px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
+      gap: 5px;
+      padding: 4px 11px;
+      border-radius: 5px;
+      font-size: 11.5px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
     }
 
-    .badge-bullish {
-      background: var(--green-dim);
-      color: var(--green);
-      border: 1px solid rgba(0, 230, 118, 0.3);
-    }
+    .badge-bullish  { background: var(--green-dim); color: var(--green); border: 1px solid rgba(52,168,105,0.25); }
+    .badge-bearish  { background: var(--red-dim);   color: var(--red);   border: 1px solid rgba(201,69,69,0.25); }
+    .badge-neutral  { background: var(--amber-dim); color: var(--amber); border: 1px solid rgba(201,148,58,0.25); }
+    .badge-accent   { background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(61,126,255,0.2); }
 
-    .badge-bearish {
-      background: var(--red-dim);
-      color: var(--red);
-      border: 1px solid rgba(255, 61, 90, 0.3);
-    }
-
-    .badge-neutral {
-      background: var(--yellow-dim);
-      color: var(--yellow);
-      border: 1px solid rgba(255, 204, 0, 0.3);
-    }
-
-    .badge-long {
-      background: var(--green-dim);
-      color: var(--green);
-      border: 1px solid rgba(0, 230, 118, 0.3);
-      font-size: 14px;
-      padding: 6px 16px;
-    }
-
-    .badge-short {
-      background: var(--red-dim);
-      color: var(--red);
-      border: 1px solid rgba(255, 61, 90, 0.3);
-      font-size: 14px;
-      padding: 6px 16px;
-    }
-
-    .badge-wait {
-      background: var(--yellow-dim);
-      color: var(--yellow);
-      border: 1px solid rgba(255, 204, 0, 0.3);
-      font-size: 14px;
-      padding: 6px 16px;
-    }
-
-    .badge-accent {
-      background: var(--accent-dim);
-      color: var(--accent);
-      border: 1px solid rgba(0, 212, 255, 0.3);
-    }
-
-    /* =============================================
-       GRID LAYOUTS
-    ============================================= */
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 16px;
-    }
-
+    /* ── Grid ── */
     .grid-3 {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin-bottom: 16px;
+      gap: 12px;
+      margin-bottom: 12px;
     }
 
-    @media (max-width: 700px) {
-      .grid-2 { grid-template-columns: 1fr; }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    @media (max-width: 680px) {
       .grid-3 { grid-template-columns: 1fr 1fr; }
     }
-
-    @media (max-width: 480px) {
-      .grid-3 { grid-template-columns: 1fr; }
+    @media (max-width: 460px) {
+      .grid-3, .grid-2 { grid-template-columns: 1fr; }
     }
 
-    /* =============================================
-       CARDS
-    ============================================= */
+    /* ── Cards ── */
     .card {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 20px;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
     }
 
     .card-sm {
@@ -624,84 +548,31 @@
       padding: 16px;
     }
 
-    .card-header {
+    .card-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
       display: flex;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 14px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid var(--border);
+      gap: 7px;
     }
 
-    .card-icon { font-size: 18px; }
-
-    .card-title {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 1px;
+    .card-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
     }
 
-    /* =============================================
-       PRICE LEVELS CARD
-    ============================================= */
-    .price-levels {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    @media (max-width: 560px) {
-      .price-levels { grid-template-columns: 1fr; }
-    }
-
-    .price-item {
-      background: var(--card-alt);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 14px;
-    }
-
-    .price-item.entry-item {
-      border-color: rgba(0, 212, 255, 0.4);
-      background: var(--accent-dim);
-      grid-column: 1 / -1;
-    }
-
-    .price-label {
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 4px;
-    }
-
-    .price-label.entry-label { color: var(--accent); }
-    .price-label.sl-label    { color: var(--red); }
-    .price-label.tp-label    { color: var(--green); }
-
-    .price-value {
-      font-size: 18px;
-      font-weight: 700;
-      color: #fff;
-      word-break: break-word;
-    }
-
-    .price-note {
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-top: 3px;
-    }
-
-    /* =============================================
-       METRICS ROW
-    ============================================= */
+    /* ── Metric cards ── */
     .metric-card {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 16px;
+      padding: 18px 16px;
       text-align: center;
     }
 
@@ -709,254 +580,252 @@
       font-size: 11px;
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 0.8px;
       color: var(--text-muted);
-      margin-bottom: 8px;
+      margin-bottom: 9px;
     }
 
     .metric-value {
-      font-size: 26px;
+      font-size: 28px;
       font-weight: 800;
-      color: #fff;
+      color: var(--white);
+      letter-spacing: -1px;
+      line-height: 1;
     }
 
-    .metric-value.accent { color: var(--accent); }
     .metric-value.green  { color: var(--green); }
     .metric-value.red    { color: var(--red); }
-    .metric-value.yellow { color: var(--yellow); }
+    .metric-value.amber  { color: var(--amber); }
+    .metric-value.accent { color: var(--accent); }
 
-    /* =============================================
-       CONFIDENCE METER
-    ============================================= */
-    .confidence-wrap { margin-top: 4px; }
-
-    .confidence-bar-bg {
-      width: 100%;
-      height: 10px;
-      background: var(--card-alt);
-      border-radius: 5px;
-      overflow: hidden;
-      margin-top: 8px;
+    /* ── Price levels ── */
+    .price-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
     }
 
-    .confidence-bar-fill {
+    @media (max-width: 500px) { .price-grid { grid-template-columns: 1fr; } }
+
+    .price-item {
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 13px 14px;
+    }
+
+    .price-item.entry-item {
+      grid-column: 1 / -1;
+      border-color: rgba(61,126,255,0.3);
+      background: var(--accent-dim);
+    }
+
+    .price-tag {
+      font-size: 10.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      margin-bottom: 4px;
+    }
+
+    .price-tag.entry { color: var(--accent); }
+    .price-tag.sl    { color: var(--red); }
+    .price-tag.tp    { color: var(--green); }
+
+    .price-val {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--white);
+      word-break: break-word;
+    }
+
+    .price-note {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* ── Confidence ── */
+    .conf-number {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .conf-bar-bg {
+      width: 100%;
+      height: 5px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .conf-bar-fill {
       height: 100%;
-      border-radius: 5px;
-      transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 3px;
+      transition: width 1s cubic-bezier(0.4,0,0.2,1);
       width: 0%;
     }
 
-    .confidence-ticks {
+    .conf-ticks {
       display: flex;
       justify-content: space-between;
       margin-top: 4px;
     }
 
-    .confidence-tick {
-      font-size: 10px;
-      color: var(--text-dim);
-    }
+    .conf-tick { font-size: 10px; color: var(--text-dim); }
 
-    /* =============================================
-       SUPPORT / RESISTANCE
-    ============================================= */
+    /* ── Level chips ── */
     .levels-list {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 7px;
     }
 
     .level-chip {
-      background: var(--card-alt);
+      background: var(--card-2);
       border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 4px 12px;
-      font-size: 13px;
+      border-radius: 5px;
+      padding: 4px 11px;
+      font-size: 12.5px;
       font-weight: 600;
       color: var(--text);
     }
 
-    .level-chip.support    { border-color: rgba(0, 230, 118, 0.4); color: var(--green); }
-    .level-chip.resistance { border-color: rgba(255, 61, 90, 0.4); color: var(--red); }
+    .level-chip.support    { color: var(--green); border-color: rgba(52,168,105,0.3); background: var(--green-dim); }
+    .level-chip.resistance { color: var(--red);   border-color: rgba(201,69,69,0.3);  background: var(--red-dim); }
 
-    .levels-empty {
-      color: var(--text-muted);
-      font-size: 13px;
-      font-style: italic;
-    }
+    .levels-empty { font-size: 13px; color: var(--text-muted); font-style: italic; }
 
-    /* =============================================
-       ANALYSIS TEXT
-    ============================================= */
-    .analysis-text {
+    /* ── Analysis text ── */
+    .body-text {
+      font-size: 14px;
       color: var(--text);
       line-height: 1.8;
-      font-size: 14px;
     }
 
-    .analysis-text p { margin-bottom: 10px; }
-    .analysis-text p:last-child { margin-bottom: 0; }
-
-    /* =============================================
-       RISK WARNING
-    ============================================= */
-    .risk-warning {
-      background: rgba(255, 204, 0, 0.08);
-      border: 1px solid rgba(255, 204, 0, 0.25);
-      border-radius: var(--radius);
-      padding: 16px 20px;
-      margin-bottom: 16px;
+    /* ── Risk warning ── */
+    .risk-box {
       display: flex;
+      gap: 13px;
       align-items: flex-start;
-      gap: 12px;
+      background: var(--amber-dim);
+      border: 1px solid rgba(201,148,58,0.25);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      margin-bottom: 12px;
     }
 
-    .risk-warning-icon { font-size: 20px; flex-shrink: 0; }
+    .risk-icon { font-size: 17px; flex-shrink: 0; margin-top: 1px; }
 
-    .risk-warning-text {
-      font-size: 13px;
-      color: var(--yellow);
-      line-height: 1.6;
-    }
-
-    .risk-warning-label {
+    .risk-label {
+      font-size: 10.5px;
       font-weight: 700;
-      font-size: 11px;
       text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 4px;
-      color: var(--yellow);
-      opacity: 0.8;
+      letter-spacing: 0.8px;
+      color: var(--amber);
+      margin-bottom: 3px;
     }
 
-    /* =============================================
-       DETECT INFO
-    ============================================= */
-    .detect-row {
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-      margin-bottom: 16px;
+    .risk-text { font-size: 13.5px; color: #c9a86a; line-height: 1.65; }
+
+    /* ── Disclaimer ── */
+    .disclaimer {
+      font-size: 12px;
+      color: var(--text-dim);
+      line-height: 1.6;
+      text-align: center;
+      padding: 16px 0;
+      border-top: 1px solid var(--border);
+      margin-top: 4px;
     }
 
-    .detect-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 13px;
-      color: var(--text-muted);
-    }
-
-    .detect-item strong { color: var(--text); }
-
-    /* =============================================
-       DIVIDER
-    ============================================= */
+    /* ── Divider ── */
     .divider {
       border: none;
       border-top: 1px solid var(--border);
       margin: 20px 0;
     }
 
-    /* =============================================
-       FOOTER
-    ============================================= */
+    /* ── Footer ── */
     footer {
       border-top: 1px solid var(--border);
-      padding: 24px 0;
+      padding: 28px 0;
       text-align: center;
-      margin-top: 60px;
+      margin-top: 64px;
     }
 
-    .footer-text {
-      color: var(--text-dim);
-      font-size: 13px;
-    }
+    .footer-text { font-size: 13px; color: var(--text-muted); }
+    .footer-copy { font-size: 11.5px; color: var(--text-dim); margin-top: 6px; }
 
-    .footer-disclaimer {
-      color: var(--text-dim);
-      font-size: 11px;
-      margin-top: 8px;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-      line-height: 1.5;
-    }
-
-    /* =============================================
-       UTILITY
-    ============================================= */
-    .hidden  { display: none !important; }
-    .visible { display: block !important; }
-
-    .mt-4  { margin-top: 16px; }
-    .mb-0  { margin-bottom: 0; }
-
-    /* =============================================
-       RESPONSIVE NAV
-    ============================================= */
+    /* ── Responsive nav ── */
     @media (max-width: 480px) {
-      .nav-badge { display: none; }
-      .hero { padding: 32px 0 28px; }
+      .nav-pill { display: none; }
+      .hero { padding: 36px 0 30px; }
     }
+
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
 
-  <!-- =========================================
-       HEADER
-  ========================================= -->
+  <!-- HEADER -->
   <header>
     <div class="container">
       <nav>
-        <div class="logo">
-          <div class="logo-icon">&#x26a1;</div>
-          <div class="logo-text">
-            <h1>WickAI</h1>
-            <span>AI-Powered Trade Analysis</span>
+        <a class="logo" href="/">
+          <div class="logo-mark">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <rect x="3" y="1" width="2" height="3" rx="1" fill="white" opacity="0.4"/>
+              <rect x="3" y="5" width="2" height="8" rx="1" fill="white"/>
+              <rect x="3" y="14" width="2" height="3" rx="1" fill="white" opacity="0.4"/>
+              <rect x="8" y="3" width="2" height="2" rx="1" fill="white" opacity="0.4"/>
+              <rect x="8" y="6" width="2" height="5" rx="1" fill="white"/>
+              <rect x="8" y="12" width="2" height="2" rx="1" fill="white" opacity="0.4"/>
+              <rect x="13" y="2" width="2" height="2" rx="1" fill="white" opacity="0.4"/>
+              <rect x="13" y="5" width="2" height="7" rx="1" fill="white"/>
+              <rect x="13" y="13" width="2" height="2" rx="1" fill="white" opacity="0.4"/>
+            </svg>
           </div>
-        </div>
-        <div class="nav-badge">&#x1f916; Claude Vision</div>
+          <div>
+            <div class="logo-name">WickAI</div>
+            <div class="logo-sub">AI Trade Analysis</div>
+          </div>
+        </a>
+        <div class="nav-pill">Claude Vision</div>
       </nav>
     </div>
   </header>
 
-  <!-- =========================================
-       MAIN
-  ========================================= -->
-  <main class="container" style="padding-top: 0; padding-bottom: 40px;">
+  <!-- MAIN -->
+  <main class="container" style="padding-bottom: 48px;">
 
     <!-- HERO -->
     <section class="hero">
-      <div class="hero-eyebrow">
+      <div class="hero-tag">
         <span class="dot"></span>
         Live AI Analysis
       </div>
-      <h2>Read the Market with<br><span class="gradient">Precision AI</span></h2>
-      <p>Upload any candlestick chart screenshot and get instant entry, stop-loss, and take-profit recommendations powered by Claude Vision.</p>
+      <h2>Read the market<br>with <em>precision AI</em></h2>
+      <p>Upload a candlestick chart from NinjaTrader, TradingView or any platform — get instant entry, stop-loss and take-profit in seconds.</p>
     </section>
 
     <!-- UPLOAD -->
     <section class="upload-section">
-      <div
-        class="upload-zone"
-        id="uploadZone"
-        role="button"
-        tabindex="0"
-        aria-label="Upload chart image"
-      >
-        <!-- Placeholder -->
+      <div class="upload-zone" id="uploadZone" role="button" tabindex="0" aria-label="Upload chart image">
+
         <div class="upload-placeholder" id="uploadPlaceholder">
-          <span class="upload-icon">&#x1f4ca;</span>
+          <div class="upload-icon-wrap">&#x1f4ca;</div>
           <div class="upload-title">Drop your chart here</div>
-          <div class="upload-subtitle">Supports NinjaTrader, TradingView, ThinkOrSwim &amp; more<br>JPEG, PNG, WebP &bull; Max 10MB</div>
-          <div class="upload-btn" id="browseBtn">Browse Files</div>
+          <div class="upload-sub">NinjaTrader, TradingView, ThinkOrSwim &amp; more<br>JPEG · PNG · WebP &nbsp;&#x2022;&nbsp; Max 10 MB</div>
+          <div class="upload-btn-label" id="browseBtn">Browse files</div>
         </div>
 
-        <!-- Preview -->
         <div class="preview-container" id="previewContainer">
           <img id="previewImage" src="" alt="Chart preview" />
-          <button class="preview-remove" id="removeBtn" title="Remove image" aria-label="Remove image">&#x2715;</button>
+          <button class="preview-remove" id="removeBtn" title="Remove" aria-label="Remove image">&#x2715;</button>
         </div>
       </div>
       <input type="file" id="fileInput" accept="image/jpeg,image/jpg,image/png,image/webp,image/gif" />
@@ -964,19 +833,19 @@
 
     <!-- ANALYZE BUTTON -->
     <button class="analyze-btn" id="analyzeBtn" disabled>
-      <span class="btn-text">&#x1f50d; Analyze Chart</span>
+      <span class="btn-text">Analyze Chart</span>
       <div class="spinner" id="btnSpinner"></div>
     </button>
 
-    <!-- ERROR BOX -->
+    <!-- ERROR -->
     <div class="error-box hidden" id="errorBox" role="alert">
-      <span class="error-icon">&#x26a0;&#xfe0f;</span>
+      <span class="error-icon">&#x26a0;</span>
       <div id="errorMessage">An error occurred.</div>
     </div>
 
-    <!-- LOADING OVERLAY -->
+    <!-- LOADING -->
     <div class="loading-overlay" id="loadingOverlay">
-      <div class="loading-chart">
+      <div class="loading-bars">
         <div class="loading-bar"></div>
         <div class="loading-bar"></div>
         <div class="loading-bar"></div>
@@ -986,46 +855,34 @@
         <div class="loading-bar"></div>
         <div class="loading-bar"></div>
       </div>
-      <div class="loading-title">Analyzing your chart&hellip;</div>
-      <div class="loading-subtitle">Claude Vision is scanning for patterns &amp; key levels</div>
+      <div class="loading-title">Analysing chart&hellip;</div>
+      <div class="loading-sub">Scanning for patterns and key levels</div>
       <div class="loading-steps" id="loadingSteps">
-        <div class="loading-step" data-step="0">
-          <span class="step-icon">&#x1f4f7;</span> Processing image
-        </div>
-        <div class="loading-step" data-step="1">
-          <span class="step-icon">&#x1f50d;</span> Identifying candlestick patterns
-        </div>
-        <div class="loading-step" data-step="2">
-          <span class="step-icon">&#x1f4c9;</span> Mapping support &amp; resistance
-        </div>
-        <div class="loading-step" data-step="3">
-          <span class="step-icon">&#x1f3af;</span> Calculating trade setup
-        </div>
-        <div class="loading-step" data-step="4">
-          <span class="step-icon">&#x2705;</span> Generating recommendation
-        </div>
+        <div class="loading-step" data-step="0"><span class="step-dot"></span> Processing image</div>
+        <div class="loading-step" data-step="1"><span class="step-dot"></span> Identifying candlestick patterns</div>
+        <div class="loading-step" data-step="2"><span class="step-dot"></span> Mapping support &amp; resistance</div>
+        <div class="loading-step" data-step="3"><span class="step-dot"></span> Calculating trade setup</div>
+        <div class="loading-step" data-step="4"><span class="step-dot"></span> Generating recommendation</div>
       </div>
     </div>
 
-    <!-- =========================================
-         RESULTS
-    ========================================= -->
+    <!-- ── RESULTS ── -->
     <section id="results">
-      <hr class="divider" />
+      <hr class="section-divider" />
 
-      <!-- Header row -->
+      <!-- Header -->
       <div class="results-header">
         <div>
-          <div class="results-title" id="patternNameDisplay">Pattern Name</div>
-          <div class="detect-row" id="detectRow" style="margin-bottom:0; margin-top:6px;">
-            <div class="detect-item">&#x23f1; <strong id="timeframeDisplay">—</strong></div>
-            <div class="detect-item">&#x1f4b9; <strong id="instrumentDisplay">—</strong></div>
+          <div class="results-title" id="patternNameDisplay">—</div>
+          <div class="detect-row">
+            <span class="detect-item">&#x23f1;&nbsp;<strong id="timeframeDisplay">—</strong></span>
+            <span class="detect-item">&#x1f4b9;&nbsp;<strong id="instrumentDisplay">—</strong></span>
           </div>
         </div>
-        <div class="results-badges" id="resultsBadges"></div>
+        <div class="badges-row" id="resultsBadges"></div>
       </div>
 
-      <!-- Metrics row: Direction | R/R | Confidence -->
+      <!-- Metrics row -->
       <div class="grid-3">
         <div class="metric-card">
           <div class="metric-label">Direction</div>
@@ -1037,48 +894,43 @@
         </div>
         <div class="metric-card">
           <div class="metric-label">Confidence</div>
-          <div id="confidenceNumber" class="metric-value accent">—</div>
-          <div class="confidence-wrap">
-            <div class="confidence-bar-bg">
-              <div class="confidence-bar-fill" id="confidenceBar"></div>
-            </div>
-            <div class="confidence-ticks">
-              <span class="confidence-tick">1</span>
-              <span class="confidence-tick">5</span>
-              <span class="confidence-tick">10</span>
-            </div>
+          <div class="conf-number metric-value accent" id="confidenceNumber">—</div>
+          <div class="conf-bar-bg">
+            <div class="conf-bar-fill" id="confidenceBar"></div>
+          </div>
+          <div class="conf-ticks">
+            <span class="conf-tick">1</span>
+            <span class="conf-tick">5</span>
+            <span class="conf-tick">10</span>
           </div>
         </div>
       </div>
 
-      <!-- Price levels card -->
-      <div class="card mb-0" style="margin-bottom: 16px;">
-        <div class="card-header">
-          <span class="card-icon">&#x1f4b0;</span>
-          <span class="card-title">Price Levels</span>
-        </div>
-        <div class="price-levels">
+      <!-- Price levels -->
+      <div class="card" style="margin-bottom:12px;">
+        <div class="card-label">Price Levels</div>
+        <div class="price-grid">
           <div class="price-item entry-item">
-            <div class="price-label entry-label">&#x1f3af; Entry</div>
-            <div class="price-value" id="entryDisplay">—</div>
+            <div class="price-tag entry">Entry</div>
+            <div class="price-val" id="entryDisplay">—</div>
           </div>
           <div class="price-item">
-            <div class="price-label sl-label">&#x1f6d1; Stop Loss</div>
-            <div class="price-value" id="slDisplay">—</div>
+            <div class="price-tag sl">Stop Loss</div>
+            <div class="price-val" id="slDisplay">—</div>
           </div>
           <div class="price-item">
-            <div class="price-label tp-label">&#x1f3c6; Take Profit 1</div>
-            <div class="price-value" id="tp1Display">—</div>
+            <div class="price-tag tp">Take Profit 1</div>
+            <div class="price-val" id="tp1Display">—</div>
             <div class="price-note">First target</div>
           </div>
           <div class="price-item">
-            <div class="price-label tp-label">&#x1f3c6; Take Profit 2</div>
-            <div class="price-value" id="tp2Display">—</div>
+            <div class="price-tag tp">Take Profit 2</div>
+            <div class="price-val" id="tp2Display">—</div>
             <div class="price-note">Extended target</div>
           </div>
           <div class="price-item" id="tp3Card">
-            <div class="price-label tp-label">&#x1f3c6; Take Profit 3</div>
-            <div class="price-value" id="tp3Display">—</div>
+            <div class="price-tag tp">Take Profit 3</div>
+            <div class="price-val" id="tp3Display">—</div>
             <div class="price-note">Aggressive target</div>
           </div>
         </div>
@@ -1086,57 +938,41 @@
 
       <!-- Support / Resistance -->
       <div class="grid-2">
-        <div class="card-sm">
-          <div class="card-header">
-            <span class="card-icon">&#x1f7e2;</span>
-            <span class="card-title">Support Levels</span>
-          </div>
+        <div class="card-sm" style="margin-bottom:12px;">
+          <div class="card-label">Support</div>
           <div class="levels-list" id="supportList"></div>
         </div>
-        <div class="card-sm">
-          <div class="card-header">
-            <span class="card-icon">&#x1f534;</span>
-            <span class="card-title">Resistance Levels</span>
-          </div>
+        <div class="card-sm" style="margin-bottom:12px;">
+          <div class="card-label">Resistance</div>
           <div class="levels-list" id="resistanceList"></div>
         </div>
       </div>
 
-      <!-- Pattern Explanation -->
+      <!-- Pattern Analysis -->
       <div class="card">
-        <div class="card-header">
-          <span class="card-icon">&#x1f4da;</span>
-          <span class="card-title">Pattern Analysis</span>
-        </div>
-        <div class="analysis-text" id="patternExplanation"></div>
+        <div class="card-label">Pattern Analysis</div>
+        <div class="body-text" id="patternExplanation"></div>
       </div>
 
-      <!-- Overall Analysis -->
+      <!-- Trade Rationale -->
       <div class="card">
-        <div class="card-header">
-          <span class="card-icon">&#x1f9e0;</span>
-          <span class="card-title">Trade Rationale</span>
-        </div>
-        <div class="analysis-text" id="analysisSummary"></div>
+        <div class="card-label">Trade Rationale</div>
+        <div class="body-text" id="analysisSummary"></div>
       </div>
 
       <!-- Risk Warning -->
-      <div class="risk-warning">
-        <span class="risk-warning-icon">&#x26a0;&#xfe0f;</span>
+      <div class="risk-box">
+        <span class="risk-icon">&#x26a0;</span>
         <div>
-          <div class="risk-warning-label">Risk Warning</div>
-          <div class="risk-warning-text" id="riskWarning"></div>
+          <div class="risk-label">Risk Warning</div>
+          <div class="risk-text" id="riskWarning"></div>
         </div>
       </div>
 
       <!-- Disclaimer -->
-      <div class="card" style="border-color: rgba(74,85,104,0.5);">
-        <div class="analysis-text" style="color: var(--text-dim); font-size: 12px;">
-          &#x26a0;&#xfe0f; <strong style="color: var(--text-muted);">Disclaimer:</strong>
-          WickAI provides AI-generated technical analysis for educational purposes only. This is not financial advice.
-          Always conduct your own due diligence, use proper risk management, and only risk capital you can afford to lose.
-          Past patterns do not guarantee future results.
-        </div>
+      <div class="disclaimer">
+        WickAI provides AI-generated technical analysis for educational purposes only — not financial advice.
+        Always use proper risk management and only risk capital you can afford to lose.
       </div>
     </section>
 
@@ -1145,277 +981,164 @@
   <!-- FOOTER -->
   <footer>
     <div class="container">
-      <div class="footer-text">&#x26a1; WickAI &mdash; AI-Powered Candlestick Analysis</div>
-      <div class="footer-disclaimer">
-        For educational purposes only. Not financial advice. Trading involves substantial risk of loss.
-      </div>
+      <div class="footer-text">WickAI &mdash; AI-Powered Candlestick Analysis</div>
+      <div class="footer-copy">For educational purposes only. Trading involves substantial risk of loss.</div>
     </div>
   </footer>
 
-  <!-- =========================================
-       JAVASCRIPT
-  ========================================= -->
   <script>
     'use strict';
 
-    // ---- DOM references ----
-    const uploadZone      = document.getElementById('uploadZone');
-    const uploadPlaceholder = document.getElementById('uploadPlaceholder');
-    const fileInput       = document.getElementById('fileInput');
-    const browseBtn       = document.getElementById('browseBtn');
+    const uploadZone       = document.getElementById('uploadZone');
+    const uploadPlaceholder= document.getElementById('uploadPlaceholder');
+    const fileInput        = document.getElementById('fileInput');
+    const browseBtn        = document.getElementById('browseBtn');
     const previewContainer = document.getElementById('previewContainer');
-    const previewImage    = document.getElementById('previewImage');
-    const removeBtn       = document.getElementById('removeBtn');
-    const analyzeBtn      = document.getElementById('analyzeBtn');
-    const btnSpinner      = document.getElementById('btnSpinner');
-    const errorBox        = document.getElementById('errorBox');
-    const errorMessage    = document.getElementById('errorMessage');
-    const loadingOverlay  = document.getElementById('loadingOverlay');
-    const results         = document.getElementById('results');
-    const loadingSteps    = document.querySelectorAll('.loading-step');
+    const previewImage     = document.getElementById('previewImage');
+    const removeBtn        = document.getElementById('removeBtn');
+    const analyzeBtn       = document.getElementById('analyzeBtn');
+    const btnSpinner       = document.getElementById('btnSpinner');
+    const errorBox         = document.getElementById('errorBox');
+    const errorMessage     = document.getElementById('errorMessage');
+    const loadingOverlay   = document.getElementById('loadingOverlay');
+    const results          = document.getElementById('results');
+    const loadingSteps     = document.querySelectorAll('.loading-step');
 
     let selectedFile = null;
-    let loadingStepTimer = null;
 
-    // ---- File selection ----
-    browseBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      fileInput.click();
+    browseBtn.addEventListener('click', e => { e.stopPropagation(); fileInput.click(); });
+    uploadZone.addEventListener('click', () => { if (!selectedFile) fileInput.click(); });
+    uploadZone.addEventListener('keydown', e => {
+      if ((e.key === 'Enter' || e.key === ' ') && !selectedFile) { e.preventDefault(); fileInput.click(); }
+    });
+    fileInput.addEventListener('change', e => { const f = e.target.files[0]; if (f) handleFileSelect(f); });
+
+    uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+    uploadZone.addEventListener('dragleave', e => {
+      if (!uploadZone.contains(e.relatedTarget)) uploadZone.classList.remove('dragover');
+    });
+    uploadZone.addEventListener('drop', e => {
+      e.preventDefault(); uploadZone.classList.remove('dragover');
+      const f = e.dataTransfer.files[0]; if (f) handleFileSelect(f);
     });
 
-    uploadZone.addEventListener('click', () => {
-      if (!selectedFile) fileInput.click();
-    });
-
-    uploadZone.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        if (!selectedFile) fileInput.click();
-      }
-    });
-
-    fileInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) handleFileSelect(file);
-    });
-
-    // ---- Drag and drop ----
-    uploadZone.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      uploadZone.classList.add('dragover');
-    });
-
-    uploadZone.addEventListener('dragleave', (e) => {
-      if (!uploadZone.contains(e.relatedTarget)) {
-        uploadZone.classList.remove('dragover');
-      }
-    });
-
-    uploadZone.addEventListener('drop', (e) => {
-      e.preventDefault();
-      uploadZone.classList.remove('dragover');
-      const file = e.dataTransfer.files[0];
-      if (file) handleFileSelect(file);
-    });
-
-    // ---- Remove image ----
-    removeBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      clearFile();
-    });
+    removeBtn.addEventListener('click', e => { e.stopPropagation(); clearFile(); });
 
     function handleFileSelect(file) {
-      // Validate type
-      const allowed = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+      const allowed = ['image/jpeg','image/jpg','image/png','image/webp','image/gif'];
       if (!allowed.includes(file.type.toLowerCase())) {
-        showError('Unsupported file type. Please upload a JPEG, PNG, WebP, or GIF image.');
-        return;
+        showError('Unsupported file type. Please upload a JPEG, PNG, WebP, or GIF image.'); return;
       }
-      // Validate size (10MB)
       if (file.size > 10 * 1024 * 1024) {
-        showError(`File too large (${(file.size / 1024 / 1024).toFixed(1)}MB). Maximum size is 10MB.`);
-        return;
+        showError(`File too large (${(file.size/1024/1024).toFixed(1)} MB). Max size is 10 MB.`); return;
       }
-
       selectedFile = file;
       hideError();
-
-      // Show preview
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = e => {
         previewImage.src = e.target.result;
         previewContainer.classList.add('visible');
         uploadPlaceholder.classList.add('hidden');
         uploadZone.classList.add('has-image');
       };
       reader.readAsDataURL(file);
-
       analyzeBtn.disabled = false;
-
-      // Hide any previous results
       results.classList.remove('visible');
       loadingOverlay.classList.remove('visible');
     }
 
     function clearFile() {
-      selectedFile = null;
-      fileInput.value = '';
-      previewImage.src = '';
+      selectedFile = null; fileInput.value = ''; previewImage.src = '';
       previewContainer.classList.remove('visible');
       uploadPlaceholder.classList.remove('hidden');
       uploadZone.classList.remove('has-image');
-      analyzeBtn.disabled = true;
-      hideError();
+      analyzeBtn.disabled = true; hideError();
       results.classList.remove('visible');
     }
 
-    // ---- Error helpers ----
-    function showError(msg) {
-      errorMessage.textContent = msg;
-      errorBox.classList.remove('hidden');
-      errorBox.classList.add('visible');
-    }
+    function showError(msg) { errorMessage.textContent = msg; errorBox.classList.remove('hidden'); }
+    function hideError()    { errorBox.classList.add('hidden'); }
 
-    function hideError() {
-      errorBox.classList.remove('visible');
-      errorBox.classList.add('hidden');
-    }
-
-    // ---- Loading step animation ----
     function startLoadingAnimation() {
       loadingSteps.forEach(s => s.classList.remove('active', 'done'));
-      let step = 0;
       const delays = [0, 800, 1800, 3000, 4500];
-
-      function showStep(i) {
-        if (i >= loadingSteps.length) return;
-        // Mark previous as done
-        if (i > 0) loadingSteps[i - 1].classList.remove('active');
-        if (i > 0) loadingSteps[i - 1].classList.add('done');
-        // Activate current
-        loadingSteps[i].classList.add('active');
-      }
-
       delays.forEach((delay, i) => {
-        const t = setTimeout(() => showStep(i), delay);
-        // Store timers to clear on done
+        setTimeout(() => {
+          if (i > 0) { loadingSteps[i-1].classList.remove('active'); loadingSteps[i-1].classList.add('done'); }
+          loadingSteps[i].classList.add('active');
+        }, delay);
       });
-
-      // Return a cleanup function
-      return () => {
-        // Mark all done
-        loadingSteps.forEach(s => {
-          s.classList.remove('active');
-          s.classList.add('done');
-        });
-      };
+      return () => loadingSteps.forEach(s => { s.classList.remove('active'); s.classList.add('done'); });
     }
 
-    // ---- Analyze ----
     analyzeBtn.addEventListener('click', async () => {
       if (!selectedFile) return;
-
-      // UI: enter loading state
       analyzeBtn.disabled = true;
       btnSpinner.classList.add('visible');
-      document.querySelector('.btn-text').textContent = 'Analyzing…';
+      document.querySelector('.btn-text').textContent = 'Analysing…';
       hideError();
       results.classList.remove('visible');
       loadingOverlay.classList.add('visible');
-
       const stopAnimation = startLoadingAnimation();
-
-      // Scroll to loading area smoothly
       loadingOverlay.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
       try {
         const formData = new FormData();
         formData.append('file', selectedFile);
-
-        const response = await fetch('/api/analyze', {
-          method: 'POST',
-          body: formData,
-        });
-
+        const response = await fetch('/api/analyze', { method: 'POST', body: formData });
         const data = await response.json();
         stopAnimation();
-
-        if (!response.ok) {
-          // Server returned an error status
-          const detail = data.detail || data.error_message || 'Analysis failed. Please try again.';
-          throw new Error(detail);
-        }
-
-        if (data.error) {
-          throw new Error(data.error_message || 'Analysis failed.');
-        }
-
-        // Render results
+        if (!response.ok) throw new Error(data.detail || data.error_message || 'Analysis failed.');
+        if (data.error) throw new Error(data.error_message || 'Analysis failed.');
         renderResults(data);
-
       } catch (err) {
         showError(err.message || 'An unexpected error occurred. Please try again.');
       } finally {
-        // UI: exit loading state
         loadingOverlay.classList.remove('visible');
         analyzeBtn.disabled = false;
         btnSpinner.classList.remove('visible');
-        document.querySelector('.btn-text').textContent = '🔍 Analyze Chart';
+        document.querySelector('.btn-text').textContent = 'Analyze Chart';
       }
     });
 
-    // ---- Render results ----
     function renderResults(data) {
-      // Pattern name
       document.getElementById('patternNameDisplay').textContent = data.pattern_name || 'Unknown Pattern';
 
-      // Badges
       const badgesEl = document.getElementById('resultsBadges');
       badgesEl.innerHTML = '';
 
-      const patternBadge = makeBadge(data.pattern_type, {
+      const pBadge = makeBadge(data.pattern_type, {
         bullish: ['badge-bullish', '&#x25b2; Bullish'],
         bearish: ['badge-bearish', '&#x25bc; Bearish'],
         neutral: ['badge-neutral', '&#x25c6; Neutral'],
       });
-      if (patternBadge) badgesEl.appendChild(patternBadge);
+      if (pBadge) badgesEl.appendChild(pBadge);
 
-      const trendText = `Trend: ${capitalize(data.trend || 'neutral')}${data.trend_strength ? ' (' + capitalize(data.trend_strength) + ')' : ''}`;
-      const trendBadge = document.createElement('span');
-      trendBadge.className = 'badge badge-accent';
-      trendBadge.textContent = trendText;
-      badgesEl.appendChild(trendBadge);
+      const tBadge = document.createElement('span');
+      tBadge.className = 'badge badge-accent';
+      tBadge.textContent = `Trend: ${cap(data.trend || 'neutral')}${data.trend_strength ? ' · ' + cap(data.trend_strength) : ''}`;
+      badgesEl.appendChild(tBadge);
 
-      // Timeframe & instrument
       document.getElementById('timeframeDisplay').textContent = data.timeframe_detected || 'Unknown';
       document.getElementById('instrumentDisplay').textContent = data.instrument_detected || 'Unknown';
 
-      // Direction metric
       const dirEl = document.getElementById('directionDisplay');
       const dir = (data.trade_direction || 'WAIT').toUpperCase();
       dirEl.textContent = dir;
       dirEl.className = 'metric-value';
-      if (dir === 'LONG')  dirEl.classList.add('green');
+      if (dir === 'LONG') dirEl.classList.add('green');
       else if (dir === 'SHORT') dirEl.classList.add('red');
-      else dirEl.classList.add('yellow');
+      else dirEl.classList.add('amber');
 
-      // R/R ratio
       document.getElementById('rrDisplay').textContent = data.risk_reward_ratio || 'N/A';
 
-      // Confidence
       const conf = parseInt(data.confidence) || 0;
       document.getElementById('confidenceNumber').textContent = conf + '/10';
       const bar = document.getElementById('confidenceBar');
       bar.style.width = '0%';
-      bar.style.background = confidenceColor(conf);
-      // Animate after a tick
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          bar.style.width = (conf / 10 * 100) + '%';
-        });
-      });
+      bar.style.background = confColor(conf);
+      requestAnimationFrame(() => requestAnimationFrame(() => { bar.style.width = (conf / 10 * 100) + '%'; }));
 
-      // Price levels
       document.getElementById('entryDisplay').textContent = data.entry || '—';
       document.getElementById('slDisplay').textContent = data.stop_loss || '—';
       document.getElementById('tp1Display').textContent = data.take_profit_1 || '—';
@@ -1423,82 +1146,55 @@
       const tp3Val = data.take_profit_3;
       const tp3Card = document.getElementById('tp3Card');
       if (tp3Val && tp3Val !== 'N/A' && tp3Val !== '—') {
-        document.getElementById('tp3Display').textContent = tp3Val;
-        tp3Card.style.display = '';
-      } else {
-        tp3Card.style.display = 'none';
-      }
+        document.getElementById('tp3Display').textContent = tp3Val; tp3Card.style.display = '';
+      } else { tp3Card.style.display = 'none'; }
 
-      // Support levels
-      renderLevelChips('supportList', data.support_levels || [], 'support');
+      renderChips('supportList',    data.support_levels || [],    'support');
+      renderChips('resistanceList', data.resistance_levels || [], 'resistance');
 
-      // Resistance levels
-      renderLevelChips('resistanceList', data.resistance_levels || [], 'resistance');
-
-      // Pattern explanation
       document.getElementById('patternExplanation').textContent = data.pattern_explanation || '—';
-
-      // Analysis summary
-      document.getElementById('analysisSummary').textContent = data.analysis_summary || '—';
-
-      // Risk warning
-      document.getElementById('riskWarning').textContent = data.risk_warning || '—';
+      document.getElementById('analysisSummary').textContent    = data.analysis_summary || '—';
+      document.getElementById('riskWarning').textContent        = data.risk_warning || '—';
 
       // Demo mode banner
-      const existingBanner = document.getElementById('demoBanner');
-      if (existingBanner) existingBanner.remove();
+      const existing = document.getElementById('demoBanner');
+      if (existing) existing.remove();
       if (data.demo_mode) {
         const banner = document.createElement('div');
         banner.id = 'demoBanner';
-        banner.style.cssText = 'background:#2a1a00;border:1px solid #ff9800;border-radius:10px;padding:12px 18px;margin-bottom:18px;color:#ffb74d;font-size:13.5px;display:flex;align-items:center;gap:10px;';
-        banner.innerHTML = '<span style="font-size:18px">&#9888;</span><span><strong>Demo-tilstand:</strong> Ingen API-nøgle er konfigureret. Dette er eksempeldata. Tilføj din <code style="background:#1a1000;padding:2px 6px;border-radius:4px;">ANTHROPIC_API_KEY</code> i Render for rigtig AI-analyse.</span>';
+        banner.style.cssText = 'background:rgba(201,148,58,0.08);border:1px solid rgba(201,148,58,0.25);border-radius:10px;padding:13px 17px;margin-bottom:16px;color:#c9a86a;font-size:13px;display:flex;align-items:center;gap:10px;';
+        banner.innerHTML = '<span>&#x26a0;</span><span><strong style="color:#d4b87a">Demo mode:</strong> No API key configured — this is sample data. Add your <code style="background:rgba(201,148,58,0.12);padding:1px 6px;border-radius:4px;font-size:12px;">ANTHROPIC_API_KEY</code> in Render for live AI analysis.</span>';
         results.insertBefore(banner, results.firstChild);
       }
 
-      // Show results
       results.classList.add('visible');
       results.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    function renderLevelChips(containerId, levels, type) {
-      const el = document.getElementById(containerId);
+    function renderChips(id, levels, type) {
+      const el = document.getElementById(id);
       el.innerHTML = '';
       if (!levels || levels.length === 0) {
-        const empty = document.createElement('span');
-        empty.className = 'levels-empty';
-        empty.textContent = 'None identified';
-        el.appendChild(empty);
-        return;
+        const e = document.createElement('span'); e.className = 'levels-empty'; e.textContent = 'None identified'; el.appendChild(e); return;
       }
-      levels.forEach(lvl => {
-        const chip = document.createElement('span');
-        chip.className = `level-chip ${type}`;
-        chip.textContent = lvl;
-        el.appendChild(chip);
-      });
+      levels.forEach(l => { const c = document.createElement('span'); c.className = `level-chip ${type}`; c.textContent = l; el.appendChild(c); });
     }
 
     function makeBadge(type, map) {
       const entry = map[type] || map['neutral'];
       if (!entry) return null;
       const [cls, html] = entry;
-      const span = document.createElement('span');
-      span.className = `badge ${cls}`;
-      span.innerHTML = html;
-      return span;
+      const s = document.createElement('span'); s.className = `badge ${cls}`; s.innerHTML = html; return s;
     }
 
-    function confidenceColor(conf) {
-      if (conf >= 8) return 'linear-gradient(90deg, #00e676, #00d4ff)';
-      if (conf >= 6) return 'linear-gradient(90deg, #00d4ff, #7c6fff)';
-      if (conf >= 4) return 'linear-gradient(90deg, #ffcc00, #ff9900)';
-      return 'linear-gradient(90deg, #ff3d5a, #ff6b35)';
+    function confColor(c) {
+      if (c >= 8) return 'linear-gradient(90deg, #34a869, #3d7eff)';
+      if (c >= 6) return 'linear-gradient(90deg, #3d7eff, #7b61ff)';
+      if (c >= 4) return 'linear-gradient(90deg, #c9943a, #e07a30)';
+      return 'linear-gradient(90deg, #c94545, #c96030)';
     }
 
-    function capitalize(str) {
-      if (!str) return '';
-      return str.charAt(0).toUpperCase() + str.slice(1);
-    }
+    function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
   </script>
 </body>
 </html>
