@@ -98,13 +98,6 @@ async def analyze_chart_endpoint(file: UploadFile = File(...)):
     Accepts a multipart/form-data image upload and returns a structured
     JSON analysis with trade recommendations.
     """
-    # Check API key
-    if not ANTHROPIC_API_KEY:
-        raise HTTPException(
-            status_code=503,
-            detail="ANTHROPIC_API_KEY is not configured. Please set it in your .env file.",
-        )
-
     # Validate content type
     content_type = file.content_type or ""
     # Normalize content type (some browsers send image/jpg instead of image/jpeg)

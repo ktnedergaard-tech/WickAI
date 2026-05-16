@@ -6,6 +6,8 @@ for detailed candlestick pattern analysis and trade recommendations.
 
 import base64
 import json
+import os
+import random
 import re
 import logging
 from typing import Optional
@@ -15,8 +17,79 @@ from patterns import get_system_prompt_patterns
 
 logger = logging.getLogger(__name__)
 
-# Initialize Anthropic client (reads ANTHROPIC_API_KEY from environment)
-client = anthropic.Anthropic()
+ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
+
+# Only initialize client if key is present
+client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY) if ANTHROPIC_API_KEY else None
+
+DEMO_RESPONSES = [
+    {
+        "pattern_name": "Bullish Engulfing",
+        "pattern_type": "bullish",
+        "trend": "bullish",
+        "trend_strength": "strong",
+        "support_levels": ["18,250", "18,100"],
+        "resistance_levels": ["18,600", "18,800"],
+        "trade_direction": "LONG",
+        "entry": "near 18,420",
+        "stop_loss": "18,200 – below engulfing candle low",
+        "take_profit_1": "18,600",
+        "take_profit_2": "18,750",
+        "take_profit_3": "18,900",
+        "risk_reward_ratio": "1:2.8",
+        "confidence": 8,
+        "pattern_explanation": "A Bullish Engulfing pattern forms when a large green candle completely 'engulfs' the previous red candle. This signals that buyers have overwhelmed sellers and momentum is shifting upward. It is most powerful when appearing after a downtrend or at key support.",
+        "analysis_summary": "Price has been in a short-term pullback within a larger uptrend. The bullish engulfing candle at the 18,250 support zone suggests buyers are stepping in aggressively. Volume confirmation and the higher-low structure add confluence to this long setup. Risk is well-defined below the pattern low.",
+        "risk_warning": "Setup is invalidated if price closes below 18,200. Watch for resistance at 18,600 – a rejection there could signal a double-top.",
+        "timeframe_detected": "15-minute",
+        "instrument_detected": "NQ (Nasdaq Futures)",
+        "demo_mode": True,
+    },
+    {
+        "pattern_name": "Bearish Shooting Star",
+        "pattern_type": "bearish",
+        "trend": "bearish",
+        "trend_strength": "moderate",
+        "support_levels": ["4,200", "4,150"],
+        "resistance_levels": ["4,320", "4,400"],
+        "trade_direction": "SHORT",
+        "entry": "near 4,295",
+        "stop_loss": "4,340 – above shooting star high",
+        "take_profit_1": "4,240",
+        "take_profit_2": "4,200",
+        "take_profit_3": "4,150",
+        "risk_reward_ratio": "1:2.1",
+        "confidence": 7,
+        "pattern_explanation": "A Shooting Star has a small body near the low and a long upper wick, showing that buyers pushed price up but sellers took control and rejected the move. It signals potential reversal when appearing after an uptrend or at resistance.",
+        "analysis_summary": "Price rallied into the 4,320 resistance zone and printed a shooting star, indicating strong selling pressure at this level. The upper wick rejection combined with the prior resistance makes this a high-probability short setup. The trend structure shows lower highs forming.",
+        "risk_warning": "A close above 4,340 invalidates the pattern. If broader market sentiment turns bullish, resistance could break — wait for confirmation before entering.",
+        "timeframe_detected": "1-hour",
+        "instrument_detected": "ES (S&P 500 Futures)",
+        "demo_mode": True,
+    },
+    {
+        "pattern_name": "Doji at Support",
+        "pattern_type": "neutral",
+        "trend": "ranging",
+        "trend_strength": "weak",
+        "support_levels": ["42,800", "42,500"],
+        "resistance_levels": ["43,500", "44,000"],
+        "trade_direction": "WAIT",
+        "entry": "Wait for confirmation candle",
+        "stop_loss": "Define after direction confirmed",
+        "take_profit_1": "43,500 if long",
+        "take_profit_2": "44,000 if long",
+        "take_profit_3": "42,500 if short",
+        "risk_reward_ratio": "TBD",
+        "confidence": 5,
+        "pattern_explanation": "A Doji forms when open and close are nearly equal, creating a cross shape. It signals indecision between buyers and sellers. At support it can precede a bullish reversal, but confirmation is required before trading.",
+        "analysis_summary": "Price is consolidating at a key support level with a doji candle showing indecision. The market is in a ranging phase with no clear directional bias. Wait for the next candle to confirm direction before committing to a trade.",
+        "risk_warning": "Do not trade the doji alone — wait for a strong follow-through candle. A break below 42,500 support could trigger a sharper move down.",
+        "timeframe_detected": "4-hour",
+        "instrument_detected": "BTC/USD",
+        "demo_mode": True,
+    },
+]
 
 # The comprehensive system prompt — cached via cache_control for cost savings
 SYSTEM_PROMPT = f"""You are WickAI, an expert day trading analyst specializing in candlestick chart analysis. You have deep knowledge of technical analysis, price action, and candlestick patterns. Your role is to analyze trading chart screenshots and provide specific, actionable trade recommendations.
@@ -79,6 +152,7 @@ def encode_image(image_bytes: bytes, media_type: str) -> str:
 def analyze_chart(image_bytes: bytes, media_type: str) -> dict:
     """
     Analyze a candlestick chart image using Claude's vision capabilities.
+    Falls back to demo mode if no API key is configured.
 
     Args:
         image_bytes: Raw bytes of the image file
@@ -87,6 +161,10 @@ def analyze_chart(image_bytes: bytes, media_type: str) -> dict:
     Returns:
         dict: Structured analysis result with trade recommendation
     """
+    if not ANTHROPIC_API_KEY:
+        logger.info("No API key configured — returning demo analysis")
+        return random.choice(DEMO_RESPONSES)
+
     # Encode image to base64
     image_data = encode_image(image_bytes, media_type)
 

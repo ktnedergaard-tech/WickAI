@@ -1444,6 +1444,17 @@
       // Risk warning
       document.getElementById('riskWarning').textContent = data.risk_warning || '—';
 
+      // Demo mode banner
+      const existingBanner = document.getElementById('demoBanner');
+      if (existingBanner) existingBanner.remove();
+      if (data.demo_mode) {
+        const banner = document.createElement('div');
+        banner.id = 'demoBanner';
+        banner.style.cssText = 'background:#2a1a00;border:1px solid #ff9800;border-radius:10px;padding:12px 18px;margin-bottom:18px;color:#ffb74d;font-size:13.5px;display:flex;align-items:center;gap:10px;';
+        banner.innerHTML = '<span style="font-size:18px">&#9888;</span><span><strong>Demo-tilstand:</strong> Ingen API-nøgle er konfigureret. Dette er eksempeldata. Tilføj din <code style="background:#1a1000;padding:2px 6px;border-radius:4px;">ANTHROPIC_API_KEY</code> i Render for rigtig AI-analyse.</span>';
+        results.insertBefore(banner, results.firstChild);
+      }
+
       // Show results
       results.classList.add('visible');
       results.scrollIntoView({ behavior: 'smooth', block: 'start' });
