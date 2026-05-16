@@ -50,6 +50,61 @@
       -webkit-font-smoothing: antialiased;
     }
 
+    /* ── Stats bar ── */
+    .stats-bar { display: grid; grid-template-columns: repeat(4,1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 56px; }
+    .stat-item { background: var(--card); padding: 20px 16px; text-align: center; }
+    .stat-num { font-size: 28px; font-weight: 800; color: var(--white); letter-spacing: -1px; line-height: 1; margin-bottom: 4px; }
+    .stat-label { font-size: 11.5px; color: var(--text-muted); font-weight: 500; }
+    @media (max-width: 640px) { .stats-bar { grid-template-columns: repeat(2,1fr); } }
+
+    /* ── How it works ── */
+    .hiw-section { margin-bottom: 64px; }
+    .section-title { font-size: 22px; font-weight: 700; color: var(--white); letter-spacing: -0.5px; margin-bottom: 6px; }
+    .section-sub { font-size: 14px; color: var(--text-muted); margin-bottom: 28px; }
+    .steps-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; position: relative; }
+    @media (max-width: 640px) { .steps-grid { grid-template-columns: 1fr; } }
+    .step-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 20px; position: relative; }
+    .step-number { font-size: 11px; font-weight: 700; color: var(--accent); background: var(--accent-dim); border: 1px solid rgba(61,126,255,0.2); display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 7px; margin-bottom: 14px; }
+    .step-title { font-size: 15px; font-weight: 600; color: var(--white); margin-bottom: 8px; letter-spacing: -0.2px; }
+    .step-desc { font-size: 13.5px; color: var(--text-muted); line-height: 1.65; }
+    .step-icon-lg { font-size: 28px; margin-bottom: 14px; display: block; }
+
+    /* ── Features ── */
+    .features-section { margin-bottom: 64px; }
+    .features-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+    @media (max-width: 700px) { .features-grid { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 420px) { .features-grid { grid-template-columns: 1fr; } }
+    .feature-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+    .feature-icon { font-size: 22px; margin-bottom: 12px; display: block; }
+    .feature-title { font-size: 14px; font-weight: 600; color: var(--white); margin-bottom: 6px; }
+    .feature-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+
+    /* ── Pattern showcase ── */
+    .patterns-section { margin-bottom: 64px; }
+    .patterns-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+    @media (max-width: 680px) { .patterns-grid { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 420px) { .patterns-grid { grid-template-columns: 1fr; } }
+    .pattern-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+    .pattern-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .pattern-name { font-size: 13.5px; font-weight: 600; color: var(--white); }
+    .pattern-type-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.4px; flex-shrink: 0; }
+    .pt-bullish { background: var(--green-dim); color: var(--green); }
+    .pt-bearish { background: var(--red-dim); color: var(--red); }
+    .pt-neutral { background: var(--amber-dim); color: var(--amber); }
+    .pattern-desc { font-size: 12px; color: var(--text-muted); line-height: 1.55; }
+    .reliability-row { display: flex; align-items: center; gap: 7px; margin-top: 2px; }
+    .rel-bar-bg { flex: 1; height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+    .rel-bar-fill { height: 100%; border-radius: 2px; background: var(--accent); }
+    .rel-label { font-size: 10.5px; color: var(--text-muted); font-weight: 600; flex-shrink: 0; }
+
+    /* ── CTA section ── */
+    .cta-section { text-align: center; margin-bottom: 8px; }
+    .cta-section h3 { font-size: 20px; font-weight: 700; color: var(--white); letter-spacing: -0.4px; margin-bottom: 8px; }
+    .cta-section p { font-size: 14px; color: var(--text-muted); margin-bottom: 22px; }
+    .cta-btn { display: inline-flex; align-items: center; gap: 9px; background: var(--accent); color: #fff; border: none; padding: 13px 28px; border-radius: var(--radius); font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; transition: var(--t); text-decoration: none; }
+    .cta-btn:hover { background: #2d6fe8; }
+    .section-hr { border: none; border-top: 1px solid var(--border); margin: 56px 0; }
+
     /* ── Scrollbar ── */
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
@@ -830,6 +885,186 @@
       </div>
       <h2>Read the market<br>with <em>precision AI</em></h2>
       <p>Upload a candlestick chart from NinjaTrader, TradingView or any platform — get instant entry, stop-loss and take-profit in seconds.</p>
+      <div style="margin-top:28px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="#analyze" class="cta-btn">&#x2197; Analyze My Chart</a>
+        <a href="#how-it-works" style="display:inline-flex;align-items:center;gap:8px;background:var(--card);color:var(--text);border:1px solid var(--border);padding:13px 24px;border-radius:var(--radius);font-size:14px;font-weight:500;text-decoration:none;font-family:inherit;transition:var(--t);">Learn how it works</a>
+      </div>
+    </section>
+
+    <!-- STATS BAR -->
+    <div class="stats-bar">
+      <div class="stat-item">
+        <div class="stat-num" id="statPatterns">21</div>
+        <div class="stat-label">Candlestick patterns</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">3</div>
+        <div class="stat-label">Take-profit targets</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">10 s</div>
+        <div class="stat-label">Average analysis time</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">4+</div>
+        <div class="stat-label">Platforms supported</div>
+      </div>
+    </div>
+
+    <!-- HOW IT WORKS -->
+    <section class="hiw-section" id="how-it-works">
+      <div class="section-title">How it works</div>
+      <div class="section-sub">Three steps from screenshot to trade setup</div>
+      <div class="steps-grid">
+        <div class="step-card">
+          <span class="step-icon-lg">&#x1f4f8;</span>
+          <div class="step-number">01</div>
+          <div class="step-title">Upload your chart</div>
+          <div class="step-desc">Take a screenshot from NinjaTrader, TradingView, ThinkOrSwim or any charting platform and drop it here.</div>
+        </div>
+        <div class="step-card">
+          <span class="step-icon-lg">&#x1f9e0;</span>
+          <div class="step-number">02</div>
+          <div class="step-title">AI reads the market</div>
+          <div class="step-desc">Claude Vision scans your chart for candlestick patterns, trend direction, and key support &amp; resistance levels.</div>
+        </div>
+        <div class="step-card">
+          <span class="step-icon-lg">&#x1f3af;</span>
+          <div class="step-number">03</div>
+          <div class="step-title">Get your trade setup</div>
+          <div class="step-desc">Receive a precise entry price, stop-loss, up to three take-profit targets, and a full risk/reward breakdown.</div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="section-hr" />
+
+    <!-- FEATURES -->
+    <section class="features-section">
+      <div class="section-title">Built for serious traders</div>
+      <div class="section-sub">Everything you need to make confident trade decisions</div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <span class="feature-icon">&#x1f4ca;</span>
+          <div class="feature-title">21 Candlestick patterns</div>
+          <div class="feature-desc">From Doji to Three White Soldiers — every major reversal and continuation pattern is covered.</div>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">&#x1f3af;</span>
+          <div class="feature-title">Precise entry zones</div>
+          <div class="feature-desc">AI pinpoints exact entry prices based on the pattern structure and market context visible in your chart.</div>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">&#x1f6d1;</span>
+          <div class="feature-title">Structured risk management</div>
+          <div class="feature-desc">Stop-loss levels are calculated from the pattern's invalidation point — not guesswork.</div>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">&#x1f4c8;</span>
+          <div class="feature-title">Multiple profit targets</div>
+          <div class="feature-desc">Get TP1, TP2 and TP3 so you can scale out of positions and lock in profits at each key level.</div>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">&#x2696;&#xfe0f;</span>
+          <div class="feature-title">Risk / Reward ratio</div>
+          <div class="feature-desc">Every setup comes with a calculated R:R ratio so you know immediately whether the trade is worth taking.</div>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">&#x1f4f1;</span>
+          <div class="feature-title">Any platform, any market</div>
+          <div class="feature-desc">Works with screenshots from NinjaTrader, TradingView, ThinkOrSwim, MetaTrader and more — stocks, futures, forex, crypto.</div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="section-hr" />
+
+    <!-- PATTERN SHOWCASE -->
+    <section class="patterns-section">
+      <div class="section-title">Pattern library</div>
+      <div class="section-sub">A selection of the candlestick patterns WickAI recognises and trades</div>
+      <div class="patterns-grid">
+        <div class="pattern-card">
+          <div class="pattern-header">
+            <span class="pattern-name">Bullish Engulfing</span>
+            <span class="pattern-type-badge pt-bullish">Bullish</span>
+          </div>
+          <div class="pattern-desc">A large green candle completely engulfs the prior red candle, signalling a sharp shift in momentum.</div>
+          <div class="reliability-row"><div class="rel-bar-bg"><div class="rel-bar-fill" style="width:88%"></div></div><span class="rel-label">88%</span></div>
+        </div>
+        <div class="pattern-card">
+          <div class="pattern-header">
+            <span class="pattern-name">Bearish Engulfing</span>
+            <span class="pattern-type-badge pt-bearish">Bearish</span>
+          </div>
+          <div class="pattern-desc">A large red candle engulfs the prior green candle — sellers have taken full control.</div>
+          <div class="reliability-row"><div class="rel-bar-bg"><div class="rel-bar-fill" style="width:85%"></div></div><span class="rel-label">85%</span></div>
+        </div>
+        <div class="pattern-card">
+          <div class="pattern-header">
+            <span class="pattern-name">Morning Star</span>
+            <span class="pattern-type-badge pt-bullish">Bullish</span>
+          </div>
+          <div class="pattern-desc">A three-candle reversal: big red, small indecision, then a big green — powerful bottom signal.</div>
+          <div class="reliability-row"><div class="rel-bar-bg"><div class="rel-bar-fill" style="width:83%"></div></div><span class="rel-label">83%</span></div>
+        </div>
+        <div class="pattern-card">
+          <div class="pattern-header">
+            <span class="pattern-name">Evening Star</span>
+            <span class="pattern-type-badge pt-bearish">Bearish</span>
+          </div>
+          <div class="pattern-desc">Mirror of the Morning Star — signals a top and the start of a downtrend after an upswing.</div>
+          <div class="reliability-row"><div class="rel-bar-bg"><div class="rel-bar-fill" style="width:82%"></div></div><span class="rel-label">82%</span></div>
+        </div>
+        <div class="pattern-card">
+          <div class="pattern-header">
+            <span class="pattern-name">Hammer</span>
+            <span class="pattern-type-badge pt-bullish">Bullish</span>
+          </div>
+          <div class="pattern-desc">Long lower wick, small body at top — buyers rejected a sell-off and pushed price back up strongly.</div>
+          <div class="reliability-row"><div class="rel-bar-bg"><div class="rel-bar-fill" style="width:78%"></div></div><span class="rel-label">78%</span></div>
+        </div>
+        <div class="pattern-card">
+          <div class="pattern-header">
+            <span class="pattern-name">Shooting Star</span>
+            <span class="pattern-type-badge pt-bearish">Bearish</span>
+          </div>
+          <div class="pattern-desc">Long upper wick, small body at bottom — buyers tried to push higher but were rejected hard.</div>
+          <div class="reliability-row"><div class="rel-bar-bg"><div class="rel-bar-fill" style="width:78%"></div></div><span class="rel-label">78%</span></div>
+        </div>
+        <div class="pattern-card">
+          <div class="pattern-header">
+            <span class="pattern-name">Three White Soldiers</span>
+            <span class="pattern-type-badge pt-bullish">Bullish</span>
+          </div>
+          <div class="pattern-desc">Three consecutive strong green candles — one of the most reliable bullish continuation signals.</div>
+          <div class="reliability-row"><div class="rel-bar-bg"><div class="rel-bar-fill" style="width:90%"></div></div><span class="rel-label">90%</span></div>
+        </div>
+        <div class="pattern-card">
+          <div class="pattern-header">
+            <span class="pattern-name">Three Black Crows</span>
+            <span class="pattern-type-badge pt-bearish">Bearish</span>
+          </div>
+          <div class="pattern-desc">Three consecutive strong red candles — signals sustained selling pressure and trend continuation.</div>
+          <div class="reliability-row"><div class="rel-bar-bg"><div class="rel-bar-fill" style="width:90%"></div></div><span class="rel-label">90%</span></div>
+        </div>
+        <div class="pattern-card">
+          <div class="pattern-header">
+            <span class="pattern-name">Doji</span>
+            <span class="pattern-type-badge pt-neutral">Neutral</span>
+          </div>
+          <div class="pattern-desc">Open and close nearly equal — perfect indecision. Powerful at extremes of a trend as a reversal signal.</div>
+          <div class="reliability-row"><div class="rel-bar-bg"><div class="rel-bar-fill" style="width:70%"></div></div><span class="rel-label">70%</span></div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="section-hr" />
+
+    <!-- CTA -->
+    <section class="cta-section" id="analyze">
+      <h3>Ready to analyse your chart?</h3>
+      <p>Upload a screenshot and get your trade setup in seconds — no account needed.</p>
     </section>
 
     <!-- UPLOAD -->
