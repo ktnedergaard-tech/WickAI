@@ -1303,13 +1303,13 @@
         </button>
       </div>
 
-      <!-- Snapshot guide (shows on click) -->
+      <!-- Snapshot fallback guide (only shown if Screen Capture API unavailable) -->
       <div class="snap-toast" id="snapToast">
-        <strong>How to snapshot &amp; analyse this chart:</strong>
+        <strong>Your browser doesn't support direct capture.</strong> Manual steps:
         <div class="snap-steps">
-          <div class="snap-step"><span>1</span>Click the <strong>&#x1f4f7; camera icon</strong> inside the chart toolbar (top-right of chart)</div>
+          <div class="snap-step"><span>1</span>Click the <strong>&#x1f4f7; camera icon</strong> inside the chart toolbar</div>
           <div class="snap-step"><span>2</span>Save the PNG to your device</div>
-          <div class="snap-step"><span>3</span>Drag &amp; drop it onto the <strong>upload zone</strong> below — AI analyses instantly</div>
+          <div class="snap-step"><span>3</span>Drag &amp; drop it onto the <strong>upload zone</strong> below</div>
         </div>
       </div>
 
@@ -1733,14 +1733,100 @@
     }
 
     function toggleSnapGuide() {
-      const toast = document.getElementById('snapToast');
-      const frame = document.getElementById('chartFrame');
-      const isShowing = toast.classList.contains('show');
-      toast.classList.toggle('show', !isShowing);
-      frame.classList.toggle('snap-highlight', !isShowing);
-      if (!isShowing) {
-        toast.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      // If Screen Capture API is available, use it directly
+      if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
+        snapAndAnalyse();
+      } else {
+        // Fallback: show manual guide
+        const toast = document.getElementById('snapToast');
+        const frame = document.getElementById('chartFrame');
+        const isShowing = toast.classList.contains('show');
+        toast.classList.toggle('show', !isShowing);
+        frame.classList.toggle('snap-highlight', !isShowing);
+        if (!isShowing) toast.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
+    }
+
+    async function snapAndAnalyse() {
+      const btn = document.querySelector('.snap-btn');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '&#x23f3; Select this tab&hellip;';
+      btn.disabled = true;
+
+      // Scroll chart into view so it's visible when user shares the tab
+      document.getElementById('chartFrame').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      await new Promise(r => setTimeout(r, 400));
+
+      let stream;
+      try {
+        stream = await navigator.mediaDevices.getDisplayMedia({
+          video: { frameRate: 1 },
+          preferCurrentTab: true,   // Chrome: suggests current tab first
+          selfBrowserSurface: 'include',
+        });
+      } catch (err) {
+        // User cancelled or permission denied — fall back to guide
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        if (err.name !== 'NotAllowedError') {
+          document.getElementById('snapToast').classList.add('show');
+        }
+        return;
+      }
+
+      btn.innerHTML = '&#x23f3; Capturing&hellip;';
+
+      try {
+        const video = document.createElement('video');
+        video.srcObject = stream;
+        video.muted = true;
+        await new Promise(r => { video.onloadedmetadata = r; });
+        await video.play();
+        await new Promise(r => setTimeout(r, 120)); // let frame render
+
+        // Full-tab canvas
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        stream.getTracks().forEach(t => t.stop());
+
+        // Crop to chart frame area
+        const frame = document.getElementById('chartFrame');
+        const rect = frame.getBoundingClientRect();
+        const sx = rect.left  / window.innerWidth  * video.videoWidth;
+        const sy = rect.top   / window.innerHeight * video.videoHeight;
+        const sw = rect.width / window.innerWidth  * video.videoWidth;
+        const sh = rect.height/ window.innerHeight * video.videoHeight;
+
+        const crop = document.createElement('canvas');
+        crop.width  = Math.round(sw);
+        crop.height = Math.round(sh);
+        crop.getContext('2d').drawImage(canvas, sx, sy, sw, sh, 0, 0, crop.width, crop.height);
+
+        crop.toBlob(blob => {
+          if (!blob) { showSnapError(); return; }
+          const file = new File([blob], 'chart-snapshot.png', { type: 'image/png' });
+          // Hand off to existing upload flow
+          handleFileSelect(file);
+          // Scroll to upload zone so user sees the preview
+          document.getElementById('uploadZone').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 'image/png', 0.95);
+
+      } catch (err) {
+        console.error('Snap error:', err);
+        showSnapError();
+      } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        if (stream) stream.getTracks().forEach(t => t.stop());
+      }
+    }
+
+    function showSnapError() {
+      const toast = document.getElementById('snapToast');
+      toast.classList.add('show');
+      document.getElementById('chartFrame').classList.add('snap-highlight');
     }
 
     // Initialise chart on load — wait for tv.js to be ready
