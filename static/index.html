@@ -1967,7 +1967,9 @@
         dot.style.background = sessionColors[d.session] || '#566a85';
 
         document.getElementById('miSession').textContent = d.session;
-        document.getElementById('miNotes').textContent   = d.session_notes || '';
+        // Store session notes for zone function to combine with
+        document.getElementById('miNotes').dataset.sessionNotes = d.session_notes || '';
+        document.getElementById('miNotes').textContent = d.session_notes || '';
 
         const fg = d.fear_greed;
         if (fg) {
@@ -1979,28 +1981,104 @@
           else if (fg.value < 55)  fgEl.style.color = '#c9943a';
           else                     fgEl.style.color = '#34a869';
         }
-
-        // Trading zone (Red/Yellow/Green)
-        const tz = d.trading_zone;
-        if (tz && tz.zone !== 'closed') {
-          const zoneBlock = document.getElementById('miZoneBlock');
-          const zoneDot   = document.getElementById('miZoneDot');
-          const zoneLabel = document.getElementById('miZoneLabel');
-          const zoneTime  = document.getElementById('miZoneTime');
-          zoneBlock.style.display = 'flex';
-          zoneDot.style.backgroundColor = tz.color;
-          zoneDot.style.color = tz.color;
-          zoneLabel.textContent = tz.label;
-          zoneLabel.style.color = tz.color;
-          zoneTime.textContent  = tz.et_time || '';
-          // Update session notes to include zone advice
-          const notes = document.getElementById('miNotes');
-          notes.textContent = tz.advice + (d.session_notes ? ' · ' + d.session_notes : '');
-        }
+        // Zone is handled by updateTradingZone() using local time
+        updateTradingZone();
       } catch(_) {}
     }
     loadMarketIntel();
-    setInterval(loadMarketIntel, 60000); // refresh every 60 sec for zone accuracy
+    setInterval(loadMarketIntel, 300000); // refresh Fear&Greed every 5 min
+
+    // ── Red/Yellow/Green trading zones — calculated in browser using user's local timezone ──
+    const ZONE_SCHEDULE = [
+      { start:[9,30],  end:[9,35],  zone:'red',    label:'Opening Danger',
+        advice:'First 5 min: erratic stops and whipsaws — no new entries' },
+      { start:[9,35],  end:[9,50],  zone:'green',  label:'Green Window',
+        advice:'Strong momentum window — A+ setups have high follow-through' },
+      { start:[9,50],  end:[10,10], zone:'yellow', label:'Yellow Zone',
+        advice:'Volatility spike risk — wait for clear direction before entering' },
+      { start:[10,10], end:[10,35], zone:'green',  label:'Green Window',
+        advice:'Mid-morning green zone — trend continuation trades work well' },
+      { start:[10,35], end:[10,45], zone:'red',    label:'10:35 Reversal',
+        advice:'Classic 10:35 reversal window — existing trends often stall or flip' },
+      { start:[10,45], end:[14,10], zone:'green',  label:'Green Window',
+        advice:'Longest green zone — highest probability for trend and breakout trades' },
+      { start:[14,10], end:[14,20], zone:'red',    label:'2:15 Danger Zone',
+        advice:'2:15 PM reversal zone — afternoon reversals are common, tighten stops' },
+      { start:[14,20], end:[15,0],  zone:'green',  label:'Green Window',
+        advice:'Pre-close window — momentum trades can still work with tight risk' },
+      { start:[15,0],  end:[15,40], zone:'yellow', label:'Yellow Zone',
+        advice:'3:00–3:40 PM choppy zone — position squaring creates noise' },
+      { start:[15,40], end:[15,50], zone:'green',  label:'Green Window',
+        advice:'Brief window before close — scalps only, very tight stops' },
+      { start:[15,50], end:[16,0],  zone:'red',    label:'Close Danger',
+        advice:'Final 10 min: erratic — close positions, do not open new ones' },
+    ];
+
+    function getETMinutes() {
+      // Use Intl API — handles DST automatically for America/New_York
+      const parts = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/New_York',
+        hour: 'numeric', minute: 'numeric', hour12: false,
+      }).formatToParts(new Date());
+      const h = parseInt(parts.find(p => p.type === 'hour').value);
+      const m = parseInt(parts.find(p => p.type === 'minute').value);
+      return h * 60 + m;
+    }
+
+    function etToLocalTime(h, m) {
+      // Build a Date at the given ET hour:min today, then display in user's local time
+      const now = new Date();
+      // Get today's date string in ET to avoid day-boundary issues
+      const etDateStr = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'America/New_York',
+      }).format(now); // gives YYYY-MM-DD
+      const d = new Date(`${etDateStr}T${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:00-04:00`);
+      return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function updateTradingZone() {
+      const now = new Date();
+      const etMin = getETMinutes();
+      const etDay = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/New_York', weekday: 'short',
+      }).format(now);
+
+      const zoneBlock = document.getElementById('miZoneBlock');
+      const isWeekend = etDay === 'Sat' || etDay === 'Sun';
+      if (isWeekend || etMin < 9*60+30 || etMin >= 16*60) {
+        zoneBlock.style.display = 'none';
+        return;
+      }
+
+      let found = null;
+      for (const z of ZONE_SCHEDULE) {
+        const s = z.start[0]*60 + z.start[1];
+        const e = z.end[0]*60   + z.end[1];
+        if (etMin >= s && etMin < e) { found = z; break; }
+      }
+      if (!found) { zoneBlock.style.display = 'none'; return; }
+
+      const colors = { red:'#e74c3c', yellow:'#f0a500', green:'#2ecc71' };
+      const color  = colors[found.zone];
+      const localEnd = etToLocalTime(found.end[0], found.end[1]);
+
+      zoneBlock.style.display = 'flex';
+      const dot = document.getElementById('miZoneDot');
+      dot.style.backgroundColor = color;
+      dot.style.color            = color;
+      const lbl = document.getElementById('miZoneLabel');
+      lbl.textContent = found.label;
+      lbl.style.color  = color;
+      document.getElementById('miZoneTime').textContent = `til ${localEnd}`;
+
+      // Combine zone advice with session notes
+      const notesEl = document.getElementById('miNotes');
+      const sessionNotes = notesEl.dataset.sessionNotes || '';
+      notesEl.textContent = found.advice + (sessionNotes ? ' · ' + sessionNotes : '');
+    }
+
+    updateTradingZone();
+    setInterval(updateTradingZone, 30000); // update zone every 30 sec
 
     const uploadZone       = document.getElementById('uploadZone');
     const uploadPlaceholder= document.getElementById('uploadPlaceholder');
