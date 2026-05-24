@@ -182,7 +182,10 @@
     }
     #tvChartContainer {
       width: 100%;
-      height: 480px;
+      height: 620px;
+    }
+    @media (max-width: 768px) {
+      #tvChartContainer { height: 420px; }
     }
     #tvChartContainer iframe {
       width: 100% !important;
@@ -1397,9 +1400,11 @@
 
     function loadChart(symbol, interval, clickedBtn) {
       document.getElementById('tvChartContainer').innerHTML = '';
+      const h = window.innerWidth <= 768 ? 420 : 620;
       _tvWidget = new TradingView.widget({
         container_id: 'tvChartContainer',
-        autosize: true,
+        width: '100%',
+        height: h,
         symbol: symbol,
         interval: interval,
         timezone: 'Etc/UTC',
