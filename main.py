@@ -15,6 +15,7 @@ from fastapi.staticfiles import StaticFiles
 
 from analyzer import analyze_chart, get_analysis_error_response
 from patterns import get_pattern_names
+import threading
 
 # Load environment variables from .env file if present
 load_dotenv()
@@ -84,6 +85,31 @@ async def get_strategies():
     """Return the list of loaded candlestick strategies."""
     names = get_pattern_names()
     return {"count": len(names), "strategies": names}
+
+
+@app.post("/api/scrape")
+async def trigger_scrape(secret: str = ""):
+    """
+    Manually trigger the pattern scraper.
+    Pass ?secret=YOUR_SCRAPE_SECRET to authenticate.
+    """
+    scrape_secret = os.getenv("SCRAPE_SECRET", "")
+    if scrape_secret and secret != scrape_secret:
+        raise HTTPException(status_code=403, detail="Invalid secret")
+    if not ANTHROPIC_API_KEY:
+        raise HTTPException(status_code=503, detail="ANTHROPIC_API_KEY not set")
+
+    def run_scraper():
+        try:
+            from scraper import run
+            added = run()
+            logger.info(f"Scraper finished: {added} new patterns added")
+        except Exception as e:
+            logger.error(f"Scraper error: {e}")
+
+    thread = threading.Thread(target=run_scraper, daemon=True)
+    thread.start()
+    return {"status": "started", "message": "Scraper is running in the background"}
 
 
 @app.get("/health")
