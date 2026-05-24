@@ -111,37 +111,12 @@
       background: var(--surface);
       border-bottom: 1px solid var(--border);
       overflow: hidden;
-      height: 36px;
-      display: flex;
-      align-items: center;
     }
-    .ticker-track {
-      display: flex;
-      gap: 0;
-      animation: tickerScroll 40s linear infinite;
-      white-space: nowrap;
+    .ticker-bar .tradingview-widget-container {
+      margin: 0 !important;
     }
-    .ticker-bar:hover .ticker-track { animation-play-state: paused; }
-    @keyframes tickerScroll {
-      0%   { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
-    }
-    .ticker-item {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 0 24px;
-      border-right: 1px solid var(--border);
-      font-size: 12.5px;
-      font-weight: 500;
-      color: var(--text-muted);
-      flex-shrink: 0;
-    }
-    .ticker-name { color: var(--white); font-weight: 600; }
-    .ticker-price { color: var(--text); }
-    .ticker-change.up   { color: var(--green); }
-    .ticker-change.down { color: var(--red); }
     .ticker-dot {
+      display: none;
       width: 5px; height: 5px; border-radius: 50%;
       background: var(--green);
       animation: blink 2s ease-in-out infinite;
@@ -962,20 +937,26 @@
   </header>
 
   <!-- LIVE TICKER -->
-  <div class="ticker-bar" id="tickerBar">
-    <div class="ticker-track" id="tickerTrack">
-      <span class="ticker-item"><span class="ticker-dot"></span><span class="ticker-name">NQ</span><span class="ticker-price" id="tick-NQ-p">—</span><span class="ticker-change" id="tick-NQ-c">—</span></span>
-      <span class="ticker-item"><span class="ticker-name">ES</span><span class="ticker-price" id="tick-ES-p">—</span><span class="ticker-change" id="tick-ES-c">—</span></span>
-      <span class="ticker-item"><span class="ticker-name">BTC</span><span class="ticker-price" id="tick-BTC-p">—</span><span class="ticker-change" id="tick-BTC-c">—</span></span>
-      <span class="ticker-item"><span class="ticker-name">Gold</span><span class="ticker-price" id="tick-Gold-p">—</span><span class="ticker-change" id="tick-Gold-c">—</span></span>
-      <span class="ticker-item"><span class="ticker-name">EUR/USD</span><span class="ticker-price" id="tick-EURUSD-p">—</span><span class="ticker-change" id="tick-EURUSD-c">—</span></span>
-      <span class="ticker-item"><span class="ticker-name">Oil</span><span class="ticker-price" id="tick-Oil-p">—</span><span class="ticker-change" id="tick-Oil-c">—</span></span>
-      <span class="ticker-item"><span class="ticker-dot"></span><span class="ticker-name">NQ</span><span class="ticker-price" id="tick-NQ-p2">—</span><span class="ticker-change" id="tick-NQ-c2">—</span></span>
-      <span class="ticker-item"><span class="ticker-name">ES</span><span class="ticker-price" id="tick-ES-p2">—</span><span class="ticker-change" id="tick-ES-c2">—</span></span>
-      <span class="ticker-item"><span class="ticker-name">BTC</span><span class="ticker-price" id="tick-BTC-p2">—</span><span class="ticker-change" id="tick-BTC-c2">—</span></span>
-      <span class="ticker-item"><span class="ticker-name">Gold</span><span class="ticker-price" id="tick-Gold-p2">—</span><span class="ticker-change" id="tick-Gold-c2">—</span></span>
-      <span class="ticker-item"><span class="ticker-name">EUR/USD</span><span class="ticker-price" id="tick-EURUSD-p2">—</span><span class="ticker-change" id="tick-EURUSD-c2">—</span></span>
-      <span class="ticker-item"><span class="ticker-name">Oil</span><span class="ticker-price" id="tick-Oil-p2">—</span><span class="ticker-change" id="tick-Oil-c2">—</span></span>
+  <div class="ticker-bar">
+    <div class="tradingview-widget-container">
+      <div class="tradingview-widget-container__widget"></div>
+      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+      {
+        "symbols": [
+          {"proName": "NASDAQ:NQ1!",    "title": "NQ Futures"},
+          {"proName": "CME_MINI:ES1!",  "title": "ES Futures"},
+          {"proName": "BITSTAMP:BTCUSD","title": "BTC/USD"},
+          {"proName": "TVC:GOLD",       "title": "Gold"},
+          {"proName": "FX:EURUSD",      "title": "EUR/USD"},
+          {"proName": "NYMEX:CL1!",     "title": "Oil"}
+        ],
+        "showSymbolLogo": false,
+        "isTransparent": true,
+        "displayMode": "adaptive",
+        "colorTheme": "dark",
+        "locale": "en"
+      }
+      </script>
     </div>
   </div>
 
@@ -1368,32 +1349,6 @@
   <script>
     'use strict';
 
-    // ── Live ticker ──
-    const TICK_IDS = ['NQ','ES','BTC','Gold','EURUSD','Oil'];
-    const TICK_MAP = {'EUR/USD':'EURUSD'};
-
-    async function updateTicker() {
-      try {
-        const res = await fetch('/api/prices');
-        if (!res.ok) return;
-        const data = await res.json();
-        Object.entries(data.prices).forEach(([name, info]) => {
-          const key = TICK_MAP[name] || name;
-          const price = info.price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-          const chg   = (info.change_pct >= 0 ? '+' : '') + info.change_pct.toFixed(2) + '%';
-          const cls   = info.change_pct >= 0 ? 'up' : 'down';
-          ['', '2'].forEach(suffix => {
-            const p = document.getElementById(`tick-${key}-p${suffix}`);
-            const c = document.getElementById(`tick-${key}-c${suffix}`);
-            if (p) p.textContent = price;
-            if (c) { c.textContent = chg; c.className = `ticker-change ${cls}`; }
-          });
-        });
-      } catch(_) {}
-    }
-
-    updateTicker();
-    setInterval(updateTicker, 60000); // refresh every 60 seconds
 
     // ── Live chart symbol switcher ──
     let _tvWidget = null;
