@@ -1070,12 +1070,12 @@
       <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
       {
         "symbols": [
-          {"proName": "NASDAQ:NQ1!",    "title": "NQ Futures"},
-          {"proName": "CME_MINI:ES1!",  "title": "ES Futures"},
+          {"proName": "CME:NQ1!",        "title": "NQ Futures"},
+          {"proName": "CME:ES1!",        "title": "ES Futures"},
           {"proName": "BITSTAMP:BTCUSD","title": "BTC/USD"},
           {"proName": "TVC:GOLD",       "title": "Gold"},
-          {"proName": "FX:EURUSD",      "title": "EUR/USD"},
-          {"proName": "NYMEX:CL1!",     "title": "Oil"}
+          {"proName": "FX_IDC:EURUSD",  "title": "EUR/USD"},
+          {"proName": "TVC:USOIL",      "title": "Oil"}
         ],
         "showSymbolLogo": false,
         "isTransparent": true,
@@ -1145,12 +1145,12 @@
       <div class="section-title">Live Charts</div>
       <div class="section-sub">Interactive charts — switch instrument and timeframe, then upload a screenshot to analyse</div>
       <div class="symbol-tabs">
-        <button class="symbol-tab active" onclick="loadChart('NASDAQ:NQ1!','15',this)">NQ Futures</button>
-        <button class="symbol-tab" onclick="loadChart('CME_MINI:ES1!','15',this)">ES Futures</button>
+        <button class="symbol-tab active" onclick="loadChart('CME:NQ1!','15',this)">NQ Futures</button>
+        <button class="symbol-tab" onclick="loadChart('CME:ES1!','15',this)">ES Futures</button>
         <button class="symbol-tab" onclick="loadChart('BITSTAMP:BTCUSD','15',this)">BTC/USD</button>
         <button class="symbol-tab" onclick="loadChart('TVC:GOLD','60',this)">Gold</button>
-        <button class="symbol-tab" onclick="loadChart('FX:EURUSD','60',this)">EUR/USD</button>
-        <button class="symbol-tab" onclick="loadChart('NYMEX:CL1!','60',this)">Oil</button>
+        <button class="symbol-tab" onclick="loadChart('FX_IDC:EURUSD','60',this)">EUR/USD</button>
+        <button class="symbol-tab" onclick="loadChart('TVC:USOIL','60',this)">Oil</button>
       </div>
       <div class="chart-frame" id="chartFrame">
         <div id="tvChartContainer"></div>
@@ -1545,7 +1545,7 @@
     // Initialise chart on load — wait for tv.js to be ready
     (function initChart() {
       if (typeof TradingView !== 'undefined') {
-        loadChart('NASDAQ:NQ1!', '15', document.querySelector('.symbol-tab'));
+        loadChart('CME:NQ1!', '15', document.querySelector('.symbol-tab'));
       } else {
         setTimeout(initChart, 100);
       }
