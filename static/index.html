@@ -98,6 +98,60 @@
     .rel-bar-fill { height: 100%; border-radius: 2px; background: var(--accent); }
     .rel-label { font-size: 10.5px; color: var(--text-muted); font-weight: 600; flex-shrink: 0; }
 
+    /* ── Free Resources section ── */
+    .resources-section { margin-bottom: 64px; }
+    .resources-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+    @media (max-width: 900px) { .resources-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 520px) { .resources-grid { grid-template-columns: 1fr; } }
+    .resource-category {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+    .resource-cat-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .resource-list { display: flex; flex-direction: column; gap: 8px; }
+    .resource-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      text-decoration: none;
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 7px 10px;
+      border-radius: 7px;
+      transition: var(--t);
+      border: 1px solid transparent;
+    }
+    .resource-link:hover {
+      background: var(--surface);
+      border-color: var(--border);
+      color: var(--white);
+    }
+    .resource-link-arrow { color: var(--text-dim); font-size: 11px; }
+    .resource-tag {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: rgba(52,168,105,0.15);
+      color: var(--green);
+    }
+
     /* ── CTA section ── */
     .cta-section { text-align: center; margin-bottom: 8px; }
     .cta-section h3 { font-size: 20px; font-weight: 700; color: var(--white); letter-spacing: -0.4px; margin-bottom: 8px; }
@@ -1161,6 +1215,105 @@
           <div class="pattern-desc">Open and close nearly equal — perfect indecision. Powerful at extremes of a trend as a reversal signal.</div>
           <div class="reliability-row"><div class="rel-bar-bg"><div class="rel-bar-fill" style="width:70%"></div></div><span class="rel-label">70%</span></div>
         </div>
+      </div>
+    </section>
+
+    <hr class="section-hr" />
+
+    <!-- FREE RESOURCES -->
+    <section class="resources-section">
+      <div class="section-title">Free Trading Tools</div>
+      <div class="section-sub">The best free alternatives to expensive paid platforms — handpicked for serious traders</div>
+      <div class="resources-grid">
+
+        <!-- Charting -->
+        <div class="resource-category">
+          <div class="resource-cat-title">Charting &amp; Analysis</div>
+          <div class="resource-list">
+            <a class="resource-link" href="https://www.tradingview.com" target="_blank" rel="noopener">
+              <span>TradingView</span><span class="resource-tag">Free</span>
+            </a>
+            <a class="resource-link" href="https://stockcharts.com" target="_blank" rel="noopener">
+              <span>StockCharts</span><span class="resource-tag">Free</span>
+            </a>
+            <a class="resource-link" href="https://finviz.com/map.ashx" target="_blank" rel="noopener">
+              <span>Finviz</span><span class="resource-tag">Free</span>
+            </a>
+            <a class="resource-link" href="https://www.barchart.com" target="_blank" rel="noopener">
+              <span>Barchart</span><span class="resource-tag">Free</span>
+            </a>
+            <a class="resource-link" href="https://www.prorealtime.com" target="_blank" rel="noopener">
+              <span>ProRealTime</span><span class="resource-tag">Free</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Scanners -->
+        <div class="resource-category">
+          <div class="resource-cat-title">Scanners &amp; Screeners</div>
+          <div class="resource-list">
+            <a class="resource-link" href="https://finviz.com/screener.ashx" target="_blank" rel="noopener">
+              <span>Finviz Screener</span><span class="resource-tag">Free</span>
+            </a>
+            <a class="resource-link" href="https://www.barchart.com/stocks/performance/price-change/advances" target="_blank" rel="noopener">
+              <span>Barchart Scanner</span><span class="resource-tag">Free</span>
+            </a>
+            <a class="resource-link" href="https://www.zacks.com/screening/stock-screener" target="_blank" rel="noopener">
+              <span>Zacks Screener</span><span class="resource-tag">Free</span>
+            </a>
+            <a class="resource-link" href="https://finance.yahoo.com/screener" target="_blank" rel="noopener">
+              <span>Yahoo Screener</span><span class="resource-tag">Free</span>
+            </a>
+            <a class="resource-link" href="https://www.koyfin.com" target="_blank" rel="noopener">
+              <span>Koyfin</span><span class="resource-tag">Free</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Performance Tracking -->
+        <div class="resource-category">
+          <div class="resource-cat-title">Trade Journal &amp; Tracking</div>
+          <div class="resource-list">
+            <a class="resource-link" href="https://tradesviz.com" target="_blank" rel="noopener">
+              <span>TradesViz</span><span class="resource-tag">Free</span>
+            </a>
+            <a class="resource-link" href="https://www.tradervue.com" target="_blank" rel="noopener">
+              <span>Tradervue</span><span class="resource-tag">Free</span>
+            </a>
+            <a class="resource-link" href="https://stonkjournal.com" target="_blank" rel="noopener">
+              <span>Stonk Journal</span><span class="resource-tag">Free</span>
+            </a>
+            <a class="resource-link" href="https://tradebench.com" target="_blank" rel="noopener">
+              <span>TradeBench</span><span class="resource-tag">Free</span>
+            </a>
+            <a class="resource-link" href="https://docs.google.com/spreadsheets" target="_blank" rel="noopener">
+              <span>Google Sheets</span><span class="resource-tag">Free</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Research -->
+        <div class="resource-category">
+          <div class="resource-cat-title">News &amp; Research</div>
+          <div class="resource-list">
+            <a class="resource-link" href="https://www.marketwatch.com" target="_blank" rel="noopener">
+              <span>MarketWatch</span><span class="resource-tag">Free</span>
+            </a>
+            <a class="resource-link" href="https://www.investing.com" target="_blank" rel="noopener">
+              <span>Investing.com</span><span class="resource-tag">Free</span>
+            </a>
+            <a class="resource-link" href="https://finance.yahoo.com" target="_blank" rel="noopener">
+              <span>Yahoo Finance</span><span class="resource-tag">Free</span>
+            </a>
+            <a class="resource-link" href="https://www.cnbc.com/markets" target="_blank" rel="noopener">
+              <span>CNBC Markets</span><span class="resource-tag">Free</span>
+            </a>
+            <a class="resource-link" href="https://seekingalpha.com" target="_blank" rel="noopener">
+              <span>Seeking Alpha</span><span class="resource-tag">Free</span>
+            </a>
+          </div>
+        </div>
+
       </div>
     </section>
 
