@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4d8bff"/>
+      <stop offset="100%" stop-color="#2ecc71"/>
+    </linearGradient>
+  </defs>
+  <rect width="32" height="32" rx="7" fill="url(#g)"/>
+  <!-- Candlestick bars -->
+  <!-- Left candle -->
+  <rect x="5" y="7"  width="3" height="4"  rx="1" fill="white" opacity="0.45"/>
+  <rect x="5" y="12" width="3" height="10" rx="1" fill="white"/>
+  <rect x="5" y="23" width="3" height="3"  rx="1" fill="white" opacity="0.45"/>
+  <!-- Middle candle -->
+  <rect x="14" y="5"  width="4" height="5"  rx="1" fill="white" opacity="0.45"/>
+  <rect x="14" y="11" width="4" height="9"  rx="1" fill="white"/>
+  <rect x="14" y="21" width="4" height="4"  rx="1" fill="white" opacity="0.45"/>
+  <!-- Right candle -->
+  <rect x="24" y="9"  width="3" height="4"  rx="1" fill="white" opacity="0.45"/>
+  <rect x="24" y="14" width="3" height="7"  rx="1" fill="white"/>
+  <rect x="24" y="22" width="3" height="3"  rx="1" fill="white" opacity="0.45"/>
+</svg>
