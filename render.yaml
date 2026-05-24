@@ -11,3 +11,15 @@ services:
         sync: false
       - key: PYTHON_VERSION
         value: 3.11.0
+
+  - type: cron
+    name: wickai-pattern-scraper
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    schedule: "0 3 * * 0"
+    command: python scraper.py
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: PYTHON_VERSION
+        value: 3.11.0
