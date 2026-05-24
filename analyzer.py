@@ -9,6 +9,7 @@ import json
 import os
 import random
 import re
+import time
 import logging
 
 from patterns import get_system_prompt_patterns
@@ -148,41 +149,60 @@ def analyze_chart(image_bytes: bytes, media_type: str) -> dict:
     context_block = format_context_for_prompt(market_ctx)
     enriched_prompt = SYSTEM_PROMPT + "\n\n" + context_block
 
-    try:
-        import google.generativeai as genai
-        genai.configure(api_key=GEMINI_API_KEY)
-        model = genai.GenerativeModel(
-            model_name="gemini-2.0-flash",
-            system_instruction=enriched_prompt,
-        )
+    import google.generativeai as genai
+    genai.configure(api_key=GEMINI_API_KEY)
+    model = genai.GenerativeModel(
+        model_name="gemini-2.0-flash",
+        system_instruction=enriched_prompt,
+    )
+    image_part = {
+        "mime_type": media_type,
+        "data": base64.b64encode(image_bytes).decode("utf-8"),
+    }
 
-        image_part = {
-            "mime_type": media_type,
-            "data": base64.b64encode(image_bytes).decode("utf-8"),
-        }
+    last_error = None
+    for attempt in range(3):
+        try:
+            response = model.generate_content([
+                image_part,
+                "Analyse this candlestick chart and return the JSON trade recommendation.",
+            ])
 
-        response = model.generate_content([
-            image_part,
-            "Analyse this candlestick chart and return the JSON trade recommendation.",
-        ])
+            response_text = response.text.strip()
+            logger.info(f"Gemini response received ({len(response_text)} chars)")
 
-        response_text = response.text.strip()
-        logger.info(f"Gemini response received ({len(response_text)} chars)")
+            analysis = parse_json_response(response_text)
+            result = validate_and_normalize(analysis)
+            result["market_context"] = {
+                "session":    market_ctx["session"],
+                "day":        market_ctx["day"],
+                "fear_greed": market_ctx.get("fear_greed"),
+            }
+            return result
 
-        analysis = parse_json_response(response_text)
-        result = validate_and_normalize(analysis)
+        except Exception as e:
+            last_error = e
+            err_str = str(e)
 
-        # Attach live market context to the result for frontend display
-        result["market_context"] = {
-            "session":     market_ctx["session"],
-            "day":         market_ctx["day"],
-            "fear_greed":  market_ctx.get("fear_greed"),
-        }
-        return result
+            # Rate limit (429) — extract suggested retry delay and wait
+            if "429" in err_str:
+                match = re.search(r"seconds:\s*(\d+)", err_str)
+                delay = min(int(match.group(1)) if match else 60, 65)
+                logger.warning(f"Rate limited (attempt {attempt+1}/3). Retrying in {delay}s…")
+                if attempt < 2:
+                    time.sleep(delay)
+                    continue
+                # After retries exhausted, raise friendly message
+                raise ValueError(
+                    f"RATE_LIMIT:{delay}:Gemini free tier quota reached. "
+                    "Please wait about a minute and try again."
+                )
 
-    except Exception as e:
-        logger.error(f"Gemini analysis error: {e}")
-        raise ValueError(f"Analysis failed: {e}")
+            # Any other error — don't retry
+            logger.error(f"Gemini analysis error: {e}")
+            raise ValueError(f"Analysis failed: {e}")
+
+    raise ValueError(f"Analysis failed after retries: {last_error}")
 
 
 def parse_json_response(text: str) -> dict:

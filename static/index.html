@@ -2183,6 +2183,24 @@
     function showError(msg) { errorMessage.textContent = msg; errorBox.classList.remove('hidden'); }
     function hideError()    { errorBox.classList.add('hidden'); }
 
+    function showRateLimitError(text, seconds) {
+      errorBox.classList.remove('hidden');
+      let remaining = seconds;
+      const update = () => {
+        errorMessage.textContent = `⏳ ${text} Retrying in ${remaining}s…`;
+      };
+      update();
+      const iv = setInterval(() => {
+        remaining--;
+        if (remaining <= 0) {
+          clearInterval(iv);
+          errorMessage.textContent = `${text} Please try again now.`;
+        } else {
+          update();
+        }
+      }, 1000);
+    }
+
     function startLoadingAnimation() {
       const steps = Array.from(document.querySelectorAll('#loadingSteps .loading-step'));
       steps.forEach(s => s.classList.remove('active', 'done'));
@@ -2236,7 +2254,18 @@
         if (data.error) throw new Error(data.error_message || 'Analysis failed.');
         renderResults(data);
       } catch (err) {
-        showError(err.message || 'An unexpected error occurred. Please try again.');
+        const msg = err.message || '';
+        // Parse friendly rate-limit message: "RATE_LIMIT:60:human text"
+        const rlMatch = msg.match(/^RATE_LIMIT:(\d+):(.+)/);
+        if (rlMatch) {
+          const seconds = parseInt(rlMatch[1]);
+          const text = rlMatch[2];
+          showRateLimitError(text, seconds);
+        } else {
+          // Strip raw API noise — show only the first sentence
+          const clean = msg.replace(/\[links.*$/s, '').replace(/\{.*$/s, '').trim();
+          showError(clean || 'An unexpected error occurred. Please try again.');
+        }
       } finally {
         loadingOverlay.classList.remove('visible');
         analyzeBtn.disabled = false;
