@@ -87,6 +87,37 @@ async def get_strategies():
     return {"count": len(names), "strategies": names}
 
 
+@app.get("/api/prices")
+async def get_prices():
+    """Return live prices for popular trading instruments using yfinance."""
+    import yfinance as yf
+    symbols = {
+        "NQ": "NQ=F",
+        "ES": "ES=F",
+        "BTC": "BTC-USD",
+        "Gold": "GC=F",
+        "EUR/USD": "EURUSD=X",
+        "Oil": "CL=F",
+    }
+    prices = {}
+    for name, ticker in symbols.items():
+        try:
+            t = yf.Ticker(ticker)
+            hist = t.history(period="2d", interval="1m")
+            if not hist.empty:
+                current = float(hist["Close"].iloc[-1])
+                prev_close = float(hist["Close"].iloc[0])
+                change_pct = ((current - prev_close) / prev_close) * 100
+                prices[name] = {
+                    "price": round(current, 2),
+                    "change_pct": round(change_pct, 2),
+                    "ticker": ticker,
+                }
+        except Exception:
+            pass
+    return {"prices": prices, "updated": __import__("datetime").datetime.utcnow().isoformat()}
+
+
 @app.post("/api/scrape")
 async def trigger_scrape(secret: str = ""):
     """
