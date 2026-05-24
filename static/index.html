@@ -901,6 +901,133 @@
     }
 
     .hidden { display: none !important; }
+
+    /* ── Market Intelligence bar ── */
+    .market-intel-bar {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 20px;
+      margin-bottom: 32px;
+      display: flex;
+      align-items: center;
+      gap: 0;
+      flex-wrap: wrap;
+      overflow: hidden;
+      position: relative;
+    }
+    .market-intel-bar::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(61,126,255,0.04) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .mi-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-right: 20px;
+      flex-shrink: 0;
+    }
+    .mi-block {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 0 20px;
+      border-left: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .mi-block:first-of-type { border-left: none; padding-left: 0; }
+    .mi-block-label {
+      font-size: 10.5px;
+      color: var(--text-muted);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .mi-block-val {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--white);
+      white-space: nowrap;
+    }
+    .mi-session-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .mi-session-dot.active { animation: blink 2s ease-in-out infinite; }
+    .mi-notes {
+      flex: 1;
+      min-width: 200px;
+      padding-left: 20px;
+      border-left: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--text-muted);
+      font-style: italic;
+      line-height: 1.5;
+    }
+    .fg-meter {
+      width: 80px;
+      height: 6px;
+      border-radius: 3px;
+      background: linear-gradient(90deg, #c94545 0%, #e07a30 25%, #c9943a 45%, #34a869 75%, #2d9e5e 100%);
+      position: relative;
+      flex-shrink: 0;
+    }
+    .fg-marker {
+      position: absolute;
+      top: -3px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--white);
+      border: 2px solid var(--bg);
+      transform: translateX(-50%);
+      transition: left 0.8s cubic-bezier(0.4,0,0.2,1);
+      box-shadow: 0 0 6px rgba(0,0,0,0.5);
+    }
+    @media (max-width: 700px) {
+      .mi-notes { display: none; }
+      .mi-block { padding: 0 12px; }
+    }
+
+    /* ── Market context card in results ── */
+    .mctx-card {
+      background: linear-gradient(135deg, rgba(61,126,255,0.06) 0%, var(--card) 50%);
+      border: 1px solid rgba(61,126,255,0.2);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      margin-bottom: 12px;
+      display: none;
+    }
+    .mctx-card.visible { display: block; }
+    .mctx-header {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .mctx-header::after { content: ''; flex: 1; height: 1px; background: rgba(61,126,255,0.18); }
+    .mctx-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    @media (max-width: 520px) { .mctx-grid { grid-template-columns: 1fr 1fr; } }
+    .mctx-item { display: flex; flex-direction: column; gap: 4px; }
+    .mctx-item-label { font-size: 10.5px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+    .mctx-item-val { font-size: 14px; font-weight: 700; color: var(--white); display: flex; align-items: center; gap: 6px; }
+    .mctx-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .mctx-note { font-size: 11.5px; color: var(--text-muted); line-height: 1.5; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); font-style: italic; }
   </style>
 </head>
 <body>
@@ -977,10 +1104,26 @@
       </div>
     </section>
 
+    <!-- MARKET INTELLIGENCE BAR -->
+    <div class="market-intel-bar" id="marketIntelBar">
+      <span class="mi-label">Market Intel</span>
+      <div class="mi-block">
+        <span class="mi-session-dot active" id="miDot" style="background:#566a85"></span>
+        <span class="mi-block-label">Session</span>
+        <span class="mi-block-val" id="miSession">Loading…</span>
+      </div>
+      <div class="mi-block">
+        <span class="mi-block-label">Sentiment</span>
+        <div class="fg-meter"><div class="fg-marker" id="fgMarker" style="left:50%"></div></div>
+        <span class="mi-block-val" id="miFgVal">—</span>
+      </div>
+      <div class="mi-notes" id="miNotes">Fetching live market context…</div>
+    </div>
+
     <!-- STATS BAR -->
     <div class="stats-bar">
       <div class="stat-item">
-        <div class="stat-num" id="statPatterns">65</div>
+        <div class="stat-num" id="statPatterns">131</div>
         <div class="stat-label">Candlestick patterns</div>
       </div>
       <div class="stat-item">
@@ -1217,11 +1360,11 @@
       <div class="loading-title">Analysing chart&hellip;</div>
       <div class="loading-sub">Scanning for patterns and key levels</div>
       <div class="loading-steps" id="loadingSteps">
-        <div class="loading-step" data-step="0"><span class="step-dot"></span> Processing image</div>
-        <div class="loading-step" data-step="1"><span class="step-dot"></span> Identifying candlestick patterns</div>
-        <div class="loading-step" data-step="2"><span class="step-dot"></span> Mapping support &amp; resistance</div>
-        <div class="loading-step" data-step="3"><span class="step-dot"></span> Calculating trade setup</div>
-        <div class="loading-step" data-step="4"><span class="step-dot"></span> Generating recommendation</div>
+        <div class="loading-step" data-step="0"><span class="step-dot"></span> Fetching live market context</div>
+        <div class="loading-step" data-step="1"><span class="step-dot"></span> Processing chart image</div>
+        <div class="loading-step" data-step="2"><span class="step-dot"></span> Identifying patterns (131 strategies)</div>
+        <div class="loading-step" data-step="3"><span class="step-dot"></span> Mapping support &amp; resistance</div>
+        <div class="loading-step" data-step="4"><span class="step-dot"></span> Generating trade recommendation</div>
       </div>
     </div>
 
@@ -1263,6 +1406,26 @@
             <span class="conf-tick">10</span>
           </div>
         </div>
+      </div>
+
+      <!-- Market Context Card -->
+      <div class="mctx-card" id="mctxCard">
+        <div class="mctx-header">&#x26a1; Market Context at Analysis Time</div>
+        <div class="mctx-grid">
+          <div class="mctx-item">
+            <div class="mctx-item-label">Session</div>
+            <div class="mctx-item-val"><span class="mctx-dot" id="mctxDot"></span><span id="mctxSession">—</span></div>
+          </div>
+          <div class="mctx-item">
+            <div class="mctx-item-label">Sentiment</div>
+            <div class="mctx-item-val" id="mctxFg">—</div>
+          </div>
+          <div class="mctx-item">
+            <div class="mctx-item-label">Day</div>
+            <div class="mctx-item-val" id="mctxDay">—</div>
+          </div>
+        </div>
+        <div class="mctx-note" id="mctxNote"></div>
       </div>
 
       <!-- Price levels -->
@@ -1399,6 +1562,43 @@
         }
       } catch (_) {}
     })();
+
+    // ── Live market intelligence widget ──
+    async function loadMarketIntel() {
+      try {
+        const res = await fetch('/api/market-context');
+        if (!res.ok) return;
+        const d = await res.json();
+
+        // Session dot color
+        const sessionColors = {
+          'London/NY Overlap': '#34a869',
+          'US Market Hours': '#3d7eff',
+          'European Session': '#7b61ff',
+          'Asian Session': '#c9943a',
+          'Pre-Market / After Hours': '#566a85',
+        };
+        const dot = document.getElementById('miDot');
+        dot.style.background = sessionColors[d.session] || '#566a85';
+
+        document.getElementById('miSession').textContent = d.session;
+        document.getElementById('miNotes').textContent   = d.session_notes || '';
+
+        const fg = d.fear_greed;
+        if (fg) {
+          document.getElementById('miFgVal').textContent = `${fg.label} ${fg.value}`;
+          document.getElementById('fgMarker').style.left = `${fg.value}%`;
+          const fgColors = { v: fg.value };
+          const fgEl = document.getElementById('miFgVal');
+          if (fg.value < 25)       fgEl.style.color = '#c94545';
+          else if (fg.value < 45)  fgEl.style.color = '#e07a30';
+          else if (fg.value < 55)  fgEl.style.color = '#c9943a';
+          else                     fgEl.style.color = '#34a869';
+        }
+      } catch(_) {}
+    }
+    loadMarketIntel();
+    setInterval(loadMarketIntel, 300000); // refresh every 5 min
 
     const uploadZone       = document.getElementById('uploadZone');
     const uploadPlaceholder= document.getElementById('uploadPlaceholder');
@@ -1567,27 +1767,31 @@
       document.getElementById('analysisSummary').textContent    = data.analysis_summary || '—';
       document.getElementById('riskWarning').textContent        = data.risk_warning || '—';
 
-      // Market context bar
-      const existingCtx = document.getElementById('marketContextBar');
-      if (existingCtx) existingCtx.remove();
+      // Market context card
       const mc = data.market_context;
-      if (mc) {
-        const bar = document.createElement('div');
-        bar.id = 'marketContextBar';
-        bar.style.cssText = 'background:rgba(61,126,255,0.06);border:1px solid rgba(61,126,255,0.18);border-radius:10px;padding:11px 16px;margin-bottom:16px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;font-size:12px;color:var(--text-muted);';
+      const mctxCard = document.getElementById('mctxCard');
+      if (mc && mctxCard) {
+        const sessionColors = {
+          'London/NY Overlap': '#34a869',
+          'US Market Hours': '#3d7eff',
+          'European Session': '#7b61ff',
+          'Asian Session': '#c9943a',
+          'Pre-Market / After Hours': '#566a85',
+        };
+        document.getElementById('mctxDot').style.background = sessionColors[mc.session] || '#566a85';
+        document.getElementById('mctxSession').textContent = mc.session;
+        document.getElementById('mctxDay').textContent = mc.day;
 
-        const sessionEl = `<span style="display:flex;align-items:center;gap:5px;"><span style="width:7px;height:7px;border-radius:50%;background:#3d7eff;display:inline-block;"></span><strong style="color:var(--white)">${mc.session}</strong></span>`;
-        const dayEl = `<span>${mc.day}</span>`;
-
-        let fgEl = '';
-        if (mc.fear_greed) {
-          const fg = mc.fear_greed;
-          const fgColor = fg.value < 25 ? '#c94545' : fg.value < 45 ? '#e07a30' : fg.value < 55 ? '#888' : fg.value < 75 ? '#c9943a' : '#c94545';
-          fgEl = `<span>Sentiment: <strong style="color:${fgColor}">${fg.label} ${fg.value}/100</strong></span>`;
+        const fg = mc.fear_greed;
+        const fgEl = document.getElementById('mctxFg');
+        if (fg) {
+          const fgColor = fg.value < 25 ? '#c94545' : fg.value < 45 ? '#e07a30' : fg.value < 55 ? '#c9943a' : '#34a869';
+          fgEl.innerHTML = `<span style="color:${fgColor};font-weight:700">${fg.label} ${fg.value}/100</span>`;
+          document.getElementById('mctxNote').textContent = fg.context;
+        } else {
+          fgEl.textContent = 'Unavailable';
         }
-
-        bar.innerHTML = `<span style="font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);margin-right:4px">Market Intel</span>${sessionEl}${dayEl}${fgEl}`;
-        results.insertBefore(bar, results.firstChild);
+        mctxCard.classList.add('visible');
       }
 
       // Demo mode banner
