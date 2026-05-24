@@ -129,7 +129,7 @@
       display: flex;
       gap: 6px;
       flex-wrap: wrap;
-      margin-bottom: 16px;
+      margin-bottom: 10px;
     }
     .symbol-tab {
       background: var(--card);
@@ -149,11 +149,131 @@
       border-color: rgba(61,126,255,0.35);
       color: var(--accent);
     }
+
+    /* Chart toolbar row */
+    .chart-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .tf-group {
+      display: flex;
+      gap: 3px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 3px;
+    }
+    .tf-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 4px 9px;
+      border-radius: 5px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: var(--t);
+      letter-spacing: 0.02em;
+    }
+    .tf-btn:hover { background: var(--border); color: var(--text); }
+    .tf-btn.active {
+      background: var(--accent-dim);
+      color: var(--accent);
+    }
+    .chart-symbol-search {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 4px 10px;
+      transition: var(--t);
+    }
+    .chart-symbol-search:focus-within {
+      border-color: rgba(61,126,255,0.4);
+    }
+    .chart-symbol-search input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-size: 12.5px;
+      font-family: inherit;
+      width: 110px;
+      font-weight: 600;
+    }
+    .chart-symbol-search input::placeholder { color: var(--text-muted); font-weight: 400; }
+    .chart-symbol-search button {
+      background: transparent;
+      border: none;
+      color: var(--accent);
+      cursor: pointer;
+      font-size: 13px;
+      padding: 0;
+      line-height: 1;
+    }
+    .snap-btn {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: linear-gradient(135deg, #1a2f1f 0%, #0f2018 100%);
+      border: 1px solid rgba(52,168,105,0.4);
+      color: #34a869;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: var(--t);
+      white-space: nowrap;
+    }
+    .snap-btn:hover {
+      background: linear-gradient(135deg, #1f3a26 0%, #132518 100%);
+      border-color: rgba(52,168,105,0.7);
+      box-shadow: 0 0 12px rgba(52,168,105,0.15);
+    }
+
+    /* Snapshot guide toast */
+    .snap-toast {
+      display: none;
+      background: #0f2018;
+      border: 1px solid rgba(52,168,105,0.5);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-bottom: 10px;
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .snap-toast.show { display: block; }
+    .snap-toast strong { color: #34a869; }
+    .snap-toast .snap-steps { margin-top: 8px; display: flex; gap: 10px; flex-wrap: wrap; }
+    .snap-step {
+      background: rgba(52,168,105,0.1);
+      border: 1px solid rgba(52,168,105,0.2);
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .snap-step span { color: #34a869; font-weight: 700; margin-right: 5px; }
+
     .chart-frame {
       border-radius: var(--radius);
       overflow: hidden;
       border: 1px solid var(--border);
       background: var(--card);
+    }
+    .chart-frame.snap-highlight {
+      border-color: rgba(52,168,105,0.6);
+      box-shadow: 0 0 0 2px rgba(52,168,105,0.15);
     }
     #tvChartContainer {
       width: 100%;
@@ -161,6 +281,7 @@
     }
     @media (max-width: 768px) {
       #tvChartContainer { height: 420px; }
+      .snap-btn { margin-left: 0; }
     }
     #tvChartContainer iframe {
       width: 100% !important;
@@ -1143,15 +1264,55 @@
     <!-- LIVE CHARTS -->
     <section class="live-section">
       <div class="section-title">Live Charts</div>
-      <div class="section-sub">Interactive charts — switch instrument and timeframe, then upload a screenshot to analyse</div>
+      <div class="section-sub">Switch instrument &amp; timeframe — then snapshot the chart and analyse it with AI</div>
+
+      <!-- Symbol tabs -->
       <div class="symbol-tabs">
-        <button class="symbol-tab active" onclick="loadChart('NASDAQ:NDX','15',this)">Nasdaq 100</button>
-        <button class="symbol-tab" onclick="loadChart('SP:SPX','15',this)">S&P 500</button>
-        <button class="symbol-tab" onclick="loadChart('BITSTAMP:BTCUSD','15',this)">BTC/USD</button>
-        <button class="symbol-tab" onclick="loadChart('TVC:GOLD','60',this)">Gold</button>
-        <button class="symbol-tab" onclick="loadChart('FX_IDC:EURUSD','60',this)">EUR/USD</button>
-        <button class="symbol-tab" onclick="loadChart('TVC:USOIL','60',this)">Oil</button>
+        <button class="symbol-tab active" onclick="changeSymbol('NASDAQ:NDX','Nasdaq 100',this)">Nasdaq 100</button>
+        <button class="symbol-tab" onclick="changeSymbol('SP:SPX','S&P 500',this)">S&P 500</button>
+        <button class="symbol-tab" onclick="changeSymbol('BITSTAMP:BTCUSD','BTC/USD',this)">BTC/USD</button>
+        <button class="symbol-tab" onclick="changeSymbol('TVC:GOLD','Gold',this)">Gold</button>
+        <button class="symbol-tab" onclick="changeSymbol('FX_IDC:EURUSD','EUR/USD',this)">EUR/USD</button>
+        <button class="symbol-tab" onclick="changeSymbol('TVC:USOIL','Oil',this)">Oil</button>
       </div>
+
+      <!-- Chart toolbar: timeframes + symbol search + snapshot -->
+      <div class="chart-toolbar">
+        <!-- Timeframe selector -->
+        <div class="tf-group">
+          <button class="tf-btn" onclick="changeTF('1',this)">1m</button>
+          <button class="tf-btn" onclick="changeTF('3',this)">3m</button>
+          <button class="tf-btn" onclick="changeTF('5',this)">5m</button>
+          <button class="tf-btn active" onclick="changeTF('15',this)">15m</button>
+          <button class="tf-btn" onclick="changeTF('30',this)">30m</button>
+          <button class="tf-btn" onclick="changeTF('60',this)">1H</button>
+          <button class="tf-btn" onclick="changeTF('240',this)">4H</button>
+          <button class="tf-btn" onclick="changeTF('D',this)">1D</button>
+          <button class="tf-btn" onclick="changeTF('W',this)">1W</button>
+        </div>
+
+        <!-- Custom symbol search -->
+        <div class="chart-symbol-search">
+          <input id="symbolSearchInput" placeholder="e.g. AAPL, TSLA…" onkeydown="if(event.key==='Enter')searchCustomSymbol()" />
+          <button onclick="searchCustomSymbol()" title="Load symbol">&#x2192;</button>
+        </div>
+
+        <!-- Snapshot button -->
+        <button class="snap-btn" onclick="toggleSnapGuide()">
+          &#x1f4f8; Snapshot &amp; Analyse
+        </button>
+      </div>
+
+      <!-- Snapshot guide (shows on click) -->
+      <div class="snap-toast" id="snapToast">
+        <strong>How to snapshot &amp; analyse this chart:</strong>
+        <div class="snap-steps">
+          <div class="snap-step"><span>1</span>Click the <strong>&#x1f4f7; camera icon</strong> inside the chart toolbar (top-right of chart)</div>
+          <div class="snap-step"><span>2</span>Save the PNG to your device</div>
+          <div class="snap-step"><span>3</span>Drag &amp; drop it onto the <strong>upload zone</strong> below — AI analyses instantly</div>
+        </div>
+      </div>
+
       <div class="chart-frame" id="chartFrame">
         <div id="tvChartContainer"></div>
       </div>
@@ -1512,12 +1673,16 @@
     'use strict';
 
 
-    // ── Live chart symbol switcher ──
+    // ── Live chart controls ──
     let _tvWidget = null;
+    let _chartSymbol = 'NASDAQ:NDX';
+    let _chartInterval = '15';
 
-    function loadChart(symbol, interval, clickedBtn) {
+    function loadChart(symbol, interval) {
+      _chartSymbol = symbol;
+      _chartInterval = interval;
       document.getElementById('tvChartContainer').innerHTML = '';
-      const h = window.innerWidth <= 768 ? 420 : 620;
+      const h = window.innerWidth <= 768 ? 420 : 660;
       _tvWidget = new TradingView.widget({
         container_id: 'tvChartContainer',
         width: '100%',
@@ -1528,24 +1693,60 @@
         theme: 'dark',
         style: '1',
         locale: 'en',
-        toolbar_bg: '#0f1520',
+        toolbar_bg: '#0d1117',
         enable_publishing: false,
-        allow_symbol_change: false,
-        save_image: false,
+        allow_symbol_change: true,
+        save_image: true,
         hide_side_toolbar: false,
+        hide_top_toolbar: false,
         withdateranges: true,
-        details: false,
+        details: true,
         hotlist: false,
         calendar: false,
+        studies: [],
+        show_popup_button: true,
+        popup_width: '1000',
+        popup_height: '700',
       });
+    }
+
+    function changeSymbol(symbol, label, btn) {
       document.querySelectorAll('.symbol-tab').forEach(t => t.classList.remove('active'));
-      if (clickedBtn) clickedBtn.classList.add('active');
+      if (btn) btn.classList.add('active');
+      document.getElementById('symbolSearchInput').value = '';
+      loadChart(symbol, _chartInterval);
+    }
+
+    function changeTF(interval, btn) {
+      document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      loadChart(_chartSymbol, interval);
+    }
+
+    function searchCustomSymbol() {
+      const raw = document.getElementById('symbolSearchInput').value.trim().toUpperCase();
+      if (!raw) return;
+      // Accept bare tickers and map to likely exchange prefix
+      const sym = raw.includes(':') ? raw : `NASDAQ:${raw}`;
+      document.querySelectorAll('.symbol-tab').forEach(t => t.classList.remove('active'));
+      loadChart(sym, _chartInterval);
+    }
+
+    function toggleSnapGuide() {
+      const toast = document.getElementById('snapToast');
+      const frame = document.getElementById('chartFrame');
+      const isShowing = toast.classList.contains('show');
+      toast.classList.toggle('show', !isShowing);
+      frame.classList.toggle('snap-highlight', !isShowing);
+      if (!isShowing) {
+        toast.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
     }
 
     // Initialise chart on load — wait for tv.js to be ready
     (function initChart() {
       if (typeof TradingView !== 'undefined') {
-        loadChart('NASDAQ:NDX', '15', document.querySelector('.symbol-tab'));
+        loadChart('NASDAQ:NDX', '15');
       } else {
         setTimeout(initChart, 100);
       }
