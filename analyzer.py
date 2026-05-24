@@ -12,6 +12,7 @@ import re
 import logging
 
 from patterns import get_system_prompt_patterns
+from market_intel import get_market_context, format_context_for_prompt
 
 logger = logging.getLogger(__name__)
 
@@ -142,12 +143,17 @@ def analyze_chart(image_bytes: bytes, media_type: str) -> dict:
         logger.info("No GEMINI_API_KEY — returning demo analysis")
         return random.choice(DEMO_RESPONSES)
 
+    # Fetch live market context and inject into prompt
+    market_ctx = get_market_context()
+    context_block = format_context_for_prompt(market_ctx)
+    enriched_prompt = SYSTEM_PROMPT + "\n\n" + context_block
+
     try:
         import google.generativeai as genai
         genai.configure(api_key=GEMINI_API_KEY)
         model = genai.GenerativeModel(
             model_name="gemini-1.5-flash",
-            system_instruction=SYSTEM_PROMPT,
+            system_instruction=enriched_prompt,
         )
 
         image_part = {
@@ -164,7 +170,15 @@ def analyze_chart(image_bytes: bytes, media_type: str) -> dict:
         logger.info(f"Gemini response received ({len(response_text)} chars)")
 
         analysis = parse_json_response(response_text)
-        return validate_and_normalize(analysis)
+        result = validate_and_normalize(analysis)
+
+        # Attach live market context to the result for frontend display
+        result["market_context"] = {
+            "session":     market_ctx["session"],
+            "day":         market_ctx["day"],
+            "fear_greed":  market_ctx.get("fear_greed"),
+        }
+        return result
 
     except Exception as e:
         logger.error(f"Gemini analysis error: {e}")

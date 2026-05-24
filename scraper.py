@@ -23,12 +23,41 @@ logger = logging.getLogger(__name__)
 
 # ── Sources to scrape ──────────────────────────────────────────────────────────
 SOURCES = [
+    # ── Original sources ───────────────────────────────────────────────────────
     "https://school.stockcharts.com/doku.php?id=chart_analysis:introduction_to_candlesticks",
+    "https://school.stockcharts.com/doku.php?id=chart_analysis:chart_patterns",
     "https://www.investopedia.com/articles/active-trading/092315/5-most-powerful-candlestick-patterns.asp",
+    "https://www.investopedia.com/trading/candlestick-charting-what-is-it/",
     "https://www.babypips.com/learn/forex/candlestick-cheat-sheet",
+    "https://www.babypips.com/learn/forex/japanese-candlestick-cheat-sheet",
     "https://analyzingalpha.com/candlestick-patterns",
+    "https://analyzingalpha.com/chart-patterns",
     "https://www.candlescanner.com/candlestick-patterns/",
     "https://www.quantifiedstrategies.com/candlestick-patterns/",
+    "https://www.quantifiedstrategies.com/chart-patterns/",
+
+    # ── Barchart education ────────────────────────────────────────────────────
+    "https://www.barchart.com/education/candlestick-patterns",
+    "https://www.barchart.com/education/chart-patterns",
+
+    # ── Finviz ────────────────────────────────────────────────────────────────
+    "https://finviz.com/candlestick-patterns.ashx",
+
+    # ── Investing.com education ───────────────────────────────────────────────
+    "https://www.investing.com/education/candlestick-patterns",
+    "https://www.investing.com/education/chart-patterns",
+
+    # ── StockCharts ChartSchool — specific topics ─────────────────────────────
+    "https://school.stockcharts.com/doku.php?id=chart_analysis:candlestick_pattern_dictionary",
+
+    # ── Smart Money / ICT / SMC educational pages ─────────────────────────────
+    "https://www.babypips.com/learn/forex/smart-money-concepts",
+    "https://analyzingalpha.com/order-block",
+    "https://www.quantifiedstrategies.com/smart-money-concepts/",
+
+    # ── Harmonic patterns ─────────────────────────────────────────────────────
+    "https://www.investopedia.com/terms/h/harmonics.asp",
+    "https://analyzingalpha.com/harmonic-patterns",
 ]
 
 HEADERS = {
