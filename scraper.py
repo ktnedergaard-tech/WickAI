@@ -199,7 +199,6 @@ def run(dry_run: bool = False) -> int:
         logger.error("GEMINI_API_KEY not set — scraper requires AI for extraction")
         return 0
 
-    client = anthropic.Anthropic(api_key="placeholder")  # unused, kept for compat
     existing_names = get_existing_names()
     logger.info(f"Currently {len(existing_names)} patterns in database")
 
@@ -210,7 +209,7 @@ def run(dry_run: bool = False) -> int:
         text = fetch_page(url)
         if not text:
             continue
-        patterns = extract_patterns_from_text(client, text)
+        patterns = extract_patterns_from_text(None, text)
         logger.info(f"  → Extracted {len(patterns)} pattern candidates")
         all_candidates.extend(patterns)
         time.sleep(1)  # polite delay between requests
@@ -222,7 +221,7 @@ def run(dry_run: bool = False) -> int:
     logger.info(f"Total candidates across all sources: {len(all_candidates)}")
 
     # Deduplicate against existing patterns
-    new_patterns = deduplicate(client, existing_names, all_candidates)
+    new_patterns = deduplicate(None, existing_names, all_candidates)
     logger.info(f"New unique patterns after deduplication: {len(new_patterns)}")
 
     if not new_patterns:

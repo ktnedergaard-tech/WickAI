@@ -1015,6 +1015,1152 @@ CANDLESTICK_PATTERNS = {
             "deeper penetration — still requires confirmation before trading."
         ),
     },
+
+    # ── Smart Money Concepts (SMC) — Order Blocks ──────────────────────────────
+
+    "bullish_order_block": {
+        "name": "Bullish Order Block",
+        "type": "bullish",
+        "reliability": 8,
+        "description": (
+            "The last bearish candle before a strong impulse move upward, identified by Smart Money "
+            "Concepts (SMC). Institutional buyers placed large orders at this zone, leaving a price "
+            "footprint. When price returns to this area, it typically finds demand and bounces "
+            "strongly, as institutions defend their original position entries."
+        ),
+        "trade_guidance": (
+            "Enter long when price retraces into the Order Block zone (body of the last bearish "
+            "candle before the impulse). Stop-loss just below the OB low. Target the next liquidity "
+            "pool or previous high. Best used on 15m–4H timeframes with HTF confluence."
+        ),
+    },
+
+    "bearish_order_block": {
+        "name": "Bearish Order Block",
+        "type": "bearish",
+        "reliability": 8,
+        "description": (
+            "The last bullish candle before a strong impulse move downward, identified by SMC. "
+            "Institutional sellers placed large short orders in this zone. When price retraces up "
+            "to this area, supply overwhelms demand and price typically rejects sharply downward, "
+            "repeating the institutional sell pattern."
+        ),
+        "trade_guidance": (
+            "Enter short when price retraces into the Order Block zone (body of the last bullish "
+            "candle before the bearish impulse). Stop-loss just above the OB high. Target the "
+            "previous low or the next demand zone. Combine with bearish BOS for higher confluence."
+        ),
+    },
+
+    "bullish_breaker_block": {
+        "name": "Bullish Breaker Block",
+        "type": "bullish",
+        "reliability": 8,
+        "description": (
+            "A former Bearish Order Block that has been invalidated by a Break of Structure to the "
+            "upside. Once price breaks above the swing high that the bearish OB was protecting, the "
+            "OB 'flips' polarity and becomes a demand zone (Breaker Block). Institutions use this "
+            "level to add to long positions on the retest."
+        ),
+        "trade_guidance": (
+            "Enter long on retracement back to the Breaker Block zone. Stop-loss below the zone. "
+            "Target the next supply zone or liquidity pool above. The BOS confirmation before the "
+            "retest makes this a high-probability setup."
+        ),
+    },
+
+    "bearish_breaker_block": {
+        "name": "Bearish Breaker Block",
+        "type": "bearish",
+        "reliability": 8,
+        "description": (
+            "A former Bullish Order Block that has been invalidated by a Break of Structure to the "
+            "downside. Once price breaks below the swing low the bullish OB was protecting, it "
+            "flips to a supply zone. When price retraces back into this area, sellers re-engage "
+            "strongly, making it a high-confluence short entry zone."
+        ),
+        "trade_guidance": (
+            "Enter short on retracement back into the Breaker Block zone. Stop-loss above the zone. "
+            "Target the next demand zone or equal lows below. Confirm with a bearish BOS and "
+            "lower-timeframe rejection candle at the zone."
+        ),
+    },
+
+    "bullish_mitigation_block": {
+        "name": "Bullish Mitigation Block",
+        "type": "bullish",
+        "reliability": 7,
+        "description": (
+            "A price area where institutional buyers failed to push price higher on the first "
+            "attempt, leaving unfilled orders (unmitigated demand). When price returns to this "
+            "zone, the remaining orders are 'mitigated' (filled), causing a strong bounce. Similar "
+            "to an OB but specifically marks incomplete institutional business."
+        ),
+        "trade_guidance": (
+            "Enter long at the mitigation block zone on a lower-timeframe confirmation candle. "
+            "Stop-loss below the zone. Target the failed swing high from the first attempt. "
+            "Works best when price approaches from below with bullish momentum."
+        ),
+    },
+
+    "bearish_mitigation_block": {
+        "name": "Bearish Mitigation Block",
+        "type": "bearish",
+        "reliability": 7,
+        "description": (
+            "A price area where institutional sellers failed to push price lower on the first "
+            "attempt, leaving unfilled supply orders. When price returns to this zone, the "
+            "remaining sell orders are triggered, causing a sharp rejection downward. Most "
+            "effective after a failed breakdown attempt followed by a retest."
+        ),
+        "trade_guidance": (
+            "Enter short at the mitigation block zone with lower-timeframe confirmation. "
+            "Stop-loss above the zone high. Target the failed swing low or the next demand zone. "
+            "Most effective when combined with a bearish CHOCH or BOS confirmation."
+        ),
+    },
+
+    # ── Smart Money Concepts — Fair Value Gaps (FVG) ───────────────────────────
+
+    "bullish_fvg": {
+        "name": "Bullish Fair Value Gap",
+        "type": "bullish",
+        "reliability": 7,
+        "description": (
+            "A three-candle imbalance where the high of candle 1 and the low of candle 3 do not "
+            "overlap, leaving a gap in price that was skipped in a rapid bullish move. This gap "
+            "represents inefficiency in price delivery and acts as a magnet — price often retraces "
+            "to fill it before continuing the trend. Also called a bullish imbalance zone."
+        ),
+        "trade_guidance": (
+            "Enter long when price retraces into the FVG zone (between candle 1 high and candle 3 "
+            "low). Stop-loss below the FVG bottom. Target the previous high or next imbalance. "
+            "Best used when FVG aligns with an Order Block for confluence."
+        ),
+    },
+
+    "bearish_fvg": {
+        "name": "Bearish Fair Value Gap",
+        "type": "bearish",
+        "reliability": 7,
+        "description": (
+            "A three-candle downward imbalance where the low of candle 1 and the high of candle 3 "
+            "do not overlap, leaving a bearish price gap. Created during rapid institutional selling. "
+            "Price tends to retrace upward to fill this gap before continuing lower. It acts as a "
+            "distribution zone where sellers re-enter."
+        ),
+        "trade_guidance": (
+            "Enter short when price retraces up into the FVG zone. Stop-loss above the FVG top. "
+            "Target the previous low or the next demand zone. High conviction when FVG sits within "
+            "a Bearish Order Block or Breaker Block zone."
+        ),
+    },
+
+    "fvg_continuation": {
+        "name": "FVG Continuation",
+        "type": "neutral",
+        "reliability": 7,
+        "description": (
+            "When price retraces into a Fair Value Gap and then resumes in the original trend "
+            "direction, it confirms the FVG acted as support/resistance and the trend is intact. "
+            "This continuation pattern shows that the imbalance zone absorbed counter-trend "
+            "pressure and institutional order flow remains directionally committed."
+        ),
+        "trade_guidance": (
+            "Enter in trend direction when price touches the FVG zone and shows a rejection "
+            "candle (pin bar, engulfing, or doji). Stop just outside the FVG. Target next "
+            "imbalance zone or swing high/low. Most reliable on higher timeframes (1H, 4H, Daily)."
+        ),
+    },
+
+    "fvg_reversal": {
+        "name": "FVG Reversal",
+        "type": "neutral",
+        "reliability": 6,
+        "description": (
+            "When price aggressively blows through an FVG zone without any pause or rejection, "
+            "it signals a potential reversal of the prevailing trend. This 'violation' of the "
+            "imbalance zone indicates that the opposing institutional force is strong enough to "
+            "override the existing order flow, suggesting a trend change may be underway."
+        ),
+        "trade_guidance": (
+            "Wait for price to fully close through the FVG zone, then look for a structural "
+            "shift (CHOCH) on a lower timeframe. Enter in the new direction on the retest of the "
+            "violated FVG as new S/R. Stop above the entry candle's wick. Requires patience and confirmation."
+        ),
+    },
+
+    "bullish_ifvg": {
+        "name": "Bullish Inverse Fair Value Gap (iFVG)",
+        "type": "bullish",
+        "reliability": 7,
+        "description": (
+            "An FVG that has been violated and flipped — a Bearish FVG that price has broken "
+            "through to the upside, inverting its polarity from resistance to support. The iFVG "
+            "becomes a bullish demand zone on retest, as the institutional order that originally "
+            "caused the bearish imbalance has been absorbed and overcome."
+        ),
+        "trade_guidance": (
+            "Enter long when price retraces back to the iFVG zone after the bullish violation. "
+            "Stop-loss below the iFVG zone. Target the next supply zone or previous high. "
+            "Confirm with a lower-timeframe bullish structure shift before entry."
+        ),
+    },
+
+    "bearish_ifvg": {
+        "name": "Bearish Inverse Fair Value Gap (iFVG)",
+        "type": "bearish",
+        "reliability": 7,
+        "description": (
+            "A Bullish FVG that has been violated to the downside, flipping its polarity from "
+            "support to resistance. The zone that was once a demand imbalance now acts as supply "
+            "on retest. Institutional sell orders have overwhelmed the original buyers, and the "
+            "flipped zone attracts new short entries from smart money."
+        ),
+        "trade_guidance": (
+            "Enter short when price retraces up to the iFVG zone after the bearish violation. "
+            "Stop-loss above the iFVG zone top. Target the previous low or next demand zone. "
+            "Best used when iFVG sits near a Breaker Block or in a clear downtrend structure."
+        ),
+    },
+
+    # ── Smart Money Concepts — Structure ───────────────────────────────────────
+
+    "bullish_bos": {
+        "name": "Bullish Break of Structure (BOS)",
+        "type": "bullish",
+        "reliability": 8,
+        "description": (
+            "Price breaks above a previous swing high in an existing uptrend, confirming trend "
+            "continuation. The BOS signals that buyers have overcome supply at a key resistance "
+            "level and are establishing higher highs. In SMC, a BOS in an uptrend indicates "
+            "institutional accumulation and momentum continuation."
+        ),
+        "trade_guidance": (
+            "Enter long on the retest of the broken swing high (now acting as support) or the "
+            "FVG/OB left behind during the impulse. Stop-loss below the retest low. Target the "
+            "next liquidity pool above. Best combined with bullish OB or FVG confluence."
+        ),
+    },
+
+    "bearish_bos": {
+        "name": "Bearish Break of Structure (BOS)",
+        "type": "bearish",
+        "reliability": 8,
+        "description": (
+            "Price breaks below a previous swing low in an existing downtrend, confirming bearish "
+            "trend continuation. Indicates institutional distribution is ongoing and sellers are "
+            "successfully pushing price to new lows. Each BOS lower represents a new wave of "
+            "smart money selling pressure."
+        ),
+        "trade_guidance": (
+            "Enter short on the retest of the broken swing low (now acting as resistance) or the "
+            "bearish OB/FVG from the impulse move. Stop-loss above the retest high. Target the "
+            "next demand zone or equal lows below."
+        ),
+    },
+
+    "bullish_choch": {
+        "name": "Bullish Change of Character (CHOCH)",
+        "type": "bullish",
+        "reliability": 8,
+        "description": (
+            "In a downtrend, price breaks above the most recent swing high for the first time, "
+            "signaling a potential trend reversal from bearish to bullish. The CHOCH is the first "
+            "sign that institutional buyers have stepped in and taken control, disrupting the "
+            "previous lower-high, lower-low sequence. Distinct from BOS — it signals a new trend, not continuation."
+        ),
+        "trade_guidance": (
+            "Enter long on the retest of the CHOCH level or the bullish OB/FVG created during "
+            "the CHOCH impulse. Stop-loss below the swing low that preceded the CHOCH. Target "
+            "the next major supply zone. Lower timeframe confirmation strongly recommended."
+        ),
+    },
+
+    "bearish_choch": {
+        "name": "Bearish Change of Character (CHOCH)",
+        "type": "bearish",
+        "reliability": 8,
+        "description": (
+            "In an uptrend, price breaks below the most recent swing low for the first time, "
+            "signaling a potential trend reversal from bullish to bearish. The CHOCH indicates "
+            "that institutional sellers have overcome buying pressure and initiated distribution. "
+            "It is the critical first signal that the bullish trend structure has been broken."
+        ),
+        "trade_guidance": (
+            "Enter short on the retest of the CHOCH level or the bearish OB/FVG from the impulse. "
+            "Stop-loss above the swing high that preceded the CHOCH. Target the next major demand "
+            "zone. Use lower timeframe structure to fine-tune entry for better risk-reward."
+        ),
+    },
+
+    # ── Liquidity Concepts ─────────────────────────────────────────────────────
+
+    "bullish_liquidity_sweep": {
+        "name": "Bullish Liquidity Sweep",
+        "type": "bullish",
+        "reliability": 8,
+        "description": (
+            "Price briefly dips below a key swing low or support level, triggering stop-losses "
+            "and buy-stop orders from retail traders, then rapidly reverses upward. Smart money "
+            "uses this sweep to accumulate long positions at better prices by hunting the liquidity "
+            "resting below the obvious support level."
+        ),
+        "trade_guidance": (
+            "Enter long when price sweeps below the key level and the candle closes back above it "
+            "(a wick below the level with bullish close). Stop-loss below the sweep wick low. "
+            "Target the previous high or next supply zone. Best at equal lows or marked support."
+        ),
+    },
+
+    "bearish_liquidity_sweep": {
+        "name": "Bearish Liquidity Sweep",
+        "type": "bearish",
+        "reliability": 8,
+        "description": (
+            "Price briefly spikes above a key swing high or resistance level, triggering stop-losses "
+            "and sell-stop orders, then rapidly reverses downward. Institutions use this move to "
+            "distribute (sell) large positions at inflated prices using retail stop orders as "
+            "liquidity. The sweep above resistance is a trap for breakout buyers."
+        ),
+        "trade_guidance": (
+            "Enter short when price sweeps above the key level and closes back below it (a wick "
+            "above with bearish close). Stop-loss above the sweep wick high. Target the previous "
+            "low or next demand zone. Most powerful at equal highs or marked resistance levels."
+        ),
+    },
+
+    "double_liquidity_sweep": {
+        "name": "Double Liquidity Sweep",
+        "type": "neutral",
+        "reliability": 9,
+        "description": (
+            "Price sweeps liquidity on both sides of a range — first triggering stops below a "
+            "support, then sweeping above a resistance (or vice versa) before making a decisive "
+            "directional move. This double sweep clears all resting orders on both sides, giving "
+            "institutions a clean order book for a high-velocity directional move."
+        ),
+        "trade_guidance": (
+            "After both sides have been swept, enter in the direction of the final rejection with "
+            "high conviction. Stop beyond the extreme of the final sweep. Target a move equal to "
+            "the full range of the double sweep. One of the highest-probability SMC setups."
+        ),
+    },
+
+    "bullish_liquidity_grab": {
+        "name": "Bullish Liquidity Grab",
+        "type": "bullish",
+        "reliability": 7,
+        "description": (
+            "A sharp wick below a support zone that briefly touches resting buy orders and "
+            "stop-losses before snapping back. The grab is typically quick — one or two candles — "
+            "and shows up as a long lower wick on a key level. Institutions are filling long "
+            "orders by triggering retail stop-losses as the sell side of their trade."
+        ),
+        "trade_guidance": (
+            "Enter long when the candle with the long lower wick closes above the support level. "
+            "Stop-loss below the wick low. Target the nearest resistance. Combine with an Order "
+            "Block or FVG for highest conviction."
+        ),
+    },
+
+    "bearish_liquidity_grab": {
+        "name": "Bearish Liquidity Grab",
+        "type": "bearish",
+        "reliability": 7,
+        "description": (
+            "A sharp wick above a resistance zone that touches resting sell orders and buy stop-losses "
+            "before reversing down. Appears as a long upper wick at a key level. Institutions "
+            "distribute (sell) large positions using the retail momentum above the obvious resistance, "
+            "then push price sharply lower after the grab."
+        ),
+        "trade_guidance": (
+            "Enter short when the grabbing candle closes back below the resistance level. "
+            "Stop-loss above the wick high. Target the nearest support or swing low. "
+            "Best executed on 15m or 1H chart with HTF structure alignment."
+        ),
+    },
+
+    "equal_highs_sweep": {
+        "name": "Equal Highs Sweep",
+        "type": "bearish",
+        "reliability": 8,
+        "description": (
+            "Two or more swing highs at approximately the same price level create visible "
+            "buy-stop liquidity. Smart money pushes price slightly above these equal highs to "
+            "collect the resting orders, then sells aggressively into that liquidity. Equal highs "
+            "are a major SMC concept — they signal a probable manipulation zone."
+        ),
+        "trade_guidance": (
+            "Enter short after price wicks above the equal highs and closes back below them. "
+            "Stop-loss above the wick high. Target the range low or next demand zone. "
+            "A bearish engulfing or pin bar at the sweep adds significant confidence."
+        ),
+    },
+
+    "equal_lows_sweep": {
+        "name": "Equal Lows Sweep",
+        "type": "bullish",
+        "reliability": 8,
+        "description": (
+            "Two or more swing lows at approximately the same price level create visible "
+            "sell-stop liquidity below. Institutions push price below these equal lows to trigger "
+            "retail stop-losses and collect sell-side orders, then buy aggressively. Equal lows "
+            "on any timeframe are a high-probability accumulation target."
+        ),
+        "trade_guidance": (
+            "Enter long after price wicks below the equal lows and closes back above them. "
+            "Stop-loss below the wick low. Target the range high or next supply zone. "
+            "Combine with a bullish OB or FVG near the equal lows for maximum confluence."
+        ),
+    },
+
+    "high_sweep_drop": {
+        "name": "High Sweep + Drop",
+        "type": "bearish",
+        "reliability": 8,
+        "description": (
+            "Price sweeps above a previous significant high (taking out buy stops), then "
+            "immediately reverses and drops sharply. The sweep is followed by a strong bearish "
+            "impulse that often breaks the structure below. This is a classic SMC trap: "
+            "retail traders buy the breakout; smart money sells into that buying pressure."
+        ),
+        "trade_guidance": (
+            "Enter short when the sweeping candle closes below the swept high level. Aggressive "
+            "entry: on the close of the sweep candle. Conservative: on the retest of the swept "
+            "level from below. Stop above the sweep wick. Target the previous low or -1R minimum."
+        ),
+    },
+
+    "low_sweep_rally": {
+        "name": "Low Sweep + Rally",
+        "type": "bullish",
+        "reliability": 8,
+        "description": (
+            "Price sweeps below a previous significant low (triggering sell stops), then "
+            "immediately reverses and rallies strongly. Retail sellers who shorted the breakdown "
+            "get squeezed as price reverses. This is the bullish version of the SMC liquidity "
+            "hunt — institutions accumulate longs at discount prices using retail stops as fuel."
+        ),
+        "trade_guidance": (
+            "Enter long when the sweeping candle closes above the swept low level. Stop below "
+            "the wick low. Target the previous high or a measured move equal to the pre-sweep "
+            "range. Best at key daily/weekly lows with bullish higher-timeframe structure."
+        ),
+    },
+
+    # ── Price Action Setups ────────────────────────────────────────────────────
+
+    "bullish_pin_bar": {
+        "name": "Bullish Pin Bar",
+        "type": "bullish",
+        "reliability": 8,
+        "description": (
+            "A single candle with a small body near the top and a long lower wick (at least 2x "
+            "the body length). The long lower tail shows price was aggressively rejected from lower "
+            "levels — sellers pushed price down but buyers reclaimed nearly all the losses. "
+            "Most powerful at key support levels, demand zones, or SMC structures."
+        ),
+        "trade_guidance": (
+            "Enter long above the high of the pin bar. Stop-loss below the wick low. "
+            "Target the nearest resistance or the next swing high. Risk-reward is naturally "
+            "favorable due to the tight stop. Add confluence with OB, FVG, or trendline support."
+        ),
+    },
+
+    "bearish_pin_bar": {
+        "name": "Bearish Pin Bar",
+        "type": "bearish",
+        "reliability": 8,
+        "description": (
+            "A single candle with a small body near the bottom and a long upper wick (at least 2x "
+            "the body length). The extended upper tail signals a sharp rejection from higher prices — "
+            "buyers pushed price up but sellers overwhelmed them and drove it back down. Most "
+            "significant at resistance zones, supply areas, or after liquidity sweeps of highs."
+        ),
+        "trade_guidance": (
+            "Enter short below the low of the pin bar. Stop-loss above the wick high. "
+            "Target the nearest support or swing low. A bearish pin bar at a swept high or "
+            "Order Block is one of the highest-probability entries in price action trading."
+        ),
+    },
+
+    "bullish_inside_bar": {
+        "name": "Bullish Inside Bar",
+        "type": "bullish",
+        "reliability": 7,
+        "description": (
+            "A candle whose high and low are entirely within the range of the prior (mother) candle, "
+            "appearing in an uptrend or at a support level. The inside bar signals consolidation and "
+            "compressed volatility before continuation. A bullish breakout above the mother bar's "
+            "high confirms the pattern and signals trend resumption."
+        ),
+        "trade_guidance": (
+            "Enter long on a break above the mother bar's high. Stop-loss below the inside bar's "
+            "low (tight stop) or below the mother bar's low (wider). Target the next resistance. "
+            "Works best as a continuation setup in established uptrends."
+        ),
+    },
+
+    "bearish_inside_bar": {
+        "name": "Bearish Inside Bar",
+        "type": "bearish",
+        "reliability": 7,
+        "description": (
+            "A candle whose range is fully contained within the prior (mother) candle, in a "
+            "downtrend or at a resistance level. Represents consolidation within the dominant "
+            "bearish move. A break below the mother bar's low triggers the bearish continuation "
+            "signal as the compressed energy releases to the downside."
+        ),
+        "trade_guidance": (
+            "Enter short on a break below the mother bar's low. Stop-loss above the inside bar's "
+            "high. Target the next support zone or a measured move equal to the mother bar's range. "
+            "Most reliable in strong downtrends — avoid trading against the higher timeframe trend."
+        ),
+    },
+
+    "outside_bar": {
+        "name": "Outside Bar",
+        "type": "neutral",
+        "reliability": 6,
+        "description": (
+            "A candle whose high is above and low is below the prior candle, fully engulfing it "
+            "on both sides. Also called an 'Engulfing Bar' in price action trading. It represents "
+            "a volatility expansion and can signal either reversal or continuation depending on "
+            "where it appears. Direction is determined by the outside bar's close relative to the prior bar."
+        ),
+        "trade_guidance": (
+            "Trade in the direction of the outside bar's close. Enter on a break of the outside "
+            "bar's high (bullish) or low (bearish). Stop on the opposite extreme of the outside bar. "
+            "Filter using trend direction and key S/R levels — avoid trading in choppy ranges."
+        ),
+    },
+
+    "rejection_setup": {
+        "name": "Rejection Setup",
+        "type": "neutral",
+        "reliability": 7,
+        "description": (
+            "Price tests a key level (support, resistance, trendline, OB, or FVG) and is sharply "
+            "rejected, showing clear inability to sustain the move beyond that level. The rejection "
+            "appears as a long wick or an engulfing candle at the zone. Direction depends on which "
+            "level is being rejected — bullish at support, bearish at resistance."
+        ),
+        "trade_guidance": (
+            "Enter in the direction of the rejection when the rejecting candle closes. Stop beyond "
+            "the extreme of the rejection wick. Target the opposite key level. Strongest when the "
+            "rejection aligns with an SMC structure (OB, FVG, CHOCH) on a higher timeframe."
+        ),
+    },
+
+    "break_and_retest": {
+        "name": "Break and Retest",
+        "type": "neutral",
+        "reliability": 8,
+        "description": (
+            "Price breaks through a key support or resistance level with conviction, then pulls "
+            "back to retest the broken level (now acting as flipped S/R) before continuing in the "
+            "breakout direction. One of the most classic and reliable price action setups across "
+            "all timeframes and markets. Institutions often initiate positions during the retest."
+        ),
+        "trade_guidance": (
+            "Enter on the retest of the broken level. For bullish: enter long when price bounces "
+            "from the broken resistance (now support). For bearish: enter short when price rejects "
+            "the broken support (now resistance). Stop beyond the retest level. Target 1.5-3x risk."
+        ),
+    },
+
+    "support_rejection": {
+        "name": "Support Rejection",
+        "type": "bullish",
+        "reliability": 7,
+        "description": (
+            "Price reaches a well-defined support level and shows clear rejection with a long lower "
+            "wick or bullish reversal candle. The support has been tested and held, confirming "
+            "demand is present at that price. Multiple successful tests of the same support level "
+            "increase the reliability of the next rejection."
+        ),
+        "trade_guidance": (
+            "Enter long when the rejection candle closes above the support level. Stop-loss just "
+            "below the rejection wick or the support zone. Target the nearest resistance. "
+            "Add a second position after a pullback confirms the support holds."
+        ),
+    },
+
+    "resistance_rejection": {
+        "name": "Resistance Rejection",
+        "type": "bearish",
+        "reliability": 7,
+        "description": (
+            "Price reaches a key resistance level and is sharply rejected with a long upper wick "
+            "or bearish reversal candle. The resistance holds as supply overwhelms demand at that "
+            "price. Previous rejections from the same zone increase pattern reliability and often "
+            "result in faster, larger moves on subsequent rejections."
+        ),
+        "trade_guidance": (
+            "Enter short when the rejection candle closes below the resistance level. Stop-loss "
+            "above the wick high. Target the nearest support or the prior swing low. "
+            "Works best when resistance aligns with a Bearish OB, FVG, or equal highs."
+        ),
+    },
+
+    "trendline_support": {
+        "name": "Trendline Support",
+        "type": "bullish",
+        "reliability": 7,
+        "description": (
+            "Price touches a well-defined ascending trendline (connecting at least two swing lows) "
+            "and bounces, confirming the trendline as dynamic support. Each successful test of the "
+            "trendline provides a buying opportunity in the direction of the trend. The more times "
+            "the trendline has been tested, the more significant the next touch."
+        ),
+        "trade_guidance": (
+            "Enter long when price touches the trendline and forms a rejection candle (pin bar, "
+            "engulfing). Stop-loss below the trendline. Target the upper channel boundary or the "
+            "prior swing high. Never trade a first-touch trendline — require at least two confirmed touches."
+        ),
+    },
+
+    "trendline_resistance": {
+        "name": "Trendline Resistance",
+        "type": "bearish",
+        "reliability": 7,
+        "description": (
+            "Price touches a well-defined descending trendline (connecting at least two swing highs) "
+            "and is rejected, confirming the trendline as dynamic resistance. Each failed attempt "
+            "to break the trendline reinforces seller confidence. A bearish candle at the trendline "
+            "provides a high-probability short entry in the downtrend."
+        ),
+        "trade_guidance": (
+            "Enter short when price touches the trendline and shows a bearish rejection candle. "
+            "Stop-loss above the trendline. Target the lower channel boundary or prior swing low. "
+            "Trendline breaks should be treated as a separate setup, not traded as resistance bounces."
+        ),
+    },
+
+    # ── Chart Patterns ─────────────────────────────────────────────────────────
+
+    "head_and_shoulders": {
+        "name": "Head and Shoulders",
+        "type": "bearish",
+        "reliability": 8,
+        "description": (
+            "A three-peak bearish reversal pattern: a left shoulder (moderate high), a head "
+            "(higher high), and a right shoulder (lower high that matches the left shoulder). "
+            "The neckline connects the two lows between the peaks. A close below the neckline "
+            "triggers the pattern and signals a major trend reversal from bullish to bearish."
+        ),
+        "trade_guidance": (
+            "Enter short on a confirmed close below the neckline. Stop-loss above the right "
+            "shoulder's high. Measured target: subtract the head-to-neckline distance from the "
+            "neckline breakout point. A retest of the neckline as resistance provides a second "
+            "lower-risk entry opportunity."
+        ),
+    },
+
+    "inverse_head_and_shoulders": {
+        "name": "Inverse Head and Shoulders",
+        "type": "bullish",
+        "reliability": 8,
+        "description": (
+            "A three-trough bullish reversal: a left shoulder (moderate low), a head (lower low), "
+            "and a right shoulder (higher low matching the left). The neckline connects the two "
+            "highs between the troughs. A close above the neckline signals a major reversal from "
+            "bearish to bullish. Volume typically increases on the right shoulder and breakout."
+        ),
+        "trade_guidance": (
+            "Enter long on a confirmed close above the neckline. Stop-loss below the right "
+            "shoulder's low. Measured target: add the head-to-neckline distance to the neckline "
+            "breakout point. A neckline retest as support offers a lower-risk entry."
+        ),
+    },
+
+    "double_top": {
+        "name": "Double Top",
+        "type": "bearish",
+        "reliability": 8,
+        "description": (
+            "Two peaks at approximately the same price level separated by a trough, forming an 'M' "
+            "shape. The second top failing to exceed the first signals buyer exhaustion at that "
+            "level. Confirmation occurs when price breaks below the trough (the neckline) between "
+            "the two peaks, signaling a potential trend reversal to bearish."
+        ),
+        "trade_guidance": (
+            "Enter short on a confirmed break below the neckline between the two tops. Stop-loss "
+            "above the second top. Measured target: the distance from the tops to the neckline "
+            "subtracted from the breakout point. Volume should contract on the second top and "
+            "expand on the neckline break."
+        ),
+    },
+
+    "double_bottom": {
+        "name": "Double Bottom",
+        "type": "bullish",
+        "reliability": 8,
+        "description": (
+            "Two troughs at approximately the same price level separated by a peak, forming a 'W' "
+            "shape. The second bottom holding at the same level as the first signals strong demand. "
+            "Confirmation occurs when price breaks above the peak between the two lows. One of the "
+            "most commonly traded and reliable bullish reversal patterns."
+        ),
+        "trade_guidance": (
+            "Enter long on a confirmed break above the neckline (the peak between the two bottoms). "
+            "Stop-loss below the second bottom. Measured target: add the distance from the bottoms "
+            "to the neckline to the breakout point. Volume confirmation on the neckline break is key."
+        ),
+    },
+
+    "triple_top": {
+        "name": "Triple Top",
+        "type": "bearish",
+        "reliability": 8,
+        "description": (
+            "Three successive peaks at approximately the same price level, showing that price "
+            "has repeatedly failed to break through resistance. After three failed attempts, "
+            "sellers gain the upper hand and a breakdown below the support between the peaks "
+            "confirms a bearish reversal. More reliable than a Double Top due to the triple "
+            "rejection confirmation."
+        ),
+        "trade_guidance": (
+            "Enter short on a break below the lows between the three peaks. Stop-loss above the "
+            "highest peak. Measured target: the height of the pattern subtracted from the "
+            "breakdown point. The triple rejection is a strong signal — target larger than a Double Top."
+        ),
+    },
+
+    "triple_bottom": {
+        "name": "Triple Bottom",
+        "type": "bullish",
+        "reliability": 8,
+        "description": (
+            "Three successive troughs at approximately the same price level, showing strong "
+            "demand consistently absorbing selling at that zone. After the third test of support, "
+            "a breakout above the resistance between the troughs confirms a bullish reversal. "
+            "The triple support test indicates a major accumulation zone."
+        ),
+        "trade_guidance": (
+            "Enter long on a break above the highs between the three troughs. Stop-loss below the "
+            "lowest trough. Measured target: the height of the pattern added to the breakout point. "
+            "Volume should spike on the breakout to confirm institutional participation."
+        ),
+    },
+
+    "symmetrical_triangle": {
+        "name": "Symmetrical Triangle",
+        "type": "neutral",
+        "reliability": 7,
+        "description": (
+            "A consolidation pattern with converging trendlines — lower highs and higher lows — "
+            "forming a symmetric triangle. Both buyers and sellers compress into an equilibrium. "
+            "The breakout direction determines trade bias; typically resolves in the direction of "
+            "the prior trend. Volume contracts during formation and expands on breakout."
+        ),
+        "trade_guidance": (
+            "Trade the breakout: enter long above the upper trendline or short below the lower "
+            "trendline. Stop on the opposite trendline. Target: width of the triangle's widest "
+            "point added to the breakout. Beware of false breakouts — wait for a close beyond the line."
+        ),
+    },
+
+    "ascending_triangle": {
+        "name": "Ascending Triangle",
+        "type": "bullish",
+        "reliability": 8,
+        "description": (
+            "A bullish consolidation pattern with a flat upper resistance (equal highs) and a "
+            "rising lower trendline (higher lows). Buyers are becoming more aggressive, willing "
+            "to buy at higher prices, while sellers defend a fixed level. Eventually buyers "
+            "overpower sellers and price breaks out above the flat resistance."
+        ),
+        "trade_guidance": (
+            "Enter long on a confirmed close above the flat resistance level. Stop-loss below the "
+            "most recent higher low. Measured target: height of the triangle's widest left side "
+            "added to the breakout level. Volume expansion on the breakout is a strong confirmation signal."
+        ),
+    },
+
+    "descending_triangle": {
+        "name": "Descending Triangle",
+        "type": "bearish",
+        "reliability": 8,
+        "description": (
+            "A bearish consolidation with a flat lower support (equal lows) and a descending upper "
+            "trendline (lower highs). Sellers are becoming increasingly aggressive at lower levels "
+            "while buyers defend a fixed support. Eventually sellers break through the floor and "
+            "price collapses below the flat support."
+        ),
+        "trade_guidance": (
+            "Enter short on a confirmed close below the flat support level. Stop-loss above the "
+            "most recent lower high. Measured target: height of the triangle's widest point "
+            "subtracted from the breakout level. Declining volume into the breakout confirms seller dominance."
+        ),
+    },
+
+    "rectangle_breakout": {
+        "name": "Rectangle Breakout",
+        "type": "neutral",
+        "reliability": 7,
+        "description": (
+            "Price consolidates between a flat support and a flat resistance, forming a rectangle "
+            "or range. Multiple tests of both levels compress price before a breakout. The "
+            "breakout direction determines trade bias — bullish breakout above resistance, bearish "
+            "below support. Volume typically spikes significantly on the breakout candle."
+        ),
+        "trade_guidance": (
+            "Enter in the direction of the breakout. Stop on the opposite side of the rectangle. "
+            "Measured target: height of the rectangle added to the breakout level. A retest of "
+            "the broken level as S/R flip offers a second, lower-risk entry."
+        ),
+    },
+
+    "bullish_flag": {
+        "name": "Bullish Flag",
+        "type": "bullish",
+        "reliability": 8,
+        "description": (
+            "A bullish continuation: a sharp vertical rally (the flagpole) followed by a brief "
+            "downward-sloping channel (the flag) representing a controlled pullback. The flag "
+            "shows sellers testing the move but failing to reverse it. A breakout above the upper "
+            "flag boundary signals continuation with a measured move equal to the flagpole."
+        ),
+        "trade_guidance": (
+            "Enter long on a breakout above the upper channel boundary of the flag. Stop-loss "
+            "below the lower flag boundary. Target: add the flagpole length to the breakout point. "
+            "High volume on the flagpole and contracting volume in the flag confirm the pattern."
+        ),
+    },
+
+    "bearish_flag": {
+        "name": "Bearish Flag",
+        "type": "bearish",
+        "reliability": 8,
+        "description": (
+            "A bearish continuation: a sharp vertical decline (flagpole) followed by a brief "
+            "upward-sloping channel (flag) representing a shallow counter-trend bounce. Buyers "
+            "are unable to reverse the trend — the pullback is weak relative to the drop. "
+            "A breakdown below the lower flag boundary confirms continuation."
+        ),
+        "trade_guidance": (
+            "Enter short on a breakout below the lower channel boundary. Stop-loss above the "
+            "upper flag boundary. Target: subtract the flagpole length from the breakdown point. "
+            "Contracting volume during the flag and expanding on breakdown is the ideal volume profile."
+        ),
+    },
+
+    "bullish_pennant": {
+        "name": "Bullish Pennant",
+        "type": "bullish",
+        "reliability": 8,
+        "description": (
+            "Similar to the Bullish Flag but with converging trendlines forming a symmetrical "
+            "triangle instead of a parallel channel. A strong rally (flagpole) is followed by "
+            "a tight symmetrical consolidation as price compresses. The breakout above the upper "
+            "trendline signals continuation with a measured move equal to the flagpole."
+        ),
+        "trade_guidance": (
+            "Enter long on breakout above the pennant's upper trendline. Stop below the pennant's "
+            "lower trendline. Target: flagpole length added to the breakout point. Volume should "
+            "contract sharply during the pennant and surge on the breakout."
+        ),
+    },
+
+    "bearish_pennant": {
+        "name": "Bearish Pennant",
+        "type": "bearish",
+        "reliability": 8,
+        "description": (
+            "A bearish continuation: a sharp drop (flagpole) followed by a symmetrical converging "
+            "consolidation. Price compresses into a triangle as bulls and bears reach temporary "
+            "equilibrium. A breakdown below the lower trendline signals continuation of the "
+            "downtrend with a measured move equal to the flagpole."
+        ),
+        "trade_guidance": (
+            "Enter short on breakdown below the pennant's lower trendline. Stop above the pennant's "
+            "upper trendline. Target: flagpole length subtracted from the breakdown point. "
+            "Sharp volume contraction during the pennant and expansion on breakdown is ideal."
+        ),
+    },
+
+    "cup_and_handle": {
+        "name": "Cup and Handle",
+        "type": "bullish",
+        "reliability": 8,
+        "description": (
+            "A bullish continuation pattern: a rounded bottom forming a U-shape (the cup) followed "
+            "by a small downward drift channel (the handle). The cup represents a gradual recovery "
+            "from a decline, and the handle is a brief consolidation before breakout. The handle "
+            "should not retrace more than one-third of the cup's depth."
+        ),
+        "trade_guidance": (
+            "Enter long on a breakout above the handle's resistance (the rim of the cup). "
+            "Stop-loss below the handle's low. Measured target: depth of the cup added to the "
+            "breakout point. A volume surge on the breakout above the rim is a strong confirmation."
+        ),
+    },
+
+    "rising_wedge": {
+        "name": "Rising Wedge",
+        "type": "bearish",
+        "reliability": 8,
+        "description": (
+            "A bearish reversal or continuation pattern: price moves between two upward-sloping "
+            "converging trendlines. Higher highs and higher lows narrow into a wedge as buyers "
+            "lose conviction. Despite the apparent uptrend, the pattern resolves bearishly — "
+            "price breaks down through the lower trendline and often falls sharply."
+        ),
+        "trade_guidance": (
+            "Enter short on a confirmed close below the lower trendline. Stop above the last "
+            "swing high within the wedge. Target: the start of the wedge pattern. Watch for "
+            "volume declining as the wedge forms and expanding on the breakdown."
+        ),
+    },
+
+    "falling_wedge": {
+        "name": "Falling Wedge",
+        "type": "bullish",
+        "reliability": 8,
+        "description": (
+            "A bullish reversal or continuation pattern: price declines between two downward-sloping "
+            "converging trendlines. Lower highs and lower lows narrow into a wedge but with "
+            "diminishing momentum. Despite the apparent downtrend, the resolution is typically "
+            "bullish — price breaks upward through the upper trendline."
+        ),
+        "trade_guidance": (
+            "Enter long on a confirmed close above the upper trendline. Stop below the last "
+            "swing low within the wedge. Target: the start of the wedge. Volume contraction "
+            "during the wedge and a strong surge on the breakout are the key confirmation signals."
+        ),
+    },
+
+    "channel_up": {
+        "name": "Channel Up",
+        "type": "bullish",
+        "reliability": 7,
+        "description": (
+            "Price moves within two upward-sloping parallel trendlines, creating a rising channel. "
+            "The lower trendline acts as support and the upper as resistance. Traders can buy at "
+            "the lower channel boundary (support bounce) or prepare for a short if price "
+            "overextends to the upper boundary. A breakout above the channel signals acceleration."
+        ),
+        "trade_guidance": (
+            "For channel trading: enter long at the lower trendline support, stop below the channel. "
+            "Target the upper channel boundary. For a breakout trade: enter long above the upper "
+            "trendline. A channel breakdown (close below the lower trendline) signals trend reversal."
+        ),
+    },
+
+    "channel_down": {
+        "name": "Channel Down",
+        "type": "bearish",
+        "reliability": 7,
+        "description": (
+            "Price moves within two downward-sloping parallel trendlines forming a declining channel. "
+            "The upper trendline acts as resistance and the lower as support. Sellers dominate "
+            "and each rally is sold at the upper boundary. A breakout above the upper trendline "
+            "signals a potential reversal while breakdowns below the lower signal acceleration."
+        ),
+        "trade_guidance": (
+            "For channel trading: enter short at the upper trendline resistance, stop above channel. "
+            "Target the lower boundary. For reversal: enter long on a close above the upper "
+            "trendline. A channel breakdown (close below the lower trendline) signals trend continuation."
+        ),
+    },
+
+    # ── Harmonic Patterns ──────────────────────────────────────────────────────
+
+    "bat_pattern": {
+        "name": "Bat Pattern (Harmonic)",
+        "type": "neutral",
+        "reliability": 8,
+        "description": (
+            "A harmonic reversal pattern using Fibonacci ratios: a sharp move (XA), a retracement "
+            "to B (38.2%-50% of XA), an extension to C (38.2%-88.6% of AB), and a retracement to "
+            "D at 88.6% of XA — the Potential Reversal Zone (PRZ). Defined by Scott Carney, "
+            "the Bat has one of the highest success rates of all harmonic patterns."
+        ),
+        "trade_guidance": (
+            "Enter at point D (88.6% Fibonacci retracement of XA). Stop beyond point X. "
+            "Bullish Bat: enter long at D, target C then A. Bearish Bat: enter short at D, "
+            "target C then A. Use the 88.6% level as the tight stop zone for excellent R:R."
+        ),
+    },
+
+    "gartley_pattern": {
+        "name": "Gartley Pattern (Harmonic)",
+        "type": "neutral",
+        "reliability": 8,
+        "description": (
+            "The original harmonic pattern from H.M. Gartley's 1935 book. Structure: XA move, "
+            "B retraces 61.8% of XA, C retraces 38.2%-88.6% of AB, D completes at 78.6% of XA "
+            "— the Potential Reversal Zone. The Gartley is considered the 'perfect' harmonic "
+            "pattern and offers a well-defined PRZ with excellent risk-reward."
+        ),
+        "trade_guidance": (
+            "Enter at the D point (78.6% Fibonacci retracement of XA). Stop beyond X. "
+            "Bullish Gartley: long at D, target C (38.2% extension) then A. "
+            "Bearish Gartley: short at D, same targets inverted. Risk is defined by the X point."
+        ),
+    },
+
+    "butterfly_pattern": {
+        "name": "Butterfly Pattern (Harmonic)",
+        "type": "neutral",
+        "reliability": 7,
+        "description": (
+            "A harmonic reversal discovered by Bryce Gilmore: XA move, B retraces 78.6% of XA, "
+            "C retraces 38.2%-88.6% of AB, D extends to 127.2%-161.8% of XA — beyond point X. "
+            "Unlike other harmonics, the Butterfly completes beyond the origin of the pattern, "
+            "often marking extreme exhaustion moves and major reversal points."
+        ),
+        "trade_guidance": (
+            "Enter at the D point (127.2% or 161.8% extension of XA). Stop beyond D's extreme. "
+            "Bullish Butterfly: long at D, target 38.2%-61.8% retracement of the CD leg. "
+            "Bearish Butterfly: short at D with same targets inverted. Tightest stop of all harmonics."
+        ),
+    },
+
+    "crab_pattern": {
+        "name": "Crab Pattern (Harmonic)",
+        "type": "neutral",
+        "reliability": 8,
+        "description": (
+            "Discovered by Scott Carney, the Crab pattern features the most extreme extension: "
+            "XA move, B retraces 38.2%-61.8% of XA, C retraces 38.2%-88.6% of AB, D extends "
+            "to 161.8% of XA — the largest extension of any harmonic. Carney considers it the "
+            "most precise harmonic pattern with the tightest PRZ."
+        ),
+        "trade_guidance": (
+            "Enter at the D point (161.8% extension of XA). Stop: just beyond D's extreme. "
+            "Bullish Crab: long at D, target 38.2%-61.8% of CD. Bearish Crab: short with same "
+            "targets inverted. The 161.8% completion requires patience but yields excellent R:R "
+            "when the PRZ holds."
+        ),
+    },
+
+    # ── Market Structure & Momentum ────────────────────────────────────────────
+
+    "impulse_move": {
+        "name": "Impulse Move",
+        "type": "neutral",
+        "reliability": 7,
+        "description": (
+            "A sharp, fast, high-momentum price move in one direction with minimal overlapping "
+            "candles and little retracement. Impulse moves represent strong institutional order "
+            "flow and often leave behind Fair Value Gaps and Order Blocks. Following an impulse, "
+            "price typically retraces to fill imbalances before the next impulsive leg."
+        ),
+        "trade_guidance": (
+            "Do not chase impulse moves. Instead, wait for the retracement phase and identify "
+            "FVGs or OBs left by the impulse for entry. Enter at the imbalance zone in the "
+            "direction of the impulse. Stop below the origin of the impulse move."
+        ),
+    },
+
+    "correction_move": {
+        "name": "Correction Move",
+        "type": "neutral",
+        "reliability": 6,
+        "description": (
+            "A controlled, overlapping pullback against the dominant trend following an impulse "
+            "move. Corrections are characterized by slow, choppy price action with many overlapping "
+            "candles. They serve to fill imbalances, retest OBs/FVGs, and reset oscillators "
+            "before the trend resumes. Corrections should be traded carefully or avoided entirely."
+        ),
+        "trade_guidance": (
+            "Avoid entering in the direction of the correction. Instead, use the correction to "
+            "identify entry zones in the direction of the impulse. Wait for the correction to "
+            "reach a key level (OB, FVG, Fibonacci) then look for reversal signals to join the "
+            "main trend."
+        ),
+    },
+
+    "v_shape_recovery": {
+        "name": "V-Shape Recovery",
+        "type": "bullish",
+        "reliability": 7,
+        "description": (
+            "A sharp decline followed immediately by an equally sharp recovery forming a 'V' shape, "
+            "with no consolidation at the bottom. The violent reversal shows extreme sentiment "
+            "change — panic selling is instantly overwhelmed by aggressive buying. Often triggered "
+            "by news events, liquidity sweeps, or a major support level being aggressively defended."
+        ),
+        "trade_guidance": (
+            "Difficult to enter at the bottom of a V-shape in real time. Best approach: "
+            "enter on the first pullback after the recovery leg, at the initial rally's FVG or OB. "
+            "Stop below the V-shape low. Target the next resistance. Avoid chasing if already "
+            "extended significantly from the low."
+        ),
+    },
+
+    "contracting_range": {
+        "name": "Contracting Range",
+        "type": "neutral",
+        "reliability": 6,
+        "description": (
+            "Price oscillates between support and resistance with each successive swing making "
+            "a lower high and higher low — a contracting range or symmetrical triangle. Volume "
+            "declines as the range tightens. A volatility squeeze is building and the pattern "
+            "resolves with a breakout, typically in the direction of the prior trend."
+        ),
+        "trade_guidance": (
+            "Wait for the breakout of the contracting range boundaries. Enter in the breakout "
+            "direction with stop on the opposite boundary. Target: equal to the widest point of "
+            "the range projected from the breakout. Avoid trading inside the range as S/R reliability decreases."
+        ),
+    },
+
+    "expanding_range": {
+        "name": "Expanding Range",
+        "type": "neutral",
+        "reliability": 5,
+        "description": (
+            "Price makes higher highs and lower lows with each swing, expanding the range "
+            "progressively. This megaphone pattern indicates increasing volatility and uncertainty. "
+            "Direction is unpredictable and the pattern is difficult to trade. It typically "
+            "resolves with a violent move once one side capitulates — often to the downside."
+        ),
+        "trade_guidance": (
+            "Avoid trading inside an expanding range. Wait for a clear breakdown below the "
+            "pattern's lower support or a breakout above the upper resistance. Enter only on "
+            "confirmation of direction with a wide stop to account for volatility. Reduce position size."
+        ),
+    },
+
+    "bullish_fvg_order_block": {
+        "name": "Bullish FVG + Order Block",
+        "type": "bullish",
+        "reliability": 9,
+        "description": (
+            "The highest-confluence bullish SMC setup: a Bullish Order Block and a Bullish Fair "
+            "Value Gap overlap in the same price zone. The OB represents institutional demand and "
+            "the FVG marks a price imbalance — when both align, the zone has double institutional "
+            "significance. Price is expected to react strongly from this combined zone."
+        ),
+        "trade_guidance": (
+            "Enter long when price enters the combined OB/FVG zone. Stop-loss just below the "
+            "bottom of the zone. Target the next liquidity pool or supply zone. This is the "
+            "highest-probability long entry in SMC trading — reduce risk if not aligned with "
+            "higher timeframe bullish structure."
+        ),
+    },
+
+    "bearish_fvg_order_block": {
+        "name": "Bearish FVG + Order Block",
+        "type": "bearish",
+        "reliability": 9,
+        "description": (
+            "The highest-confluence bearish SMC setup: a Bearish Order Block and a Bearish Fair "
+            "Value Gap overlap in the same price zone. Both the unfilled imbalance and institutional "
+            "supply orders converge at the same level. When price retraces into this combined "
+            "zone, the probability of a sharp rejection downward is significantly elevated."
+        ),
+        "trade_guidance": (
+            "Enter short when price enters the combined OB/FVG zone. Stop-loss just above the "
+            "top of the zone. Target the next demand zone or previous low. This is the highest-"
+            "probability short entry in SMC. Align with bearish higher timeframe structure for "
+            "maximum conviction."
+        ),
+    },
 }
 
 
