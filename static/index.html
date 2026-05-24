@@ -623,27 +623,31 @@
     /* ── Analyze button ── */
     .analyze-btn {
       width: 100%;
-      padding: 14px;
-      background: var(--accent);
+      padding: 15px;
+      background: linear-gradient(135deg, #4d8bff 0%, #3570e0 100%);
       color: #fff;
       border: none;
       border-radius: var(--radius);
       font-size: 15px;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
       letter-spacing: -0.1px;
-      transition: var(--t);
+      transition: all 0.2s ease;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 9px;
       margin-top: 12px;
       font-family: inherit;
+      box-shadow: 0 4px 20px rgba(77,139,255,0.3);
     }
-
-    .analyze-btn:hover:not(:disabled) { background: #2d6fe8; }
+    .analyze-btn:hover:not(:disabled) {
+      background: linear-gradient(135deg, #5f9bff 0%, #4580f0 100%);
+      box-shadow: 0 6px 30px rgba(77,139,255,0.45);
+      transform: translateY(-1px);
+    }
     .analyze-btn:active:not(:disabled) { transform: scale(0.99); }
-    .analyze-btn:disabled { opacity: 0.38; cursor: not-allowed; }
+    .analyze-btn:disabled { opacity: 0.32; cursor: not-allowed; box-shadow: none; }
 
     /* ── Spinner ── */
     .spinner {
@@ -680,10 +684,11 @@
     /* ── Loading overlay ── */
     .loading-overlay {
       display: none;
-      background: var(--card);
-      border: 1px solid var(--border);
+      background: rgba(11,17,32,0.8);
+      border: 1px solid rgba(77,139,255,0.15);
+      backdrop-filter: blur(12px);
       border-radius: var(--radius);
-      padding: 44px 24px;
+      padding: 48px 24px;
       text-align: center;
       margin-top: 20px;
     }
@@ -701,7 +706,7 @@
 
     .loading-bar {
       width: 6px;
-      background: var(--accent);
+      background: linear-gradient(to top, #4d8bff, #2ecc71);
       border-radius: 3px 3px 0 0;
       opacity: 0.7;
       animation: barPulse 1.3s ease-in-out infinite;
@@ -868,16 +873,18 @@
 
     /* ── Cards ── */
     .card {
-      background: var(--card);
-      border: 1px solid var(--border);
+      background: rgba(11,17,32,0.7);
+      border: 1px solid rgba(255,255,255,0.06);
+      backdrop-filter: blur(10px);
       border-radius: var(--radius);
       padding: 20px;
       margin-bottom: 12px;
     }
 
     .card-sm {
-      background: var(--card);
-      border: 1px solid var(--border);
+      background: rgba(11,17,32,0.7);
+      border: 1px solid rgba(255,255,255,0.06);
+      backdrop-filter: blur(10px);
       border-radius: var(--radius);
       padding: 16px;
     }
@@ -903,8 +910,9 @@
 
     /* ── Metric cards ── */
     .metric-card {
-      background: var(--card);
-      border: 1px solid var(--border);
+      background: rgba(11,17,32,0.7);
+      border: 1px solid rgba(255,255,255,0.06);
+      backdrop-filter: blur(10px);
       border-radius: var(--radius);
       padding: 18px 16px;
       text-align: center;
@@ -1085,10 +1093,11 @@
 
     /* ── Footer ── */
     footer {
-      border-top: 1px solid var(--border);
-      padding: 28px 0;
+      border-top: 1px solid rgba(77,139,255,0.08);
+      padding: 32px 0;
       text-align: center;
       margin-top: 64px;
+      background: rgba(3,5,11,0.6);
     }
 
     .footer-text { font-size: 13px; color: var(--text-muted); }
@@ -1104,8 +1113,9 @@
 
     /* ── Market Intelligence bar ── */
     .market-intel-bar {
-      background: var(--card);
-      border: 1px solid var(--border);
+      background: rgba(7,9,15,0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(77,139,255,0.1);
       border-radius: var(--radius);
       padding: 14px 20px;
       margin-bottom: 32px;
