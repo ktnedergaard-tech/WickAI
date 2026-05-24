@@ -5,9 +5,7 @@ services:
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
-      - key: ANTHROPIC_API_KEY
-        sync: false
-      - key: SCRAPE_SECRET
+      - key: GEMINI_API_KEY
         sync: false
       - key: PYTHON_VERSION
         value: 3.11.0
@@ -19,11 +17,7 @@ services:
     schedule: "0 3 * * *"
     command: python scraper.py
     envVars:
-      - key: ANTHROPIC_API_KEY
+      - key: GEMINI_API_KEY
         sync: false
-      - key: GITHUB_TOKEN
-        sync: false
-      - key: GITHUB_REPO
-        value: ktnedergaard-tech/WickAI
       - key: PYTHON_VERSION
         value: 3.11.0

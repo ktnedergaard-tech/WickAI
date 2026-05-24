@@ -1,7 +1,7 @@
 """
-WickAI - Claude Vision AI Analysis Logic
-Encodes chart images and sends them to Claude claude-sonnet-4-6 with vision
-for detailed candlestick pattern analysis and trade recommendations.
+WickAI - AI Chart Analysis
+Uses Google Gemini (free tier) for candlestick chart analysis via vision.
+Falls back to demo mode if no API key is set.
 """
 
 import base64
@@ -10,17 +10,12 @@ import os
 import random
 import re
 import logging
-from typing import Optional
 
-import anthropic
 from patterns import get_system_prompt_patterns
 
 logger = logging.getLogger(__name__)
 
-ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
-
-# Only initialize client if key is present
-client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY) if ANTHROPIC_API_KEY else None
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 DEMO_RESPONSES = [
     {
@@ -91,7 +86,6 @@ DEMO_RESPONSES = [
     },
 ]
 
-# The comprehensive system prompt — cached via cache_control for cost savings
 SYSTEM_PROMPT = f"""You are WickAI, an expert day trading analyst specializing in candlestick chart analysis. You have deep knowledge of technical analysis, price action, and candlestick patterns. Your role is to analyze trading chart screenshots and provide specific, actionable trade recommendations.
 
 ## Your Expertise
@@ -112,197 +106,95 @@ When analyzing a chart, you must:
 You MUST respond with a valid JSON object (no markdown fences, no extra text — pure JSON only) with this exact structure:
 
 {{
-  "pattern_name": "Primary pattern name (e.g., 'Bullish Engulfing', 'Doji at Support', 'Three White Soldiers')",
+  "pattern_name": "Primary pattern name",
   "pattern_type": "bullish | bearish | neutral",
   "trend": "bullish | bearish | neutral | ranging",
   "trend_strength": "strong | moderate | weak",
-  "support_levels": ["price level or description", "..."],
-  "resistance_levels": ["price level or description", "..."],
+  "support_levels": ["price level or description"],
+  "resistance_levels": ["price level or description"],
   "trade_direction": "LONG | SHORT | WAIT",
-  "entry": "Specific price or range (e.g., 'near 4,285' or '4,280-4,290')",
-  "stop_loss": "Specific price with brief reason (e.g., '4,250 - below pattern low')",
+  "entry": "Specific price or range",
+  "stop_loss": "Specific price with brief reason",
   "take_profit_1": "First target price",
   "take_profit_2": "Second target price",
   "take_profit_3": "Third target price (more aggressive)",
-  "risk_reward_ratio": "e.g., '1:2.5'",
+  "risk_reward_ratio": "e.g. '1:2.5'",
   "confidence": 7,
-  "pattern_explanation": "Educational explanation of the pattern(s) seen (2-4 sentences explaining WHY this pattern matters and what it signals about market psychology)",
-  "analysis_summary": "Overall market context and trade rationale (3-5 sentences covering trend, key levels, and why this trade makes sense)",
-  "risk_warning": "Specific risk warning for this trade setup (1-2 sentences about what could invalidate this setup)",
-  "timeframe_detected": "e.g., '5-minute', '1-hour', 'Daily' - or 'Unknown' if not visible",
-  "instrument_detected": "e.g., 'NQ', 'ES', 'AAPL', 'BTC/USD' - or 'Unknown' if not visible"
+  "pattern_explanation": "2-4 sentences explaining WHY this pattern matters",
+  "analysis_summary": "3-5 sentences covering trend, key levels, and trade rationale",
+  "risk_warning": "1-2 sentences about what could invalidate this setup",
+  "timeframe_detected": "e.g. '15-minute' or 'Unknown'",
+  "instrument_detected": "e.g. 'NQ' or 'Unknown'"
 }}
 
 ## Important Rules
 - Always provide specific prices when visible on the chart
-- If prices are not visible, use descriptive terms like "near recent high", "at support zone"
-- Confidence scale: 1-3 (low, avoid trading), 4-6 (moderate, trade smaller), 7-8 (good setup), 9-10 (high conviction)
-- If no clear pattern or the chart is unclear, set trade_direction to "WAIT"
-- Never invent prices that aren't visible or inferable from the chart
-- The risk_warning must be specific to the current setup, not generic
-- Always respond with ONLY the JSON object, no additional text before or after
+- Confidence scale: 1-3 (avoid), 4-6 (moderate), 7-8 (good), 9-10 (high conviction)
+- If no clear pattern, set trade_direction to "WAIT"
+- Never invent prices not visible in the chart
+- Respond with ONLY the JSON object, no extra text
 """
 
 
-def encode_image(image_bytes: bytes, media_type: str) -> str:
-    """Encode image bytes to base64 string."""
-    return base64.standard_b64encode(image_bytes).decode("utf-8")
-
-
 def analyze_chart(image_bytes: bytes, media_type: str) -> dict:
-    """
-    Analyze a candlestick chart image using Claude's vision capabilities.
-    Falls back to demo mode if no API key is configured.
-
-    Args:
-        image_bytes: Raw bytes of the image file
-        media_type: MIME type of the image (e.g., 'image/jpeg', 'image/png')
-
-    Returns:
-        dict: Structured analysis result with trade recommendation
-    """
-    if not ANTHROPIC_API_KEY:
-        logger.info("No API key configured — returning demo analysis")
+    """Analyse a chart image. Uses Gemini if API key set, else demo mode."""
+    if not GEMINI_API_KEY:
+        logger.info("No GEMINI_API_KEY — returning demo analysis")
         return random.choice(DEMO_RESPONSES)
 
-    # Encode image to base64
-    image_data = encode_image(image_bytes, media_type)
-
-    logger.info(f"Analyzing chart image ({media_type}, {len(image_bytes)} bytes)")
-
     try:
-        response = client.messages.create(
-            model="claude-sonnet-4-6",
-            max_tokens=2048,
-            system=[
-                {
-                    "type": "text",
-                    "text": SYSTEM_PROMPT,
-                    # Cache the system prompt to reduce API costs
-                    # The system prompt is large and stable — perfect for caching
-                    "cache_control": {"type": "ephemeral"},
-                }
-            ],
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "image",
-                            "source": {
-                                "type": "base64",
-                                "media_type": media_type,
-                                "data": image_data,
-                            },
-                        },
-                        {
-                            "type": "text",
-                            "text": (
-                                "Please analyze this candlestick chart and provide a detailed "
-                                "trade recommendation in the specified JSON format. Identify all "
-                                "visible patterns, key levels, and give specific entry, stop-loss, "
-                                "and take-profit targets based on what you see in the chart."
-                            ),
-                        },
-                    ],
-                }
-            ],
+        import google.generativeai as genai
+        genai.configure(api_key=GEMINI_API_KEY)
+        model = genai.GenerativeModel(
+            model_name="gemini-1.5-flash",
+            system_instruction=SYSTEM_PROMPT,
         )
 
-        # Log cache usage for cost monitoring
-        usage = response.usage
-        logger.info(
-            f"API usage - Input: {usage.input_tokens}, Output: {usage.output_tokens}, "
-            f"Cache read: {getattr(usage, 'cache_read_input_tokens', 0)}, "
-            f"Cache write: {getattr(usage, 'cache_creation_input_tokens', 0)}"
-        )
+        image_part = {
+            "mime_type": media_type,
+            "data": base64.b64encode(image_bytes).decode("utf-8"),
+        }
 
-        # Extract the text response
-        response_text = ""
-        for block in response.content:
-            if block.type == "text":
-                response_text = block.text
-                break
+        response = model.generate_content([
+            image_part,
+            "Analyse this candlestick chart and return the JSON trade recommendation.",
+        ])
 
-        if not response_text:
-            raise ValueError("No text response received from Claude")
+        response_text = response.text.strip()
+        logger.info(f"Gemini response received ({len(response_text)} chars)")
 
-        # Parse JSON from response
         analysis = parse_json_response(response_text)
+        return validate_and_normalize(analysis)
 
-        # Validate and normalize the response
-        analysis = validate_and_normalize(analysis)
-
-        return analysis
-
-    except anthropic.BadRequestError as e:
-        logger.error(f"Bad request to Claude API: {e}")
-        raise ValueError(f"Image analysis failed: {str(e)}")
-    except anthropic.RateLimitError:
-        logger.error("Rate limit exceeded")
-        raise ValueError("API rate limit reached. Please try again in a moment.")
-    except anthropic.AuthenticationError:
-        logger.error("Authentication failed")
-        raise ValueError("API authentication failed. Please check your API key.")
     except Exception as e:
-        logger.error(f"Unexpected error during analysis: {e}")
-        raise ValueError(f"Analysis failed: {str(e)}")
+        logger.error(f"Gemini analysis error: {e}")
+        raise ValueError(f"Analysis failed: {e}")
 
 
-def parse_json_response(response_text: str) -> dict:
-    """
-    Parse JSON from Claude's response, handling common formatting issues.
-
-    Args:
-        response_text: Raw text from Claude
-
-    Returns:
-        dict: Parsed JSON object
-    """
-    text = response_text.strip()
-
-    # Try direct JSON parse first
+def parse_json_response(text: str) -> dict:
+    """Parse JSON from AI response, handling markdown fences."""
+    text = text.strip()
     try:
         return json.loads(text)
     except json.JSONDecodeError:
         pass
-
-    # Try to extract JSON from markdown code blocks
-    # Match ```json ... ``` or ``` ... ```
-    code_block_pattern = r"```(?:json)?\s*(\{.*?\})\s*```"
-    match = re.search(code_block_pattern, text, re.DOTALL)
+    match = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", text, re.DOTALL)
     if match:
         try:
             return json.loads(match.group(1))
         except json.JSONDecodeError:
             pass
-
-    # Try to find raw JSON object in the text
-    json_pattern = r"\{.*\}"
-    match = re.search(json_pattern, text, re.DOTALL)
+    match = re.search(r"\{.*\}", text, re.DOTALL)
     if match:
         try:
             return json.loads(match.group(0))
         except json.JSONDecodeError:
             pass
-
-    raise ValueError(
-        f"Could not parse JSON from Claude's response. "
-        f"Response preview: {text[:200]}..."
-    )
+    raise ValueError(f"Could not parse JSON from AI response: {text[:200]}")
 
 
 def validate_and_normalize(analysis: dict) -> dict:
-    """
-    Validate the analysis response and fill in defaults for missing fields.
-
-    Args:
-        analysis: Parsed analysis dict from Claude
-
-    Returns:
-        dict: Validated and normalized analysis
-    """
-    # Required fields with defaults
+    """Fill in defaults for missing fields and normalise values."""
     defaults = {
         "pattern_name": "Unidentified Pattern",
         "pattern_type": "neutral",
@@ -320,54 +212,31 @@ def validate_and_normalize(analysis: dict) -> dict:
         "confidence": 5,
         "pattern_explanation": "Pattern analysis not available.",
         "analysis_summary": "Chart analysis completed.",
-        "risk_warning": "Always use proper risk management and never risk more than you can afford to lose.",
+        "risk_warning": "Always use proper risk management.",
         "timeframe_detected": "Unknown",
         "instrument_detected": "Unknown",
     }
-
-    # Apply defaults for missing fields
-    for key, default_value in defaults.items():
+    for key, val in defaults.items():
         if key not in analysis:
-            analysis[key] = default_value
-
-    # Normalize confidence to int between 1-10
+            analysis[key] = val
     try:
-        confidence = int(analysis["confidence"])
-        analysis["confidence"] = max(1, min(10, confidence))
+        analysis["confidence"] = max(1, min(10, int(analysis["confidence"])))
     except (ValueError, TypeError):
         analysis["confidence"] = 5
-
-    # Normalize pattern_type
     if analysis["pattern_type"] not in ("bullish", "bearish", "neutral"):
         analysis["pattern_type"] = "neutral"
-
-    # Normalize trend
-    valid_trends = ("bullish", "bearish", "neutral", "ranging")
-    if analysis["trend"] not in valid_trends:
+    if analysis["trend"] not in ("bullish", "bearish", "neutral", "ranging"):
         analysis["trend"] = "neutral"
-
-    # Normalize trade_direction
     if analysis["trade_direction"] not in ("LONG", "SHORT", "WAIT"):
         analysis["trade_direction"] = "WAIT"
-
-    # Ensure lists are lists
-    for list_field in ("support_levels", "resistance_levels"):
-        if not isinstance(analysis[list_field], list):
-            analysis[list_field] = [str(analysis[list_field])] if analysis[list_field] else []
-
+    for field in ("support_levels", "resistance_levels"):
+        if not isinstance(analysis[field], list):
+            analysis[field] = [str(analysis[field])] if analysis[field] else []
     return analysis
 
 
 def get_analysis_error_response(error_message: str) -> dict:
-    """
-    Return a structured error response for failed analyses.
-
-    Args:
-        error_message: The error message to include
-
-    Returns:
-        dict: Error response in the standard analysis format
-    """
+    """Return a structured error response."""
     return {
         "error": True,
         "error_message": error_message,
@@ -386,7 +255,7 @@ def get_analysis_error_response(error_message: str) -> dict:
         "risk_reward_ratio": "N/A",
         "confidence": 0,
         "pattern_explanation": "Analysis could not be completed.",
-        "analysis_summary": f"Error during analysis: {error_message}",
+        "analysis_summary": f"Error: {error_message}",
         "risk_warning": "Always use proper risk management.",
         "timeframe_detected": "Unknown",
         "instrument_detected": "Unknown",

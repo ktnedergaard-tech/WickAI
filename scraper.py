@@ -13,13 +13,10 @@ import json
 import logging
 import os
 import re
-import subprocess
 import time
 import urllib.request
 import urllib.error
 from datetime import datetime
-
-import anthropic
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
@@ -53,7 +50,7 @@ Extract ALL candlestick pattern names mentioned in this text. For each pattern, 
 
 Return ONLY a valid JSON array. No markdown, no extra text.
 
-Page content (truncated to 8000 chars):
+Page content:
 {content}
 """
 
@@ -87,48 +84,40 @@ def fetch_page(url: str, timeout: int = 15) -> str:
         return ""
 
 
-def extract_patterns_from_text(client: anthropic.Anthropic, text: str) -> list[dict]:
-    """Ask Claude to extract pattern data from raw page text."""
+def _gemini_call(prompt: str) -> str:
+    """Call Gemini flash with a text prompt and return the response text."""
+    import google.generativeai as genai
+    api_key = os.getenv("GEMINI_API_KEY")
+    genai.configure(api_key=api_key)
+    model = genai.GenerativeModel("gemini-1.5-flash")
+    response = model.generate_content(prompt)
+    raw = response.text.strip()
+    raw = re.sub(r"^```(?:json)?\s*", "", raw)
+    raw = re.sub(r"\s*```$", "", raw)
+    return raw
+
+
+def extract_patterns_from_text(client, text: str) -> list[dict]:
+    """Ask Gemini to extract pattern data from raw page text."""
     if not text:
         return []
     try:
-        response = client.messages.create(
-            model="claude-haiku-4-5-20251001",
-            max_tokens=4096,
-            messages=[{
-                "role": "user",
-                "content": EXTRACTION_PROMPT.format(content=text)
-            }]
-        )
-        raw = response.content[0].text.strip()
-        # Strip markdown fences if present
-        raw = re.sub(r"^```(?:json)?\s*", "", raw)
-        raw = re.sub(r"\s*```$", "", raw)
+        raw = _gemini_call(EXTRACTION_PROMPT.format(content=text))
         return json.loads(raw)
     except Exception as e:
         logger.warning(f"Pattern extraction failed: {e}")
         return []
 
 
-def deduplicate(client: anthropic.Anthropic, existing_names: list[str], candidates: list[dict]) -> list[dict]:
-    """Use Claude to filter out patterns that already exist."""
+def deduplicate(client, existing_names: list[str], candidates: list[dict]) -> list[dict]:
+    """Use Gemini to filter out patterns that already exist."""
     if not candidates:
         return []
     try:
-        response = client.messages.create(
-            model="claude-haiku-4-5-20251001",
-            max_tokens=4096,
-            messages=[{
-                "role": "user",
-                "content": DEDUP_PROMPT.format(
-                    existing="\n".join(f"- {n}" for n in existing_names),
-                    candidates=json.dumps(candidates, indent=2)
-                )
-            }]
-        )
-        raw = response.content[0].text.strip()
-        raw = re.sub(r"^```(?:json)?\s*", "", raw)
-        raw = re.sub(r"\s*```$", "", raw)
+        raw = _gemini_call(DEDUP_PROMPT.format(
+            existing="\n".join(f"- {n}" for n in existing_names),
+            candidates=json.dumps(candidates, indent=2)
+        ))
         return json.loads(raw)
     except Exception as e:
         logger.warning(f"Deduplication failed: {e}")
@@ -205,12 +194,12 @@ def append_to_patterns_file(new_patterns: list[dict], patterns_path: str) -> int
 
 def run(dry_run: bool = False) -> int:
     """Main scraper loop. Returns number of new patterns added."""
-    api_key = os.getenv("ANTHROPIC_API_KEY")
+    api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
-        logger.error("ANTHROPIC_API_KEY not set — scraper requires AI for extraction")
+        logger.error("GEMINI_API_KEY not set — scraper requires AI for extraction")
         return 0
 
-    client = anthropic.Anthropic(api_key=api_key)
+    client = anthropic.Anthropic(api_key="placeholder")  # unused, kept for compat
     existing_names = get_existing_names()
     logger.info(f"Currently {len(existing_names)} patterns in database")
 
@@ -250,43 +239,7 @@ def run(dry_run: bool = False) -> int:
     patterns_path = os.path.join(os.path.dirname(__file__), "patterns.py")
     added = append_to_patterns_file(new_patterns, patterns_path)
     logger.info(f"Added {added} new patterns to {patterns_path}")
-
-    git_push(added, patterns_path)
     return added
-
-
-def git_push(added: int, patterns_path: str) -> None:
-    """Commit and push patterns.py to GitHub so changes survive restarts."""
-    github_token = os.getenv("GITHUB_TOKEN", "")
-    repo = os.getenv("GITHUB_REPO", "ktnedergaard-tech/WickAI")
-    repo_dir = os.path.dirname(os.path.abspath(patterns_path))
-    timestamp = datetime.utcnow().strftime("%Y-%m-%d")
-
-    if not github_token:
-        logger.warning("GITHUB_TOKEN not set — skipping git push. Patterns saved locally only.")
-        return
-
-    try:
-        remote_url = f"https://x-access-token:{github_token}@github.com/{repo}.git"
-
-        def git(cmd: list[str]) -> str:
-            result = subprocess.run(
-                ["git"] + cmd, cwd=repo_dir,
-                capture_output=True, text=True, timeout=30
-            )
-            if result.returncode != 0:
-                raise RuntimeError(result.stderr.strip())
-            return result.stdout.strip()
-
-        git(["config", "user.email", "scraper@wickai.app"])
-        git(["config", "user.name", "WickAI Scraper"])
-        git(["remote", "set-url", "origin", remote_url])
-        git(["add", "patterns.py"])
-        git(["commit", "-m", f"Auto-scrape {timestamp}: +{added} new patterns"])
-        git(["push", "origin", "main"])
-        logger.info(f"Pushed {added} new patterns to GitHub")
-    except Exception as e:
-        logger.error(f"Git push failed: {e}")
 
 
 if __name__ == "__main__":

@@ -28,11 +28,11 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Validate that the API key is set
-ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
+ANTHROPIC_API_KEY = os.getenv("GEMINI_API_KEY")
 if not ANTHROPIC_API_KEY:
     logger.warning(
-        "ANTHROPIC_API_KEY is not set. The /api/analyze endpoint will fail. "
-        "Copy .env.example to .env and add your key."
+        "GEMINI_API_KEY is not set. Analysis runs in demo mode. "
+        "Get a free key at aistudio.google.com"
     )
 
 # Max upload size: 10 MB
