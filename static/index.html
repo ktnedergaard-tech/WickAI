@@ -1168,6 +1168,11 @@
       flex-shrink: 0;
     }
     .mi-session-dot.active { animation: blink 2s ease-in-out infinite; }
+    .zone-dot {
+      width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+      box-shadow: 0 0 7px currentColor;
+      animation: blink 2s ease-in-out infinite;
+    }
     .mi-notes {
       flex: 1;
       min-width: 200px;
@@ -1324,6 +1329,12 @@
         <span class="mi-block-label">Sentiment</span>
         <div class="fg-meter"><div class="fg-marker" id="fgMarker" style="left:50%"></div></div>
         <span class="mi-block-val" id="miFgVal">—</span>
+      </div>
+      <div class="mi-block" id="miZoneBlock" style="display:none">
+        <span class="mi-block-label">Trading Zone</span>
+        <span class="zone-dot" id="miZoneDot"></span>
+        <span class="mi-block-val" id="miZoneLabel">—</span>
+        <span class="mi-block-label" id="miZoneTime" style="margin-left:4px"></span>
       </div>
       <div class="mi-notes" id="miNotes">Fetching live market context…</div>
     </div>
@@ -1962,17 +1973,34 @@
         if (fg) {
           document.getElementById('miFgVal').textContent = `${fg.label} ${fg.value}`;
           document.getElementById('fgMarker').style.left = `${fg.value}%`;
-          const fgColors = { v: fg.value };
           const fgEl = document.getElementById('miFgVal');
           if (fg.value < 25)       fgEl.style.color = '#c94545';
           else if (fg.value < 45)  fgEl.style.color = '#e07a30';
           else if (fg.value < 55)  fgEl.style.color = '#c9943a';
           else                     fgEl.style.color = '#34a869';
         }
+
+        // Trading zone (Red/Yellow/Green)
+        const tz = d.trading_zone;
+        if (tz && tz.zone !== 'closed') {
+          const zoneBlock = document.getElementById('miZoneBlock');
+          const zoneDot   = document.getElementById('miZoneDot');
+          const zoneLabel = document.getElementById('miZoneLabel');
+          const zoneTime  = document.getElementById('miZoneTime');
+          zoneBlock.style.display = 'flex';
+          zoneDot.style.backgroundColor = tz.color;
+          zoneDot.style.color = tz.color;
+          zoneLabel.textContent = tz.label;
+          zoneLabel.style.color = tz.color;
+          zoneTime.textContent  = tz.et_time || '';
+          // Update session notes to include zone advice
+          const notes = document.getElementById('miNotes');
+          notes.textContent = tz.advice + (d.session_notes ? ' · ' + d.session_notes : '');
+        }
       } catch(_) {}
     }
     loadMarketIntel();
-    setInterval(loadMarketIntel, 300000); // refresh every 5 min
+    setInterval(loadMarketIntel, 60000); // refresh every 60 sec for zone accuracy
 
     const uploadZone       = document.getElementById('uploadZone');
     const uploadPlaceholder= document.getElementById('uploadPlaceholder');
