@@ -143,6 +143,13 @@ async def trigger_scrape(secret: str = ""):
     return {"status": "started", "message": "Scraper is running in the background"}
 
 
+@app.get("/api/market-context")
+async def get_market_context_endpoint():
+    """Return live market context: session, Fear & Greed, session notes."""
+    from market_intel import get_market_context
+    return get_market_context()
+
+
 @app.get("/health")
 async def health_check():
     """Health check endpoint."""
