@@ -13,6 +13,7 @@ import json
 import logging
 import os
 import re
+import subprocess
 import time
 import urllib.request
 import urllib.error
@@ -249,7 +250,43 @@ def run(dry_run: bool = False) -> int:
     patterns_path = os.path.join(os.path.dirname(__file__), "patterns.py")
     added = append_to_patterns_file(new_patterns, patterns_path)
     logger.info(f"Added {added} new patterns to {patterns_path}")
+
+    git_push(added, patterns_path)
     return added
+
+
+def git_push(added: int, patterns_path: str) -> None:
+    """Commit and push patterns.py to GitHub so changes survive restarts."""
+    github_token = os.getenv("GITHUB_TOKEN", "")
+    repo = os.getenv("GITHUB_REPO", "ktnedergaard-tech/WickAI")
+    repo_dir = os.path.dirname(os.path.abspath(patterns_path))
+    timestamp = datetime.utcnow().strftime("%Y-%m-%d")
+
+    if not github_token:
+        logger.warning("GITHUB_TOKEN not set — skipping git push. Patterns saved locally only.")
+        return
+
+    try:
+        remote_url = f"https://x-access-token:{github_token}@github.com/{repo}.git"
+
+        def git(cmd: list[str]) -> str:
+            result = subprocess.run(
+                ["git"] + cmd, cwd=repo_dir,
+                capture_output=True, text=True, timeout=30
+            )
+            if result.returncode != 0:
+                raise RuntimeError(result.stderr.strip())
+            return result.stdout.strip()
+
+        git(["config", "user.email", "scraper@wickai.app"])
+        git(["config", "user.name", "WickAI Scraper"])
+        git(["remote", "set-url", "origin", remote_url])
+        git(["add", "patterns.py"])
+        git(["commit", "-m", f"Auto-scrape {timestamp}: +{added} new patterns"])
+        git(["push", "origin", "main"])
+        logger.info(f"Pushed {added} new patterns to GitHub")
+    except Exception as e:
+        logger.error(f"Git push failed: {e}")
 
 
 if __name__ == "__main__":
