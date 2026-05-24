@@ -738,35 +738,56 @@
     }
 
     .loading-steps {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      max-width: 280px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px 24px;
+      max-width: 540px;
       margin: 0 auto;
       text-align: left;
     }
+    @media (max-width: 560px) { .loading-steps { grid-template-columns: 1fr; max-width: 280px; } }
 
     .loading-step {
       display: flex;
       align-items: center;
-      gap: 9px;
-      font-size: 13px;
+      gap: 8px;
+      font-size: 12.5px;
       color: var(--text-dim);
       opacity: 0;
-      transform: translateX(-8px);
-      transition: all 0.35s ease;
+      transform: translateX(-6px);
+      transition: all 0.3s ease;
+      white-space: nowrap;
     }
 
-    .loading-step.active  { opacity: 1; transform: translateX(0); color: var(--text); }
-    .loading-step.done    { opacity: 1; transform: translateX(0); color: var(--green); }
+    .loading-step.active {
+      opacity: 1;
+      transform: translateX(0);
+      color: var(--white);
+    }
+    .loading-step.done {
+      opacity: 1;
+      transform: translateX(0);
+      color: var(--green);
+    }
 
     .step-dot {
-      width: 6px;
-      height: 6px;
+      width: 5px;
+      height: 5px;
       border-radius: 50%;
       background: currentColor;
       flex-shrink: 0;
     }
+    .loading-step.active .step-dot {
+      box-shadow: 0 0 6px currentColor;
+      animation: blink 0.8s ease-in-out infinite;
+    }
+    .step-check {
+      display: none;
+      font-size: 11px;
+      flex-shrink: 0;
+    }
+    .loading-step.done .step-dot  { display: none; }
+    .loading-step.done .step-check { display: inline; }
 
     /* ── Results ── */
     #results {
@@ -1617,13 +1638,25 @@
         <div class="loading-bar"></div>
       </div>
       <div class="loading-title">Analysing chart&hellip;</div>
-      <div class="loading-sub">Scanning for patterns and key levels</div>
+      <div class="loading-sub" id="loadingSub">Running deep multi-layer analysis</div>
       <div class="loading-steps" id="loadingSteps">
-        <div class="loading-step" data-step="0"><span class="step-dot"></span> Fetching live market context</div>
-        <div class="loading-step" data-step="1"><span class="step-dot"></span> Processing chart image</div>
-        <div class="loading-step" data-step="2"><span class="step-dot"></span> Identifying patterns (131 strategies)</div>
-        <div class="loading-step" data-step="3"><span class="step-dot"></span> Mapping support &amp; resistance</div>
-        <div class="loading-step" data-step="4"><span class="step-dot"></span> Generating trade recommendation</div>
+        <div class="loading-step"><span class="step-dot"></span><span class="step-check">✓</span> Initialising analysis engine</div>
+        <div class="loading-step"><span class="step-dot"></span><span class="step-check">✓</span> Processing chart image</div>
+        <div class="loading-step"><span class="step-dot"></span><span class="step-check">✓</span> Detecting candlestick patterns</div>
+        <div class="loading-step"><span class="step-dot"></span><span class="step-check">✓</span> Fetching live market context</div>
+        <div class="loading-step"><span class="step-dot"></span><span class="step-check">✓</span> Analysing price structure</div>
+        <div class="loading-step"><span class="step-dot"></span><span class="step-check">✓</span> Reading Fear &amp; Greed sentiment</div>
+        <div class="loading-step"><span class="step-dot"></span><span class="step-check">✓</span> Identifying trend direction</div>
+        <div class="loading-step"><span class="step-dot"></span><span class="step-check">✓</span> Checking trading zone (R/Y/G)</div>
+        <div class="loading-step"><span class="step-dot"></span><span class="step-check">✓</span> Mapping support &amp; resistance</div>
+        <div class="loading-step"><span class="step-dot"></span><span class="step-check">✓</span> Scanning SMC order blocks</div>
+        <div class="loading-step"><span class="step-dot"></span><span class="step-check">✓</span> Cross-referencing 131 patterns</div>
+        <div class="loading-step"><span class="step-dot"></span><span class="step-check">✓</span> Detecting market structure BOS</div>
+        <div class="loading-step"><span class="step-dot"></span><span class="step-check">✓</span> Calculating entry zones</div>
+        <div class="loading-step"><span class="step-dot"></span><span class="step-check">✓</span> Computing stop-loss level</div>
+        <div class="loading-step"><span class="step-dot"></span><span class="step-check">✓</span> Projecting take-profit targets</div>
+        <div class="loading-step"><span class="step-dot"></span><span class="step-check">✓</span> Calculating risk/reward ratio</div>
+        <div class="loading-step"><span class="step-dot"></span><span class="step-check">✓</span> Generating trade recommendation</div>
       </div>
     </div>
 
@@ -2151,15 +2184,35 @@
     function hideError()    { errorBox.classList.add('hidden'); }
 
     function startLoadingAnimation() {
-      loadingSteps.forEach(s => s.classList.remove('active', 'done'));
-      const delays = [0, 800, 1800, 3000, 4500];
-      delays.forEach((delay, i) => {
-        setTimeout(() => {
-          if (i > 0) { loadingSteps[i-1].classList.remove('active'); loadingSteps[i-1].classList.add('done'); }
-          loadingSteps[i].classList.add('active');
-        }, delay);
+      const steps = Array.from(document.querySelectorAll('#loadingSteps .loading-step'));
+      steps.forEach(s => s.classList.remove('active', 'done'));
+
+      // Spread steps across ~14s (Gemini usually responds in 5–15s)
+      // First 8 steps: faster (every 600ms), last 9: slower (every 900ms) — waits for API
+      const delays = [];
+      let t = 0;
+      steps.forEach((_, i) => {
+        delays.push(t);
+        t += i < 8 ? 600 : 900;
       });
-      return () => loadingSteps.forEach(s => { s.classList.remove('active'); s.classList.add('done'); });
+
+      const timers = [];
+      delays.forEach((delay, i) => {
+        timers.push(setTimeout(() => {
+          if (i > 0) {
+            steps[i-1].classList.remove('active');
+            steps[i-1].classList.add('done');
+          }
+          // Don't advance past second-to-last — hold there until API responds
+          if (i < steps.length - 1) steps[i].classList.add('active');
+        }, delay));
+      });
+
+      // Return cleanup: marks all done (called when API responds)
+      return () => {
+        timers.forEach(clearTimeout);
+        steps.forEach(s => { s.classList.remove('active'); s.classList.add('done'); });
+      };
     }
 
     analyzeBtn.addEventListener('click', async () => {
