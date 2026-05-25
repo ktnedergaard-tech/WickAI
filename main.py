@@ -3,8 +3,11 @@ WickAI - FastAPI Backend
 Serves the frontend and provides the /api/analyze endpoint for chart analysis.
 """
 
+import asyncio
 import logging
 import os
+import threading
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -15,7 +18,8 @@ from fastapi.staticfiles import StaticFiles
 
 from analyzer import analyze_chart, get_analysis_error_response
 from patterns import get_pattern_names
-import threading
+
+_scan_executor = ThreadPoolExecutor(max_workers=3)
 
 # Load environment variables from .env file if present
 load_dotenv()
@@ -141,6 +145,72 @@ async def trigger_scrape(secret: str = ""):
     thread = threading.Thread(target=run_scraper, daemon=True)
     thread.start()
     return {"status": "started", "message": "Scraper is running in the background"}
+
+
+@app.get("/api/scan")
+async def scan_endpoint(
+    market: str = "ALL",
+    interval: str = "1h",
+    watchlist: str = "",
+):
+    """
+    Scan US/UK/EU stocks for candlestick patterns.
+    market:   ALL | US | UK | EU
+    interval: 15m | 1h | 4h | 1d
+    watchlist: comma-separated extra tickers (e.g. AAPL,TSLA)
+    """
+    from scanner import scan_market, scan_all, MARKETS, market_status
+
+    wl = [t.strip().upper() for t in watchlist.split(",") if t.strip()]
+    allowed_intervals = {"15m", "30m", "1h", "4h", "1d"}
+    if interval not in allowed_intervals:
+        interval = "1h"
+
+    loop = asyncio.get_event_loop()
+
+    if market == "ALL":
+        raw = await loop.run_in_executor(
+            _scan_executor, lambda: scan_all(interval, wl)
+        )
+        # Flatten + sort for the "All" view (top 30 cross-market)
+        all_setups = []
+        for ms in raw.values():
+            all_setups.extend(ms)
+        all_setups.sort(key=lambda s: s["score"], reverse=True)
+        return {
+            "market": "ALL",
+            "interval": interval,
+            "setups": all_setups[:30],
+            "by_market": {
+                m: {"setups": raw[m][:10], "status": market_status(m), **MARKETS[m]}
+                for m in MARKETS
+            },
+            "scanned_at": __import__("datetime").datetime.utcnow().isoformat(),
+        }
+    elif market in MARKETS:
+        setups = await loop.run_in_executor(
+            _scan_executor, lambda: scan_market(market, interval, wl)
+        )
+        return {
+            "market": market,
+            "interval": interval,
+            "setups": setups,
+            "status": market_status(market),
+            **MARKETS[market],
+            "scanned_at": __import__("datetime").datetime.utcnow().isoformat(),
+        }
+    else:
+        raise HTTPException(status_code=400, detail="market must be ALL, US, UK, or EU")
+
+
+@app.get("/api/scan/status")
+async def scan_status():
+    """Return open/closed status for all three markets."""
+    from scanner import market_status, MARKETS
+    return {
+        m: {"status": market_status(m), "label": MARKETS[m]["label"], "flag": MARKETS[m]["flag"]}
+        for m in MARKETS
+    }
 
 
 @app.get("/api/market-context")

@@ -1521,6 +1521,169 @@
     .mctx-item-val { font-size: 14px; font-weight: 700; color: var(--white); display: flex; align-items: center; gap: 6px; }
     .mctx-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
     .mctx-note { font-size: 11.5px; color: var(--text-muted); line-height: 1.5; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); font-style: italic; }
+
+    /* ── Scanner ── */
+    .scanner-section { margin-bottom: 48px; }
+    .scanner-header { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; }
+    .scanner-header-left {}
+    .scanner-controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+    .scanner-tabs { display: flex; gap: 6px; }
+    .scanner-tab {
+      padding: 7px 14px; border-radius: 20px; font-size: 12.5px; font-weight: 600;
+      cursor: pointer; border: 1px solid var(--border); background: transparent;
+      color: var(--text-muted); transition: all var(--t); white-space: nowrap;
+    }
+    .scanner-tab:hover { border-color: var(--accent); color: var(--white); }
+    .scanner-tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+    .interval-select {
+      padding: 7px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600;
+      border: 1px solid var(--border); background: var(--card); color: var(--text);
+      cursor: pointer; outline: none; transition: border-color var(--t);
+    }
+    .interval-select:focus { border-color: var(--accent); }
+
+    .watchlist-wrap { display: flex; gap: 8px; align-items: center; }
+    .watchlist-input {
+      width: 180px; padding: 7px 12px; border-radius: 8px; font-size: 12.5px;
+      border: 1px solid var(--border); background: var(--card); color: var(--white);
+      outline: none; transition: border-color var(--t);
+      font-family: inherit;
+    }
+    .watchlist-input::placeholder { color: var(--text-muted); }
+    .watchlist-input:focus { border-color: var(--accent); }
+    .watchlist-btn {
+      padding: 7px 14px; border-radius: 8px; font-size: 12.5px; font-weight: 600;
+      border: 1px solid var(--border); background: transparent; color: var(--text);
+      cursor: pointer; transition: all var(--t); white-space: nowrap;
+    }
+    .watchlist-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    .scanner-refresh { display: flex; align-items: center; gap: 8px; }
+    .scanner-last-update { font-size: 11px; color: var(--text-muted); }
+    .refresh-btn {
+      width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border);
+      background: transparent; color: var(--text-muted); cursor: pointer;
+      display: flex; align-items: center; justify-content: center; font-size: 14px;
+      transition: all var(--t);
+    }
+    .refresh-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .refresh-btn.spinning { animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Market status chips */
+    .market-status-row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .mstat-chip {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 12px; border-radius: 20px;
+      border: 1px solid var(--border); font-size: 11.5px; font-weight: 600;
+      background: var(--card);
+    }
+    .mstat-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .mstat-chip.open .mstat-dot   { background: var(--green); box-shadow: 0 0 6px var(--green); }
+    .mstat-chip.closed .mstat-dot { background: var(--text-muted); }
+    .mstat-chip.open   { border-color: rgba(46,204,113,0.25); color: var(--green); }
+    .mstat-chip.closed { color: var(--text-muted); }
+
+    /* Setup grid */
+    .scanner-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 14px;
+    }
+
+    .setup-card {
+      background: rgba(11,17,32,0.7);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px 16px;
+      backdrop-filter: blur(12px);
+      transition: border-color var(--t), transform var(--t);
+      display: flex; flex-direction: column; gap: 12px;
+      position: relative; overflow: hidden;
+    }
+    .setup-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+    .setup-card.bullish::before { background: linear-gradient(90deg, var(--green), transparent); }
+    .setup-card.bearish::before { background: linear-gradient(90deg, var(--red), transparent); }
+    .setup-card.neutral::before { background: linear-gradient(90deg, var(--amber), transparent); }
+    .setup-card:hover { border-color: var(--border-light); transform: translateY(-2px); }
+
+    .setup-card-top { display: flex; justify-content: space-between; align-items: flex-start; }
+    .setup-ticker { font-size: 20px; font-weight: 800; color: var(--white); letter-spacing: -0.5px; }
+    .setup-market { font-size: 10.5px; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
+    .setup-badges { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+
+    .direction-badge {
+      padding: 4px 10px; border-radius: 5px; font-size: 11px; font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+    .direction-badge.long  { background: rgba(46,204,113,0.15); color: var(--green); border: 1px solid rgba(46,204,113,0.25); }
+    .direction-badge.short { background: rgba(231,76,60,0.15);  color: var(--red);   border: 1px solid rgba(231,76,60,0.25); }
+    .direction-badge.wait  { background: rgba(240,165,0,0.12);  color: var(--amber); border: 1px solid rgba(240,165,0,0.25); }
+
+    .score-badge {
+      font-size: 10.5px; font-weight: 700; color: var(--text-muted);
+      display: flex; align-items: center; gap: 4px;
+    }
+    .score-dots { display: flex; gap: 2px; }
+    .score-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--border); }
+    .score-dot.filled { background: var(--accent); }
+
+    .setup-pattern { font-size: 13.5px; font-weight: 700; color: var(--white); }
+    .setup-trend {
+      font-size: 11px; color: var(--text-muted); font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px;
+    }
+
+    .setup-price-row { display: flex; justify-content: space-between; align-items: center; }
+    .setup-price { font-size: 15px; font-weight: 700; color: var(--white); font-variant-numeric: tabular-nums; }
+    .setup-change { font-size: 12.5px; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .setup-change.pos { color: var(--green); }
+    .setup-change.neg { color: var(--red); }
+
+    .setup-levels { display: flex; gap: 6px; }
+    .level-chip {
+      flex: 1; padding: 6px 8px; border-radius: 6px; text-align: center;
+      border: 1px solid var(--border); background: var(--card-2);
+    }
+    .level-chip-label { font-size: 9.5px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    .level-chip-val { font-size: 11.5px; font-weight: 700; color: var(--white); font-variant-numeric: tabular-nums; margin-top: 1px; }
+
+    .setup-analyse-btn {
+      width: 100%; padding: 9px; border-radius: 8px; font-size: 12.5px; font-weight: 700;
+      border: 1px solid rgba(77,139,255,0.25); background: rgba(77,139,255,0.07);
+      color: var(--accent); cursor: pointer; transition: all var(--t); font-family: inherit;
+    }
+    .setup-analyse-btn:hover { background: rgba(77,139,255,0.15); border-color: var(--accent); color: #fff; }
+
+    /* Empty / loading states */
+    .scanner-empty {
+      grid-column: 1/-1; text-align: center; padding: 48px 20px;
+      color: var(--text-muted); font-size: 14px;
+    }
+    .scanner-empty-icon { font-size: 32px; margin-bottom: 10px; }
+    .scanner-loading {
+      grid-column: 1/-1; display: flex; align-items: center; justify-content: center;
+      gap: 12px; padding: 48px 20px; color: var(--text-muted); font-size: 14px;
+    }
+    .scanner-spinner {
+      width: 20px; height: 20px; border: 2px solid var(--border);
+      border-top-color: var(--accent); border-radius: 50%;
+      animation: spin 0.8s linear infinite; flex-shrink: 0;
+    }
+    .scanner-watchlist-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 4px; }
+    .watchlist-tag {
+      display: flex; align-items: center; gap: 4px;
+      padding: 3px 8px 3px 10px; border-radius: 20px;
+      background: var(--accent-dim); border: 1px solid var(--accent-mid);
+      font-size: 11px; font-weight: 700; color: var(--accent);
+    }
+    .watchlist-tag-remove { cursor: pointer; opacity: 0.7; font-size: 10px; }
+    .watchlist-tag-remove:hover { opacity: 1; }
   </style>
 </head>
 <body>
@@ -1754,6 +1917,55 @@
         <div class="stat-label">Platforms supported</div>
       </div>
     </div>
+
+    <!-- SCANNER -->
+    <section class="scanner-section" id="scannerSection">
+      <div class="scanner-header">
+        <div class="scanner-header-left">
+          <div class="section-title">Market Scanner</div>
+          <div class="section-sub">Live pattern detection across S&amp;P 500, FTSE 100, DAX &amp; CAC</div>
+        </div>
+        <div class="scanner-controls">
+          <div class="watchlist-wrap">
+            <input class="watchlist-input" id="watchlistInput" type="text" placeholder="Add ticker, e.g. TSLA" maxlength="10" />
+            <button class="watchlist-btn" id="watchlistAddBtn">+ Add</button>
+          </div>
+          <select class="interval-select" id="scanInterval">
+            <option value="1h" selected>1 hour</option>
+            <option value="4h">4 hour</option>
+            <option value="1d">Daily</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Watchlist tags -->
+      <div class="scanner-watchlist-tags" id="watchlistTags"></div>
+
+      <!-- Market status + tab row -->
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:14px;">
+        <div class="market-status-row" id="marketStatusRow"></div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="scanner-tabs" id="scannerTabs">
+            <button class="scanner-tab active" data-market="ALL">All</button>
+            <button class="scanner-tab" data-market="US">🇺🇸 US</button>
+            <button class="scanner-tab" data-market="UK">🇬🇧 UK</button>
+            <button class="scanner-tab" data-market="EU">🇪🇺 EU</button>
+          </div>
+          <div class="scanner-refresh">
+            <span class="scanner-last-update" id="scanLastUpdate">—</span>
+            <button class="refresh-btn" id="scanRefreshBtn" title="Refresh scan">↻</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Setup cards -->
+      <div class="scanner-grid" id="scannerGrid">
+        <div class="scanner-loading">
+          <div class="scanner-spinner"></div>
+          <span>Scanning markets…</span>
+        </div>
+      </div>
+    </section>
 
     <!-- LIVE CHARTS -->
     <section class="live-section">
@@ -3015,6 +3227,213 @@
     }
 
     function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
+
+    // ── MARKET SCANNER ────────────────────────────────────────────────────────
+
+    const scanState = {
+      market:    'ALL',
+      interval:  '1h',
+      watchlist: JSON.parse(localStorage.getItem('wai_watchlist') || '[]'),
+      scanning:  false,
+    };
+
+    function saveWatchlist() {
+      localStorage.setItem('wai_watchlist', JSON.stringify(scanState.watchlist));
+    }
+
+    function renderWatchlistTags() {
+      const el = document.getElementById('watchlistTags');
+      el.innerHTML = '';
+      scanState.watchlist.forEach(ticker => {
+        const tag = document.createElement('div');
+        tag.className = 'watchlist-tag';
+        tag.innerHTML = `${ticker} <span class="watchlist-tag-remove" data-ticker="${ticker}">✕</span>`;
+        tag.querySelector('.watchlist-tag-remove').onclick = () => {
+          scanState.watchlist = scanState.watchlist.filter(t => t !== ticker);
+          saveWatchlist();
+          renderWatchlistTags();
+          runScan();
+        };
+        el.appendChild(tag);
+      });
+    }
+
+    function fmtPrice(p) {
+      if (!p && p !== 0) return '—';
+      const n = parseFloat(p);
+      if (n > 1000)  return n.toLocaleString('en-US', {maximumFractionDigits: 2});
+      if (n > 10)    return n.toFixed(2);
+      return n.toFixed(4);
+    }
+
+    function renderSetupCard(s) {
+      const isLong  = s.trade_direction === 'LONG';
+      const isShort = s.trade_direction === 'SHORT';
+      const typeClass = s.pattern_type || 'neutral';
+      const dirClass  = isLong ? 'long' : isShort ? 'short' : 'wait';
+      const dirLabel  = isLong ? '▲ LONG' : isShort ? '▼ SHORT' : '◆ WAIT';
+      const changePos = s.change_pct >= 0;
+      const dots = Array.from({length: 10}, (_, i) =>
+        `<span class="score-dot${i < s.score ? ' filled' : ''}"></span>`
+      ).join('');
+      const trendLabel = s.trend === 'up' ? '↑ Uptrend' : s.trend === 'down' ? '↓ Downtrend' : '→ Sideways';
+      const marketInfo = { US: '🇺🇸 S&P 500', UK: '🇬🇧 FTSE 100', EU: '🇪🇺 DAX/CAC' };
+
+      return `
+        <div class="setup-card ${typeClass}">
+          <div class="setup-card-top">
+            <div>
+              <div class="setup-ticker">${s.ticker.replace('.L','').replace('.DE','').replace('.PA','')}</div>
+              <div class="setup-market">${marketInfo[s.market] || s.market} · ${s.interval}</div>
+            </div>
+            <div class="setup-badges">
+              <span class="direction-badge ${dirClass}">${dirLabel}</span>
+              <div class="score-badge"><div class="score-dots">${dots}</div>${s.score}/10</div>
+            </div>
+          </div>
+          <div>
+            <div class="setup-pattern">${s.pattern_name}</div>
+            <div class="setup-trend">${trendLabel} · ${cap(s.strength || 'moderate')} signal</div>
+          </div>
+          <div class="setup-price-row">
+            <div class="setup-price">${fmtPrice(s.price)}</div>
+            <div class="setup-change ${changePos ? 'pos' : 'neg'}">${changePos ? '+' : ''}${s.change_pct}%</div>
+          </div>
+          <div class="setup-levels">
+            <div class="level-chip">
+              <div class="level-chip-label">Support</div>
+              <div class="level-chip-val">${fmtPrice(s.support)}</div>
+            </div>
+            <div class="level-chip">
+              <div class="level-chip-label">Resistance</div>
+              <div class="level-chip-val">${fmtPrice(s.resistance)}</div>
+            </div>
+            <div class="level-chip">
+              <div class="level-chip-label">ATR</div>
+              <div class="level-chip-val">${fmtPrice(s.atr)}</div>
+            </div>
+          </div>
+          <button class="setup-analyse-btn" onclick="analyseSetup('${s.ticker}','${s.pattern_name}','${s.trade_direction}')">
+            Analyse with AI →
+          </button>
+        </div>`;
+    }
+
+    function renderMarketStatus(statusData) {
+      const row = document.getElementById('marketStatusRow');
+      if (!row || !statusData) return;
+      row.innerHTML = '';
+      Object.entries(statusData).forEach(([market, info]) => {
+        const open = info.status && info.status.open;
+        const chip = document.createElement('div');
+        chip.className = `mstat-chip ${open ? 'open' : 'closed'}`;
+        chip.innerHTML = `<div class="mstat-dot"></div>${info.flag || ''} ${info.label} · ${info.status ? info.status.label : ''}`;
+        row.appendChild(chip);
+      });
+    }
+
+    async function runScan() {
+      if (scanState.scanning) return;
+      scanState.scanning = true;
+
+      const grid = document.getElementById('scannerGrid');
+      const btn  = document.getElementById('scanRefreshBtn');
+      if (btn) btn.classList.add('spinning');
+      grid.innerHTML = `<div class="scanner-loading"><div class="scanner-spinner"></div><span>Scanning ${scanState.market === 'ALL' ? 'all markets' : scanState.market}…</span></div>`;
+
+      try {
+        const wl  = scanState.watchlist.join(',');
+        const url = `/api/scan?market=${scanState.market}&interval=${scanState.interval}${wl ? '&watchlist=' + encodeURIComponent(wl) : ''}`;
+        const res  = await fetch(url);
+        const data = await res.json();
+
+        // Update market status chips
+        if (data.by_market) renderMarketStatus(data.by_market);
+
+        const setups = data.setups || [];
+        const now = new Date();
+        const upd = document.getElementById('scanLastUpdate');
+        if (upd) upd.textContent = `Updated ${now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`;
+
+        if (setups.length === 0) {
+          grid.innerHTML = `<div class="scanner-empty">
+            <div class="scanner-empty-icon">🔍</div>
+            <div>No high-quality setups found right now.</div>
+            <div style="margin-top:6px;font-size:12px;">Try switching to Daily timeframe or check back during market hours.</div>
+          </div>`;
+        } else {
+          grid.innerHTML = setups.map(renderSetupCard).join('');
+        }
+      } catch (e) {
+        grid.innerHTML = `<div class="scanner-empty">
+          <div class="scanner-empty-icon">⚠️</div>
+          <div>Scanner unavailable — check your connection.</div>
+        </div>`;
+      } finally {
+        scanState.scanning = false;
+        if (btn) btn.classList.remove('spinning');
+      }
+    }
+
+    function analyseSetup(ticker, pattern, direction) {
+      // Show the upload section and pre-fill context for the user
+      document.getElementById('analyze').scrollIntoView({behavior: 'smooth'});
+      const sub = document.querySelector('.cta-section p');
+      if (sub) sub.textContent = `Detected ${pattern} on ${ticker} (${direction}) — upload the chart to get your full AI trade plan.`;
+    }
+
+    // ── Scanner event wiring ───────────────────────────────────────────────────
+
+    document.querySelectorAll('.scanner-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.scanner-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        scanState.market = btn.dataset.market;
+        runScan();
+      });
+    });
+
+    document.getElementById('scanInterval').addEventListener('change', e => {
+      scanState.interval = e.target.value;
+      runScan();
+    });
+
+    document.getElementById('scanRefreshBtn').addEventListener('click', () => {
+      runScan();
+    });
+
+    // Watchlist add
+    function addWatchlistTicker(raw) {
+      const ticker = raw.trim().toUpperCase();
+      if (!ticker || scanState.watchlist.includes(ticker)) return;
+      scanState.watchlist.push(ticker);
+      saveWatchlist();
+      renderWatchlistTags();
+      document.getElementById('watchlistInput').value = '';
+      runScan();
+    }
+
+    document.getElementById('watchlistAddBtn').addEventListener('click', () => {
+      addWatchlistTicker(document.getElementById('watchlistInput').value);
+    });
+    document.getElementById('watchlistInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') addWatchlistTicker(e.target.value);
+    });
+
+    // Auto-refresh every 15 min during market hours
+    function scheduleAutoRefresh() {
+      setInterval(() => {
+        const h = new Date().getUTCHours();
+        const wd = new Date().getUTCDay();
+        const inMarketHours = wd >= 1 && wd <= 5 && h >= 7 && h < 21;
+        if (inMarketHours) runScan();
+      }, 15 * 60 * 1000);
+    }
+
+    // Init
+    renderWatchlistTags();
+    runScan();
+    scheduleAutoRefresh();
   </script>
 </body>
 </html>
