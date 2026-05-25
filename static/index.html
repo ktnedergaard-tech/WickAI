@@ -1629,11 +1629,11 @@
       <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
       {
         "symbols": [
-          {"proName": "NASDAQ:NDX",      "title": "Nasdaq 100"},
-          {"proName": "SP:SPX",          "title": "S&P 500"},
-          {"proName": "BITSTAMP:BTCUSD","title": "BTC/USD"},
+          {"proName": "AMEX:QQQ",        "title": "QQQ (Nasdaq 100)"},
+          {"proName": "AMEX:SPY",        "title": "SPY (S&P 500)"},
+          {"proName": "BINANCE:BTCUSDT", "title": "BTC/USDT"},
           {"proName": "TVC:GOLD",       "title": "Gold"},
-          {"proName": "FX_IDC:EURUSD",  "title": "EUR/USD"},
+          {"proName": "OANDA:EURUSD",    "title": "EUR/USD"},
           {"proName": "TVC:USOIL",      "title": "Oil"}
         ],
         "showSymbolLogo": false,
@@ -1761,11 +1761,11 @@
 
       <!-- Symbol tabs -->
       <div class="symbol-tabs">
-        <button class="symbol-tab active" onclick="changeSymbol('NASDAQ:NDX','Nasdaq 100',this)">Nasdaq 100</button>
-        <button class="symbol-tab" onclick="changeSymbol('SP:SPX','S&P 500',this)">S&P 500</button>
-        <button class="symbol-tab" onclick="changeSymbol('BITSTAMP:BTCUSD','BTC/USD',this)">BTC/USD</button>
+        <button class="symbol-tab active" onclick="changeSymbol('AMEX:QQQ','QQQ / Nasdaq 100',this)">Nasdaq 100</button>
+        <button class="symbol-tab" onclick="changeSymbol('AMEX:SPY','SPY / S&P 500',this)">S&P 500</button>
+        <button class="symbol-tab" onclick="changeSymbol('BINANCE:BTCUSDT','BTC/USDT',this)">BTC/USD</button>
         <button class="symbol-tab" onclick="changeSymbol('TVC:GOLD','Gold',this)">Gold</button>
-        <button class="symbol-tab" onclick="changeSymbol('FX_IDC:EURUSD','EUR/USD',this)">EUR/USD</button>
+        <button class="symbol-tab" onclick="changeSymbol('OANDA:EURUSD','EUR/USD',this)">EUR/USD</button>
         <button class="symbol-tab" onclick="changeSymbol('TVC:USOIL','Oil',this)">Oil</button>
       </div>
 
@@ -2393,7 +2393,7 @@
 
     // ── Live chart controls ──
     let _tvWidget = null;
-    let _chartSymbol = 'NASDAQ:NDX';
+    let _chartSymbol = 'AMEX:QQQ';
     let _chartInterval = '15';
 
     function loadChart(symbol, interval) {
@@ -2550,7 +2550,7 @@
     // Initialise chart on load — wait for tv.js to be ready
     (function initChart() {
       if (typeof TradingView !== 'undefined') {
-        loadChart('NASDAQ:NDX', '15');
+        loadChart('AMEX:QQQ', '15');
       } else {
         setTimeout(initChart, 100);
       }
