@@ -82,6 +82,13 @@ SOURCES = [
     # ── Volume & market structure ─────────────────────────────────────────────
     "https://analyzingalpha.com/volume-spread-analysis",
     "https://www.quantifiedstrategies.com/price-action-patterns/",
+
+    # ── Daytrader.dk (dansk) ──────────────────────────────────────────────────
+    "https://www.daytrader.dk/",
+    "https://www.daytrader.dk/teknisk-analyse/",
+    "https://www.daytrader.dk/candlesticks/",
+    "https://www.daytrader.dk/strategier/",
+    "https://www.daytrader.dk/indikatorer/",
 ]
 
 HEADERS = {
