@@ -2608,7 +2608,7 @@
       } catch(_) {}
     }
     loadMarketIntel();
-    setInterval(loadMarketIntel, 300000); // refresh Fear&Greed every 5 min
+    setInterval(loadMarketIntel, 900000); // refresh Fear&Greed every 15 min
 
     // ── Red/Yellow/Green trading zones — calculated in browser using user's local timezone ──
     const ZONE_SCHEDULE = [
@@ -2934,10 +2934,11 @@
     // ── MARKET SCANNER ────────────────────────────────────────────────────────
 
     const scanState = {
-      market:    'ALL',
-      interval:  '1h',
-      watchlist: JSON.parse(localStorage.getItem('wai_watchlist') || '[]'),
-      scanning:  false,
+      market:     'ALL',
+      interval:   '1h',
+      watchlist:  JSON.parse(localStorage.getItem('wai_watchlist') || '[]'),
+      scanning:   false,
+      hasResults: false,
     };
 
     function saveWatchlist() {
@@ -3058,6 +3059,7 @@
         const upd = document.getElementById('scanLastUpdate');
         if (upd) upd.textContent = `Updated ${now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`;
 
+        scanState.hasResults = true;
         if (setups.length === 0) {
           grid.innerHTML = `<div class="scanner-empty">
             <div class="scanner-empty-icon">🔍</div>
@@ -3092,13 +3094,14 @@
         document.querySelectorAll('.scanner-tab').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         scanState.market = btn.dataset.market;
-        runScan();
+        // Only re-scan if we already have results (not on first idle state)
+        if (scanState.hasResults) runScan();
       });
     });
 
     document.getElementById('scanInterval').addEventListener('change', e => {
       scanState.interval = e.target.value;
-      runScan();
+      if (scanState.hasResults) runScan();
     });
 
     document.getElementById('scanRefreshBtn').addEventListener('click', () => {
@@ -3113,7 +3116,7 @@
       saveWatchlist();
       renderWatchlistTags();
       document.getElementById('watchlistInput').value = '';
-      runScan();
+      if (scanState.hasResults) runScan();
     }
 
     document.getElementById('watchlistAddBtn').addEventListener('click', () => {
@@ -3123,19 +3126,25 @@
       if (e.key === 'Enter') addWatchlistTicker(e.target.value);
     });
 
-    // Auto-refresh every 15 min during market hours
+    // Auto-refresh every 30 min during market hours (not on page load)
     function scheduleAutoRefresh() {
       setInterval(() => {
         const h = new Date().getUTCHours();
         const wd = new Date().getUTCDay();
         const inMarketHours = wd >= 1 && wd <= 5 && h >= 7 && h < 21;
-        if (inMarketHours) runScan();
-      }, 15 * 60 * 1000);
+        if (inMarketHours && !scanState.scanning) runScan();
+      }, 30 * 60 * 1000);
     }
 
-    // Init
+    // Init — show idle state, don't auto-scan on load
     renderWatchlistTags();
-    runScan();
+    document.getElementById('scannerGrid').innerHTML = `
+      <div class="scanner-empty">
+        <div class="scanner-empty-icon">📡</div>
+        <div style="font-size:15px;font-weight:700;color:var(--white);margin-bottom:6px;">Ready to scan</div>
+        <div>Select a market tab or click ↻ to start scanning for setups.</div>
+      </div>`;
+    document.getElementById('scanLastUpdate').textContent = 'Not scanned yet';
     scheduleAutoRefresh();
   </script>
 </body>
