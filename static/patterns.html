@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pattern Library — WickAI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; overflow-x: hidden; }
+
+    :root {
+      --bg:           #03050b;
+      --card:         #0b1120;
+      --card-2:       #07090f;
+      --border:       #111d32;
+      --border-light: #192d48;
+      --accent:       #4d8bff;
+      --green:        #2ecc71;
+      --green-dim:    rgba(46,204,113,0.10);
+      --red:          #e74c3c;
+      --red-dim:      rgba(231,76,60,0.10);
+      --amber:        #f0a500;
+      --amber-dim:    rgba(240,165,0,0.10);
+      --text:         #b0c4de;
+      --text-muted:   #405570;
+      --white:        #ddeeff;
+      --radius:       12px;
+      --t:            0.18s ease;
+    }
+
+    body {
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(ellipse 80% 50% at 15% 10%, rgba(77,139,255,0.08) 0%, transparent 100%),
+        radial-gradient(ellipse 60% 60% at 85% 20%, rgba(46,204,113,0.05) 0%, transparent 100%),
+        linear-gradient(rgba(77,139,255,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(77,139,255,0.015) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 52px 52px, 52px 52px;
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 14px;
+      line-height: 1.65;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Nav ── */
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 28px; height: 60px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(3,5,11,0.85);
+      backdrop-filter: blur(16px);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-mark {
+      width: 30px; height: 30px; border-radius: 8px;
+      background: linear-gradient(135deg, #4d8bff, #2ecc71);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav-mark svg { width: 16px; height: 16px; }
+    .nav-name { font-size: 15px; font-weight: 800; color: var(--white); letter-spacing: -0.3px; }
+    .nav-back {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 13px; color: var(--text-muted); text-decoration: none;
+      padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border);
+      transition: color var(--t), border-color var(--t);
+    }
+    .nav-back:hover { color: var(--white); border-color: var(--border-light); }
+
+    /* ── Page shell ── */
+    .page { max-width: 1300px; margin: 0 auto; padding: 48px 28px 80px; }
+
+    /* ── Hero ── */
+    .lib-hero { margin-bottom: 44px; }
+    .lib-label {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--accent); background: rgba(77,139,255,0.08);
+      border: 1px solid rgba(77,139,255,0.2); padding: 5px 12px; border-radius: 20px; margin-bottom: 16px;
+    }
+    .lib-headline { font-size: clamp(28px, 5vw, 44px); font-weight: 900; color: var(--white); letter-spacing: -1.2px; line-height: 1.1; margin-bottom: 12px; }
+    .lib-headline span { background: linear-gradient(90deg,#4d8bff,#2ecc71); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .lib-sub { font-size: 15px; color: var(--text-muted); max-width: 540px; line-height: 1.7; margin-bottom: 32px; }
+
+    /* ── Stats row ── */
+    .lib-stats { display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 40px; }
+    .lib-stat { display: flex; flex-direction: column; gap: 2px; }
+    .lib-stat-num { font-size: 28px; font-weight: 900; color: var(--white); letter-spacing: -1px; }
+    .lib-stat-lbl { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+    .lib-stat-divider { width: 1px; background: var(--border); align-self: stretch; }
+
+    /* ── Controls ── */
+    .lib-controls {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 28px;
+    }
+    .lib-search-wrap { position: relative; flex: 1; min-width: 220px; max-width: 380px; }
+    .lib-search-wrap svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-muted); pointer-events: none; }
+    .lib-search {
+      width: 100%; padding: 10px 12px 10px 36px;
+      background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+      color: var(--white); font-size: 13.5px; font-family: inherit; outline: none;
+      transition: border-color var(--t);
+    }
+    .lib-search::placeholder { color: var(--text-muted); }
+    .lib-search:focus { border-color: rgba(77,139,255,0.4); }
+
+    .filter-tabs { display: flex; gap: 6px; }
+    .filter-tab {
+      padding: 8px 16px; border-radius: 20px; font-size: 12.5px; font-weight: 700;
+      cursor: pointer; border: 1px solid var(--border); background: transparent;
+      color: var(--text-muted); transition: all var(--t); white-space: nowrap; font-family: inherit;
+    }
+    .filter-tab:hover { border-color: var(--accent); color: var(--white); }
+    .filter-tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .filter-tab.f-bullish.active { background: var(--green); border-color: var(--green); }
+    .filter-tab.f-bearish.active { background: var(--red); border-color: var(--red); }
+    .filter-tab.f-neutral.active { background: var(--amber); border-color: var(--amber); color: #000; }
+
+    .sort-select {
+      padding: 8px 12px; border-radius: 10px; font-size: 12.5px; font-weight: 600;
+      border: 1px solid var(--border); background: var(--card); color: var(--text);
+      outline: none; cursor: pointer; transition: border-color var(--t); font-family: inherit;
+    }
+    .sort-select:focus { border-color: rgba(77,139,255,0.4); }
+
+    .lib-count { font-size: 12px; color: var(--text-muted); margin-left: auto; white-space: nowrap; }
+
+    /* ── Pattern grid ── */
+    .pattern-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 14px;
+    }
+
+    /* ── Pattern card ── */
+    .pat-card {
+      background: rgba(7,9,15,0.75);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px 22px 18px;
+      backdrop-filter: blur(16px);
+      display: flex; flex-direction: column; gap: 10px;
+      transition: border-color var(--t), transform var(--t);
+      position: relative; overflow: hidden;
+    }
+    .pat-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    }
+    .pat-card.bullish::before { background: linear-gradient(90deg, var(--green), transparent); }
+    .pat-card.bearish::before { background: linear-gradient(90deg, var(--red), transparent); }
+    .pat-card.neutral::before  { background: linear-gradient(90deg, var(--amber), transparent); }
+    .pat-card:hover { border-color: var(--border-light); transform: translateY(-2px); }
+
+    .pat-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+    .pat-name { font-size: 15px; font-weight: 800; color: var(--white); letter-spacing: -0.2px; line-height: 1.3; }
+
+    .type-badge {
+      flex-shrink: 0; padding: 3px 9px; border-radius: 5px;
+      font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .type-badge.bullish { background: var(--green-dim); color: var(--green); border: 1px solid rgba(46,204,113,0.2); }
+    .type-badge.bearish { background: var(--red-dim);   color: var(--red);   border: 1px solid rgba(231,76,60,0.2); }
+    .type-badge.neutral { background: var(--amber-dim); color: var(--amber); border: 1px solid rgba(240,165,0,0.2); }
+
+    /* Reliability bar */
+    .pat-reliability { display: flex; align-items: center; gap: 10px; }
+    .rel-label-sm { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; width: 60px; flex-shrink: 0; }
+    .rel-track { flex: 1; height: 4px; background: rgba(255,255,255,0.05); border-radius: 2px; overflow: hidden; }
+    .rel-fill { height: 100%; border-radius: 2px; transition: width 0.4s ease; }
+    .rel-fill.bullish { background: linear-gradient(90deg, rgba(46,204,113,0.5), var(--green)); }
+    .rel-fill.bearish { background: linear-gradient(90deg, rgba(231,76,60,0.5), var(--red)); }
+    .rel-fill.neutral  { background: linear-gradient(90deg, rgba(240,165,0,0.5), var(--amber)); }
+    .rel-num { font-size: 11px; font-weight: 700; color: var(--white); width: 28px; text-align: right; flex-shrink: 0; }
+
+    .pat-divider { height: 1px; background: var(--border); margin: 2px 0; }
+
+    .pat-section-label {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 4px;
+    }
+    .pat-desc { font-size: 13px; color: var(--text); line-height: 1.7; }
+    .pat-guidance {
+      font-size: 12.5px; color: var(--text-muted); line-height: 1.65;
+      background: rgba(255,255,255,0.02); border-radius: 8px;
+      padding: 10px 12px; border: 1px solid rgba(255,255,255,0.04);
+    }
+
+    /* Empty state */
+    .lib-empty {
+      grid-column: 1/-1; text-align: center; padding: 60px 20px;
+      color: var(--text-muted);
+    }
+    .lib-empty-icon { font-size: 36px; margin-bottom: 12px; }
+
+    /* Loading skeleton */
+    .skeleton {
+      background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+      border-radius: 6px;
+    }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 24px 28px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px;
+      font-size: 12px; color: var(--text-muted);
+    }
+    footer a { color: var(--text-muted); text-decoration: none; transition: color var(--t); }
+    footer a:hover { color: var(--white); }
+
+    @media (max-width: 600px) {
+      .page { padding: 28px 16px 60px; }
+      nav { padding: 0 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav>
+    <a class="nav-brand" href="/">
+      <div class="nav-mark">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="1" y="3" width="2" height="10" rx="0.5" fill="white" opacity="0.4"/>
+          <rect x="1" y="5" width="2" height="5" rx="0.5" fill="white"/>
+          <rect x="5" y="2" width="2.5" height="12" rx="0.5" fill="white" opacity="0.4"/>
+          <rect x="5" y="4" width="2.5" height="6" rx="0.5" fill="white"/>
+          <rect x="10" y="4" width="2" height="8" rx="0.5" fill="white" opacity="0.4"/>
+          <rect x="10" y="6" width="2" height="4" rx="0.5" fill="white"/>
+          <rect x="14" y="3" width="1" height="10" rx="0.5" fill="white" opacity="0.2"/>
+        </svg>
+      </div>
+      <span class="nav-name">WickAI</span>
+    </a>
+    <a class="nav-back" href="/">
+      ← Back to platform
+    </a>
+  </nav>
+
+  <div class="page">
+
+    <!-- Hero -->
+    <div class="lib-hero">
+      <div class="lib-label">
+        <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3.5" fill="#4d8bff"/></svg>
+        Pattern Library
+      </div>
+      <h1 class="lib-headline">Every pattern<br><span>WickAI knows</span></h1>
+      <p class="lib-sub">The complete candlestick and chart pattern database — updated automatically every night. Each pattern includes a full description, what it signals, and how to trade it.</p>
+      <div class="lib-stats">
+        <div class="lib-stat">
+          <div class="lib-stat-num" id="statTotal">—</div>
+          <div class="lib-stat-lbl">Total patterns</div>
+        </div>
+        <div class="lib-stat-divider"></div>
+        <div class="lib-stat">
+          <div class="lib-stat-num" id="statBullish" style="color:var(--green)">—</div>
+          <div class="lib-stat-lbl">Bullish</div>
+        </div>
+        <div class="lib-stat-divider"></div>
+        <div class="lib-stat">
+          <div class="lib-stat-num" id="statBearish" style="color:var(--red)">—</div>
+          <div class="lib-stat-lbl">Bearish</div>
+        </div>
+        <div class="lib-stat-divider"></div>
+        <div class="lib-stat">
+          <div class="lib-stat-num" id="statNeutral" style="color:var(--amber)">—</div>
+          <div class="lib-stat-lbl">Neutral</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="lib-controls">
+      <div class="lib-search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+        </svg>
+        <input class="lib-search" id="searchInput" type="text" placeholder="Search patterns…" autocomplete="off" />
+      </div>
+
+      <div class="filter-tabs">
+        <button class="filter-tab active"        data-filter="all">All</button>
+        <button class="filter-tab f-bullish" data-filter="bullish">▲ Bullish</button>
+        <button class="filter-tab f-bearish" data-filter="bearish">▼ Bearish</button>
+        <button class="filter-tab f-neutral"  data-filter="neutral">◆ Neutral</button>
+      </div>
+
+      <select class="sort-select" id="sortSelect">
+        <option value="reliability">Sort: Reliability</option>
+        <option value="name">Sort: A → Z</option>
+        <option value="type">Sort: Type</option>
+      </select>
+
+      <span class="lib-count" id="libCount"></span>
+    </div>
+
+    <!-- Pattern grid -->
+    <div class="pattern-grid" id="patternGrid">
+      <!-- Skeleton loaders -->
+      <div class="pat-card" style="gap:12px;">
+        <div class="skeleton" style="height:20px;width:60%;"></div>
+        <div class="skeleton" style="height:4px;"></div>
+        <div class="skeleton" style="height:60px;"></div>
+        <div class="skeleton" style="height:50px;"></div>
+      </div>
+      <div class="pat-card" style="gap:12px;">
+        <div class="skeleton" style="height:20px;width:70%;"></div>
+        <div class="skeleton" style="height:4px;"></div>
+        <div class="skeleton" style="height:60px;"></div>
+        <div class="skeleton" style="height:50px;"></div>
+      </div>
+      <div class="pat-card" style="gap:12px;">
+        <div class="skeleton" style="height:20px;width:55%;"></div>
+        <div class="skeleton" style="height:4px;"></div>
+        <div class="skeleton" style="height:60px;"></div>
+        <div class="skeleton" style="height:50px;"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    <span>© 2025 WickAI — For educational purposes only. Not financial advice.</span>
+    <div style="display:flex;gap:20px;">
+      <a href="/">Home</a>
+      <a href="#top">Back to top ↑</a>
+    </div>
+  </footer>
+
+  <script>
+    let allPatterns = [];
+    let activeFilter = 'all';
+    let sortMode = 'reliability';
+
+    async function loadPatterns() {
+      try {
+        const res  = await fetch('/api/patterns-full');
+        const data = await res.json();
+        allPatterns = data.patterns || [];
+
+        // Stats
+        const bull = allPatterns.filter(p => p.type === 'bullish').length;
+        const bear = allPatterns.filter(p => p.type === 'bearish').length;
+        const neut = allPatterns.filter(p => p.type === 'neutral').length;
+        document.getElementById('statTotal').textContent   = allPatterns.length;
+        document.getElementById('statBullish').textContent = bull;
+        document.getElementById('statBearish').textContent = bear;
+        document.getElementById('statNeutral').textContent = neut;
+
+        render();
+      } catch (e) {
+        document.getElementById('patternGrid').innerHTML =
+          '<div class="lib-empty"><div class="lib-empty-icon">⚠️</div><div>Could not load patterns.</div></div>';
+      }
+    }
+
+    function render() {
+      const q    = document.getElementById('searchInput').value.trim().toLowerCase();
+      let list   = allPatterns.filter(p => {
+        if (activeFilter !== 'all' && p.type !== activeFilter) return false;
+        if (!q) return true;
+        return p.name.toLowerCase().includes(q) || (p.description||'').toLowerCase().includes(q);
+      });
+
+      // Sort
+      if (sortMode === 'reliability') {
+        list = list.sort((a, b) => (b.reliability||0) - (a.reliability||0));
+      } else if (sortMode === 'name') {
+        list = list.sort((a, b) => a.name.localeCompare(b.name));
+      } else if (sortMode === 'type') {
+        const order = {bullish:0, bearish:1, neutral:2};
+        list = list.sort((a, b) => (order[a.type]||0) - (order[b.type]||0) || a.name.localeCompare(b.name));
+      }
+
+      document.getElementById('libCount').textContent = `${list.length} pattern${list.length !== 1 ? 's' : ''}`;
+
+      const grid = document.getElementById('patternGrid');
+      if (list.length === 0) {
+        grid.innerHTML = '<div class="lib-empty"><div class="lib-empty-icon">🔍</div><div>No patterns match your search.</div></div>';
+        return;
+      }
+
+      grid.innerHTML = list.map(p => renderCard(p)).join('');
+    }
+
+    function renderCard(p) {
+      const rel   = Math.min(10, Math.max(1, p.reliability || 5));
+      const relPct = rel * 10;
+      const desc  = (p.description    || '').replace(/"/g, '&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      const guide = (p.trade_guidance || '').replace(/"/g, '&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      const typeLabel = p.type.charAt(0).toUpperCase() + p.type.slice(1);
+
+      return `
+        <div class="pat-card ${p.type}">
+          <div class="pat-header">
+            <div class="pat-name">${p.name}</div>
+            <span class="type-badge ${p.type}">${typeLabel}</span>
+          </div>
+
+          <div class="pat-reliability">
+            <span class="rel-label-sm">Reliability</span>
+            <div class="rel-track"><div class="rel-fill ${p.type}" style="width:${relPct}%"></div></div>
+            <span class="rel-num">${rel}/10</span>
+          </div>
+
+          <div class="pat-divider"></div>
+
+          <div>
+            <div class="pat-section-label">What it signals</div>
+            <div class="pat-desc">${desc}</div>
+          </div>
+
+          <div>
+            <div class="pat-section-label">How to trade it</div>
+            <div class="pat-guidance">${guide}</div>
+          </div>
+        </div>`;
+    }
+
+    // Event wiring
+    document.getElementById('searchInput').addEventListener('input', render);
+
+    document.querySelectorAll('.filter-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeFilter = btn.dataset.filter;
+        render();
+      });
+    });
+
+    document.getElementById('sortSelect').addEventListener('change', e => {
+      sortMode = e.target.value;
+      render();
+    });
+
+    loadPatterns();
+  </script>
+</body>
+</html>

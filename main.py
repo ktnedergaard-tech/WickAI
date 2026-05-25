@@ -84,11 +84,31 @@ async def serve_frontend():
     return FileResponse(str(index_path), media_type="text/html")
 
 
+@app.get("/patterns", include_in_schema=False)
+async def serve_patterns():
+    p = STATIC_DIR / "patterns.html"
+    if not p.exists():
+        raise HTTPException(status_code=404, detail="Page not found")
+    return FileResponse(str(p), media_type="text/html")
+
+
 @app.get("/api/strategies")
 async def get_strategies():
-    """Return the list of loaded candlestick strategies."""
     names = get_pattern_names()
     return {"count": len(names), "strategies": names}
+
+
+@app.get("/api/patterns-full")
+async def get_patterns_full():
+    """Return all patterns with full descriptions and trade guidance."""
+    from patterns import CANDLESTICK_PATTERNS
+    return {
+        "count": len(CANDLESTICK_PATTERNS),
+        "patterns": [
+            {"key": k, **v}
+            for k, v in CANDLESTICK_PATTERNS.items()
+        ],
+    }
 
 
 @app.get("/api/prices")
