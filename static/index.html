@@ -379,26 +379,71 @@
     }
 
     /* ── Features ── */
-    .features-section { margin-bottom: 64px; }
-    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+    .features-section { margin-bottom: 80px; }
+
+    .feat-header { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 36px; }
+    .feat-headline { font-size: clamp(22px, 4vw, 32px); font-weight: 800; color: var(--white); letter-spacing: -0.8px; line-height: 1.2; }
+    .feat-sub { font-size: 14px; color: var(--text-muted); max-width: 380px; line-height: 1.7; }
+
+    /* Big hero feature top row */
+    .feat-top { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+    @media (max-width: 720px) { .feat-top { grid-template-columns: 1fr; } }
+
+    /* Bottom 4-up row */
+    .feat-bottom { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    @media (max-width: 900px) { .feat-bottom { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 480px) { .feat-bottom { grid-template-columns: 1fr; } }
+
     .feature-card {
-      background: rgba(11,17,32,0.65);
+      position: relative; overflow: hidden;
+      background: rgba(7,9,15,0.7);
       border: 1px solid rgba(255,255,255,0.05);
-      border-left: 2px solid rgba(77,139,255,0.2);
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(20px);
       border-radius: var(--radius);
-      padding: 22px;
-      transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+      padding: 28px 26px;
+      transition: border-color 0.2s, transform 0.22s;
     }
-    .feature-card:hover {
-      border-color: rgba(255,255,255,0.08);
-      border-left-color: rgba(77,139,255,0.5);
-      box-shadow: 0 6px 30px rgba(77,139,255,0.07);
-      transform: translateY(-2px);
+    .feature-card:hover { border-color: rgba(255,255,255,0.1); transform: translateY(-3px); }
+
+    /* Accent glow top-left corner per card */
+    .feature-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: var(--fc-line, linear-gradient(90deg, rgba(77,139,255,0.5), transparent));
     }
-    .feature-icon { font-size: 22px; margin-bottom: 12px; display: block; }
-    .feature-title { font-size: 14px; font-weight: 700; color: var(--white); margin-bottom: 7px; }
-    .feature-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+    .feature-card::after {
+      content: ''; position: absolute; top: -60px; left: -40px;
+      width: 160px; height: 160px; border-radius: 50%;
+      background: var(--fc-glow, rgba(77,139,255,0.06));
+      filter: blur(40px); pointer-events: none;
+    }
+
+    /* Colour themes */
+    .fc-blue  { --fc-line: linear-gradient(90deg,rgba(77,139,255,0.6),transparent);  --fc-glow: rgba(77,139,255,0.08);  --fc-accent: #4d8bff; }
+    .fc-green { --fc-line: linear-gradient(90deg,rgba(46,204,113,0.5),transparent);  --fc-glow: rgba(46,204,113,0.07);  --fc-accent: #2ecc71; }
+    .fc-purple{ --fc-line: linear-gradient(90deg,rgba(139,92,246,0.5),transparent);  --fc-glow: rgba(139,92,246,0.07);  --fc-accent: #8b5cf6; }
+    .fc-amber { --fc-line: linear-gradient(90deg,rgba(240,165,0,0.5),transparent);   --fc-glow: rgba(240,165,0,0.06);   --fc-accent: #f0a500; }
+    .fc-teal  { --fc-line: linear-gradient(90deg,rgba(20,184,166,0.5),transparent);  --fc-glow: rgba(20,184,166,0.07);  --fc-accent: #14b8a6; }
+    .fc-red   { --fc-line: linear-gradient(90deg,rgba(231,76,60,0.4),transparent);   --fc-glow: rgba(231,76,60,0.06);   --fc-accent: #e74c3c; }
+
+    /* Icon badge */
+    .feat-icon-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 40px; height: 40px; border-radius: 11px; margin-bottom: 20px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
+      position: relative; z-index: 1;
+    }
+    .feat-icon-badge svg { width: 20px; height: 20px; }
+
+    .feature-title { font-size: 15px; font-weight: 800; color: var(--white); margin-bottom: 8px; letter-spacing: -0.2px; position: relative; z-index: 1; }
+    .feature-desc  { font-size: 13px; color: var(--text-muted); line-height: 1.7; position: relative; z-index: 1; }
+
+    /* Big number stat inside hero features */
+    .feat-stat { font-size: 42px; font-weight: 900; letter-spacing: -2px; line-height: 1; margin-bottom: 6px; color: var(--fc-accent, #4d8bff); position: relative; z-index: 1; }
+    .feat-stat-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 18px; position: relative; z-index: 1; }
+
+    /* Small tag list */
+    .feat-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 18px; position: relative; z-index: 1; }
+    .feat-tag { font-size: 10.5px; font-weight: 700; padding: 3px 8px; border-radius: 5px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); color: var(--text-muted); }
 
     /* ── Pattern showcase ── */
     .patterns-section { margin-bottom: 64px; }
@@ -2259,39 +2304,124 @@
 
     <!-- FEATURES -->
     <section class="features-section">
-      <div class="section-title">Built for serious traders</div>
-      <div class="section-sub">Everything you need to make confident trade decisions</div>
-      <div class="features-grid">
-        <div class="feature-card">
-          <span class="feature-icon">&#x1f4ca;</span>
-          <div class="feature-title">131 Candlestick patterns</div>
-          <div class="feature-desc">From Doji to Kicking and Abandoned Baby — every major reversal, continuation and rare pattern is covered.</div>
+      <div class="feat-header">
+        <div>
+          <div class="hiw-label">
+            <svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="#4d8bff" opacity="0.9"/></svg>
+            Features
+          </div>
+          <div class="feat-headline">Built for<br>serious traders</div>
         </div>
-        <div class="feature-card">
-          <span class="feature-icon">&#x1f3af;</span>
-          <div class="feature-title">Precise entry zones</div>
-          <div class="feature-desc">AI pinpoints exact entry prices based on the pattern structure and market context visible in your chart.</div>
+        <div class="feat-sub">Every tool a professional needs — from pattern identification to structured risk management — in one place.</div>
+      </div>
+
+      <!-- Top hero row: 2 big cards -->
+      <div class="feat-top">
+
+        <!-- Pattern library -->
+        <div class="feature-card fc-blue">
+          <div class="feat-icon-badge">
+            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="5" width="3" height="10" rx="1" fill="#4d8bff" opacity="0.4"/>
+              <rect x="2" y="8" width="3" height="4" rx="1" fill="#4d8bff"/>
+              <rect x="7" y="3" width="3" height="14" rx="1" fill="#4d8bff" opacity="0.4"/>
+              <rect x="7" y="6" width="3" height="6" rx="1" fill="#4d8bff"/>
+              <rect x="12" y="6" width="3" height="9" rx="1" fill="#4d8bff" opacity="0.4"/>
+              <rect x="12" y="9" width="3" height="3" rx="1" fill="#4d8bff"/>
+              <rect x="17" y="4" width="1" height="12" rx="0.5" fill="#4d8bff" opacity="0.2"/>
+            </svg>
+          </div>
+          <div class="feat-stat" id="featPatternCount">131+</div>
+          <div class="feat-stat-label">Candlestick patterns learned</div>
+          <div class="feature-title">The most complete pattern library</div>
+          <div class="feature-desc">From Doji and Hammer to Kicking, Abandoned Baby and Three-Line Strike — every major reversal, continuation and rare pattern. Updated automatically every night via the pattern scraper.</div>
+          <div class="feat-tags">
+            <span class="feat-tag">Reversal patterns</span>
+            <span class="feat-tag">Continuation patterns</span>
+            <span class="feat-tag">Harmonic patterns</span>
+            <span class="feat-tag">SMC / ICT</span>
+          </div>
         </div>
-        <div class="feature-card">
-          <span class="feature-icon">&#x1f6d1;</span>
-          <div class="feature-title">Structured risk management</div>
-          <div class="feature-desc">Stop-loss levels are calculated from the pattern's invalidation point — not guesswork.</div>
+
+        <!-- Trade plan output -->
+        <div class="feature-card fc-green">
+          <div class="feat-icon-badge">
+            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="2" width="16" height="16" rx="3" stroke="#2ecc71" stroke-width="1.2" fill="none"/>
+              <line x1="6" y1="7" x2="14" y2="7" stroke="#2ecc71" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+              <line x1="6" y1="10" x2="14" y2="10" stroke="#2ecc71" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/>
+              <line x1="6" y1="13" x2="10" y2="13" stroke="#2ecc71" stroke-width="1.2" stroke-linecap="round"/>
+              <circle cx="15" cy="5" r="3" fill="#2ecc71"/>
+              <path d="M13.5 5 L14.5 6 L16.5 4" stroke="#000" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="feat-stat" style="font-size:32px;">Entry · SL · TP×3</div>
+          <div class="feat-stat-label">Complete trade plan every time</div>
+          <div class="feature-title">Not a signal — a full trade blueprint</div>
+          <div class="feature-desc">Exact entry zone, stop-loss set at the pattern's invalidation level, three take-profit targets for scaling out, risk/reward ratio and a confidence score — all in one response.</div>
+          <div class="feat-tags">
+            <span class="feat-tag">Precise entry</span>
+            <span class="feat-tag">Pattern-based SL</span>
+            <span class="feat-tag">TP1 · TP2 · TP3</span>
+            <span class="feat-tag">R:R ratio</span>
+          </div>
         </div>
-        <div class="feature-card">
-          <span class="feature-icon">&#x1f4c8;</span>
-          <div class="feature-title">Multiple profit targets</div>
-          <div class="feature-desc">Get TP1, TP2 and TP3 so you can scale out of positions and lock in profits at each key level.</div>
+      </div>
+
+      <!-- Bottom 4-up row -->
+      <div class="feat-bottom">
+
+        <div class="feature-card fc-purple">
+          <div class="feat-icon-badge">
+            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="10" cy="10" r="7" stroke="#8b5cf6" stroke-width="1.2"/>
+              <circle cx="10" cy="10" r="3" stroke="#8b5cf6" stroke-width="1.2" opacity="0.6"/>
+              <circle cx="10" cy="10" r="1.2" fill="#8b5cf6"/>
+            </svg>
+          </div>
+          <div class="feature-title">Live market scanner</div>
+          <div class="feature-desc">130+ stocks across S&P 500, FTSE 100, DAX and CAC scanned every 15 minutes for high-probability setups.</div>
+          <div class="feat-tags"><span class="feat-tag">US · UK · EU</span><span class="feat-tag">Auto-refresh</span></div>
         </div>
-        <div class="feature-card">
-          <span class="feature-icon">&#x2696;&#xfe0f;</span>
-          <div class="feature-title">Risk / Reward ratio</div>
-          <div class="feature-desc">Every setup comes with a calculated R:R ratio so you know immediately whether the trade is worth taking.</div>
+
+        <div class="feature-card fc-amber">
+          <div class="feat-icon-badge">
+            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 15 L7 9 L11 12 L15 5 L17 7" stroke="#f0a500" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="17" cy="7" r="1.5" fill="#f0a500"/>
+            </svg>
+          </div>
+          <div class="feature-title">Market intelligence</div>
+          <div class="feature-desc">Live Fear &amp; Greed index, trading session, Red/Yellow/Green zone and day-of-week context injected into every analysis.</div>
+          <div class="feat-tags"><span class="feat-tag">F&amp;G index</span><span class="feat-tag">Session zones</span></div>
         </div>
-        <div class="feature-card">
-          <span class="feature-icon">&#x1f4f1;</span>
-          <div class="feature-title">Any platform, any market</div>
-          <div class="feature-desc">Works with screenshots from NinjaTrader, TradingView, ThinkOrSwim, MetaTrader and more — stocks, futures, forex, crypto.</div>
+
+        <div class="feature-card fc-teal">
+          <div class="feat-icon-badge">
+            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="3" y="3" width="6" height="6" rx="1.5" stroke="#14b8a6" stroke-width="1.2"/>
+              <rect x="11" y="3" width="6" height="6" rx="1.5" stroke="#14b8a6" stroke-width="1.2" opacity="0.5"/>
+              <rect x="3" y="11" width="6" height="6" rx="1.5" stroke="#14b8a6" stroke-width="1.2" opacity="0.5"/>
+              <rect x="11" y="11" width="6" height="6" rx="1.5" stroke="#14b8a6" stroke-width="1.2"/>
+            </svg>
+          </div>
+          <div class="feature-title">Any platform</div>
+          <div class="feature-desc">TradingView, NinjaTrader, ThinkOrSwim, MetaTrader, cTrader — if you can screenshot it, WickAI can read it.</div>
+          <div class="feat-tags"><span class="feat-tag">Stocks</span><span class="feat-tag">Futures</span><span class="feat-tag">Crypto</span></div>
         </div>
+
+        <div class="feature-card fc-red">
+          <div class="feat-icon-badge">
+            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 3 L10 17 M3 10 L17 10" stroke="#e74c3c" stroke-width="1.4" stroke-linecap="round" opacity="0.4"/>
+              <rect x="7" y="7" width="6" height="6" rx="1" stroke="#e74c3c" stroke-width="1.2"/>
+            </svg>
+          </div>
+          <div class="feature-title">Structured risk</div>
+          <div class="feature-desc">Stop-loss is always anchored to the pattern's invalidation point — not a random percentage or arbitrary level.</div>
+          <div class="feat-tags"><span class="feat-tag">Pattern-based SL</span><span class="feat-tag">Clear invalidation</span></div>
+        </div>
+
       </div>
     </section>
 
@@ -2845,6 +2975,8 @@
           const data = await res.json();
           document.getElementById('strategyCount').textContent = data.count;
           document.getElementById('statPatterns').textContent = data.count;
+          const fp = document.getElementById('featPatternCount');
+          if (fp) fp.textContent = data.count + '+';
         }
       } catch (_) {}
     })();
