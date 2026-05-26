@@ -1,7 +1,8 @@
 """
 WickAI Market Scanner
-Scans US, UK, and EU stocks for candlestick patterns using free yfinance data.
-No extra API key required. Results cached for 15 minutes per market.
+Uses TradingView Screener API as primary data source (no API key needed).
+Falls back to yfinance if TradingView is unavailable.
+Results cached for 15 minutes per market+interval.
 """
 
 import logging
@@ -13,350 +14,394 @@ import pandas as pd
 
 logger = logging.getLogger(__name__)
 
-# ── Ticker universes ───────────────────────────────────────────────────────────
-
-US_TICKERS = [
-    "AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "META", "LLY", "AVGO", "TSLA",
-    "WMT", "JPM", "V", "UNH", "XOM", "ORCL", "MA", "COST", "HD", "PG",
-    "JNJ", "BAC", "ABBV", "CRM", "KO", "CVX", "MRK", "NFLX", "AMD",
-    "PEP", "TMO", "ACN", "MCD", "ADBE", "WFC", "GE", "PM", "NOW",
-    "TXN", "AMGN", "CAT", "SPGI", "ISRG", "INTU", "BKNG", "AXP",
-    "IBM", "DHR", "LIN", "QCOM", "UBER",
-]
-
-UK_TICKERS = [
-    "AZN.L", "SHEL.L", "HSBA.L", "ULVR.L", "RIO.L", "BP.L", "GSK.L",
-    "LSEG.L", "REL.L", "NG.L", "DGE.L", "BAE.L", "NWG.L", "LLOY.L",
-    "VOD.L", "BARC.L", "IMB.L", "SSE.L", "RKT.L", "EXPN.L",
-    "WPP.L", "IAG.L", "STAN.L", "PRU.L", "BATS.L", "BHP.L",
-    "SGE.L", "CNA.L", "ABF.L", "HLN.L",
-]
-
-EU_TICKERS = [
-    # DAX
-    "SAP.DE", "SIE.DE", "ALV.DE", "MBG.DE", "BMW.DE", "BAS.DE",
-    "BAYN.DE", "DTE.DE", "EOAN.DE", "ADS.DE", "DB1.DE", "RWE.DE",
-    "MUV2.DE", "VOW3.DE", "HEN3.DE",
-    # CAC
-    "MC.PA", "OR.PA", "TTE.PA", "BNP.PA", "SAN.PA", "AIR.PA",
-    "SU.PA", "RI.PA", "AI.PA", "DG.PA", "ENGI.PA", "SGO.PA",
-    "VIE.PA", "CAP.PA", "RNO.PA",
-]
+# ── Market definitions ─────────────────────────────────────────────────────────
 
 MARKETS = {
-    "US": {"tickers": US_TICKERS, "label": "S&P 500",  "flag": "🇺🇸", "tz": "US/Eastern"},
-    "UK": {"tickers": UK_TICKERS, "label": "FTSE 100", "flag": "🇬🇧", "tz": "Europe/London"},
-    "EU": {"tickers": EU_TICKERS, "label": "DAX/CAC",  "flag": "🇪🇺", "tz": "Europe/Berlin"},
+    "US": {"label": "S&P 500",  "flag": "🇺🇸", "tv_market": "america"},
+    "UK": {"label": "FTSE 100", "flag": "🇬🇧", "tv_market": "uk"},
+    "EU": {"label": "DAX/CAC",  "flag": "🇪🇺", "tv_market": "germany"},
+}
+
+# TradingView interval mapping  (our interval → TV column suffix)
+_TV_INTERVAL = {
+    "15m": "|15",
+    "30m": "|30",
+    "1h":  "|60",
+    "4h":  "|240",
+    "1d":  "|1D",
 }
 
 # ── Cache ──────────────────────────────────────────────────────────────────────
 _SCAN_CACHE: dict = {}
 _CACHE_TTL  = 15 * 60   # 15 minutes
 
-# ── OHLCV fetching ─────────────────────────────────────────────────────────────
+# ── TradingView Screener scan ──────────────────────────────────────────────────
+
+def _tv_scan(market: str, interval: str = "1h", limit: int = 50) -> list[dict]:
+    """
+    Query TradingView's screener for the top setups in a market.
+    Returns a list of setup dicts ready to return from the API.
+    """
+    from tradingview_screener import Query, Column
+
+    tv_market = MARKETS[market]["tv_market"]
+    sfx = _TV_INTERVAL.get(interval, "|60")
+
+    # TradingView candlestick pattern columns (value: 1=bullish, -1=bearish, 0=none)
+    pattern_cols = [
+        f"Candle.Hammer{sfx}",
+        f"Candle.ShootingStar{sfx}",
+        f"Candle.Doji{sfx}",
+        f"Candle.Engulf{sfx}",
+        f"Candle.Harami{sfx}",
+        f"Candle.MorningStar{sfx}",
+        f"Candle.EveningStar{sfx}",
+        f"Candle.3WhiteSoldiers{sfx}",
+        f"Candle.3BlackCrows{sfx}",
+        f"Candle.AbandonedBaby{sfx}",
+        f"Candle.PiercingLine{sfx}",
+        f"Candle.DarkCloudCover{sfx}",
+    ]
+
+    cols = [
+        "name", "description",
+        f"close{sfx}", f"change{sfx}", f"volume{sfx}",
+        f"RSI{sfx}", f"EMA20{sfx}", f"EMA50{sfx}",
+        f"High.1M{sfx}", f"Low.1M{sfx}",
+        f"ATR{sfx}",
+        f"Recommend.All{sfx}",
+    ] + pattern_cols
+
+    # Build filter: at least one pattern must be non-zero
+    pattern_filters = [Column(p) != 0 for p in pattern_cols]
+    filter_clause = pattern_filters[0]
+    for f in pattern_filters[1:]:
+        filter_clause = filter_clause | f
+
+    try:
+        _, df = (
+            Query()
+            .set_markets(tv_market)
+            .select(*cols)
+            .where(
+                filter_clause,
+                Column("market_cap_basic") > 500_000_000,
+                Column(f"volume{sfx}") > 100_000,
+            )
+            .order_by(f"volume{sfx}", ascending=False)
+            .limit(limit)
+            .get_scanner_data()
+        )
+    except Exception as e:
+        logger.warning(f"TradingView screener failed [{market}/{interval}]: {e}")
+        return []
+
+    setups = []
+    for _, row in df.iterrows():
+        try:
+            setup = _tv_row_to_setup(row, market, interval, sfx, pattern_cols)
+            if setup:
+                setups.append(setup)
+        except Exception as e:
+            logger.debug(f"TV row parse error: {e}")
+
+    return setups
+
+
+_TV_PATTERN_NAMES = {
+    "Candle.Hammer":           "Hammer",
+    "Candle.ShootingStar":     "Shooting Star",
+    "Candle.Doji":             "Doji",
+    "Candle.Engulf":           "Engulfing",
+    "Candle.Harami":           "Harami",
+    "Candle.MorningStar":      "Morning Star",
+    "Candle.EveningStar":      "Evening Star",
+    "Candle.3WhiteSoldiers":   "Three White Soldiers",
+    "Candle.3BlackCrows":      "Three Black Crows",
+    "Candle.AbandonedBaby":    "Abandoned Baby",
+    "Candle.PiercingLine":     "Piercing Line",
+    "Candle.DarkCloudCover":   "Dark Cloud Cover",
+}
+
+_BULLISH_PATTERNS = {"Hammer", "Morning Star", "Three White Soldiers",
+                     "Abandoned Baby", "Piercing Line", "Engulfing"}
+_BEARISH_PATTERNS = {"Shooting Star", "Evening Star", "Three Black Crows",
+                     "Dark Cloud Cover", "Engulfing"}
+
+
+def _tv_row_to_setup(row, market: str, interval: str, sfx: str,
+                     pattern_cols: list) -> Optional[dict]:
+    def g(col):
+        return row.get(col, row.get(col.replace(sfx, ""), None))
+
+    ticker = str(row.get("name", "")).replace(":", "").strip()
+    if not ticker:
+        return None
+
+    price      = float(g(f"close{sfx}") or 0)
+    change_pct = float(g(f"change{sfx}") or 0)
+    hi20       = float(g(f"High.1M{sfx}") or price * 1.05)
+    lo20       = float(g(f"Low.1M{sfx}") or price * 0.95)
+    atr        = float(g(f"ATR{sfx}") or price * 0.01)
+    recommend  = float(g(f"Recommend.All{sfx}") or 0)
+    rsi        = float(g(f"RSI{sfx}") or 50)
+
+    # Find active patterns
+    active_patterns = []
+    for col in pattern_cols:
+        val = g(col)
+        if val and val != 0:
+            base = col.replace(sfx, "")
+            name = _TV_PATTERN_NAMES.get(base, base.split(".")[-1])
+            direction = "bullish" if val > 0 else "bearish"
+            active_patterns.append((name, direction, int(val)))
+
+    if not active_patterns:
+        return None
+
+    # Pick the best pattern (prefer multi-candle)
+    multi = [p for p in active_patterns if p[0] in
+             {"Morning Star", "Evening Star", "Three White Soldiers",
+              "Three Black Crows", "Abandoned Baby", "Engulfing"}]
+    chosen_name, chosen_dir, _ = (multi[0] if multi else active_patterns[0])
+
+    # Determine trade direction
+    if chosen_dir == "bullish":
+        trade_dir = "LONG"
+        pattern_type = "bullish"
+    elif chosen_dir == "bearish":
+        trade_dir = "SHORT"
+        pattern_type = "bearish"
+    else:
+        trade_dir = "WAIT"
+        pattern_type = "neutral"
+
+    # Score 1–10 based on recommendation strength, RSI positioning, pattern quality
+    score = 5
+    score += min(3, int(abs(recommend) * 3))   # TV's own signal strength
+    if trade_dir == "LONG"  and rsi < 40: score += 1   # oversold
+    if trade_dir == "SHORT" and rsi > 60: score += 1   # overbought
+    if chosen_name in {"Morning Star", "Evening Star",
+                       "Three White Soldiers", "Three Black Crows",
+                       "Abandoned Baby"}:
+        score += 1   # stronger multi-candle patterns
+    score = min(10, score)
+
+    # Trend from RSI direction
+    if   recommend > 0.2:  trend = "up"
+    elif recommend < -0.2: trend = "down"
+    else:                  trend = "sideways"
+
+    return {
+        "ticker":        ticker,
+        "market":        market,
+        "interval":      interval,
+        "pattern_name":  chosen_name,
+        "pattern_type":  pattern_type,
+        "trade_direction": trade_dir,
+        "score":         score,
+        "trend":         trend,
+        "strength":      "strong" if score >= 8 else "moderate",
+        "price":         round(price, 4),
+        "change_pct":    round(change_pct, 2),
+        "resistance":    round(hi20, 4),
+        "support":       round(lo20, 4),
+        "atr":           round(atr, 4),
+        "scanned_at":    datetime.now(timezone.utc).isoformat(),
+    }
+
+
+# ── yfinance fallback ──────────────────────────────────────────────────────────
+
+_YF_TICKERS = {
+    "US": [
+        "AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "META", "TSLA", "JPM",
+        "V", "XOM", "JNJ", "WMT", "PG", "MA", "HD", "BAC", "ABBV", "CVX",
+        "NFLX", "AMD", "KO", "PEP", "MCD", "ADBE", "CRM", "ORCL", "QCOM",
+    ],
+    "UK": [
+        "AZN.L", "SHEL.L", "HSBA.L", "BP.L", "GSK.L", "RIO.L", "ULVR.L",
+        "LSEG.L", "BAE.L", "NWG.L", "LLOY.L", "VOD.L", "BARC.L",
+    ],
+    "EU": [
+        "SAP.DE", "SIE.DE", "ALV.DE", "MBG.DE", "BMW.DE", "BAS.DE",
+        "MC.PA", "OR.PA", "TTE.PA", "BNP.PA", "AIR.PA", "SU.PA",
+    ],
+}
+
 
 def _make_yf_session():
-    """Browser-like session to avoid Yahoo Finance 403s on cloud IPs."""
     import requests
     s = requests.Session()
     s.headers.update({
         "User-Agent": (
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/124.0.0.0 Safari/537.36"
+            "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
         ),
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.5",
-        "Accept-Encoding": "gzip, deflate, br",
-        "Connection": "keep-alive",
     })
-    # Seed Yahoo cookies so crumb requests succeed on cloud servers
     try:
         s.get("https://finance.yahoo.com", timeout=5)
     except Exception:
         pass
     return s
 
-def _get_ohlcv(ticker: str, interval: str = "1h", period: str = "5d") -> Optional[pd.DataFrame]:
+
+def _get_ohlcv(ticker: str, interval: str = "1h", period: str = "5d"):
     import yfinance as yf
     session = _make_yf_session()
     try:
-        # Use Ticker.history() — avoids the quoteSummary timezone call that 403s on cloud
         t = yf.Ticker(ticker, session=session)
-        df = t.history(interval=interval, period=period, auto_adjust=True, raise_errors=False)
-        if df is None or len(df) < 6:
-            return None
-        df.columns = [c.lower() for c in df.columns]
-        return df.dropna()
+        df = t.history(interval=interval, period=period,
+                       auto_adjust=True, raise_errors=False)
+        if df is not None and len(df) >= 6:
+            df.columns = [c.lower() for c in df.columns]
+            return df.dropna()
     except Exception:
         pass
-    # Fallback: yf.download (older API path)
     try:
         df = yf.download(ticker, interval=interval, period=period,
                          progress=False, auto_adjust=True, session=session)
-        if df is None or len(df) < 6:
-            return None
-        if isinstance(df.columns, pd.MultiIndex):
-            df.columns = [col[0].lower() for col in df.columns]
-        else:
-            df.columns = [c.lower() for c in df.columns]
-        return df.dropna()
+        if df is not None and len(df) >= 6:
+            if isinstance(df.columns, pd.MultiIndex):
+                df.columns = [col[0].lower() for col in df.columns]
+            else:
+                df.columns = [c.lower() for c in df.columns]
+            return df.dropna()
     except Exception as e:
         logger.debug(f"yfinance {ticker}: {e}")
-        return None
+    return None
 
-
-# ── Candle helpers ─────────────────────────────────────────────────────────────
 
 def _f(val) -> float:
-    """Safe float extraction from pandas scalar or Series."""
     try:
         return float(val.iloc[0]) if hasattr(val, "iloc") else float(val)
     except Exception:
         return 0.0
 
-def _body(r) -> float:   return abs(_f(r["close"]) - _f(r["open"]))
-def _uw(r)   -> float:   return _f(r["high"]) - max(_f(r["open"]), _f(r["close"]))
-def _lw(r)   -> float:   return min(_f(r["open"]), _f(r["close"])) - _f(r["low"])
-def _rng(r)  -> float:   return _f(r["high"]) - _f(r["low"])
-def _bull(r) -> bool:    return _f(r["close"]) > _f(r["open"])
-def _bear(r) -> bool:    return _f(r["close"]) < _f(r["open"])
+def _body(r): return abs(_f(r["close"]) - _f(r["open"]))
+def _uw(r):   return _f(r["high"]) - max(_f(r["open"]), _f(r["close"]))
+def _lw(r):   return min(_f(r["open"]), _f(r["close"])) - _f(r["low"])
+def _rng(r):  return _f(r["high"]) - _f(r["low"])
+def _bull(r): return _f(r["close"]) > _f(r["open"])
+def _bear(r): return _f(r["close"]) < _f(r["open"])
 
 
-# ── Pattern detection ──────────────────────────────────────────────────────────
-
-def detect_patterns(df: pd.DataFrame) -> list[dict]:
-    """Detect candlestick patterns. Returns list of found patterns with scores."""
+def _detect_patterns_yf(df: pd.DataFrame) -> list[dict]:
     if len(df) < 5:
         return []
-
     c0, c1, c2 = df.iloc[-1], df.iloc[-2], df.iloc[-3]
     b0, b1, b2 = _body(c0), _body(c1), _body(c2)
-    uw0, lw0   = _uw(c0), _lw(c0)
-    r0         = _rng(c0)
+    uw0, lw0, r0 = _uw(c0), _lw(c0), _rng(c0)
+    avg_body  = df.iloc[-20:].apply(_body, axis=1).mean()
+    avg_range = (df["high"].apply(_f) - df["low"].apply(_f)).iloc[-20:].mean()
+    closes    = df["close"].iloc[-20:].apply(_f)
+    trend     = ("up"   if closes.iloc[-1] > closes.iloc[-5] > closes.iloc[-10] else
+                 "down" if closes.iloc[-1] < closes.iloc[-5] < closes.iloc[-10] else
+                 "sideways")
+    hi20 = df["high"].iloc[-20:].apply(_f).max()
+    lo20 = df["low"].iloc[-20:].apply(_f).min()
+    pos  = (_f(c0["close"]) - lo20) / (hi20 - lo20) if (hi20 - lo20) > 0 else 0.5
+    at_sup, at_res = pos < 0.25, pos > 0.75
+    found = []
 
-    tail      = df.iloc[-20:]
-    avg_body  = tail.apply(lambda r: _body(r), axis=1).mean()
-    avg_range = (df["high"] - df["low"]).iloc[-20:].apply(_f).mean()
+    def add(name, ptype, direction, score):
+        found.append({"pattern_name": name, "pattern_type": ptype,
+                      "trade_direction": direction, "score": min(int(score), 10),
+                      "trend": trend, "strength": "strong" if score >= 8 else "moderate"})
 
-    # ── Trend (last 20 candles) ────────────────────────────────────────────────
-    closes = df["close"].iloc[-20:].apply(_f)
-    if closes.iloc[-1] > closes.iloc[-5] and closes.iloc[-5] > closes.iloc[-10]:
-        trend = "up"
-    elif closes.iloc[-1] < closes.iloc[-5] and closes.iloc[-5] < closes.iloc[-10]:
-        trend = "down"
-    else:
-        trend = "sideways"
-
-    # ── Position in 20-candle range ────────────────────────────────────────────
-    hi20   = df["high"].iloc[-20:].apply(_f).max()
-    lo20   = df["low"].iloc[-20:].apply(_f).min()
-    rng20  = hi20 - lo20
-    pos    = (_f(c0["close"]) - lo20) / rng20 if rng20 > 0 else 0.5
-    at_sup = pos < 0.25
-    at_res = pos > 0.75
-
-    found: list[dict] = []
-
-    def add(name, ptype, direction, score, strength="moderate"):
-        found.append({
-            "pattern_name":   name,
-            "pattern_type":   ptype,
-            "trade_direction": direction,
-            "score":          min(int(score), 10),
-            "trend":          trend,
-            "strength":       strength,
-        })
-
-    # ── Single-candle ──────────────────────────────────────────────────────────
-
-    # Doji
     if b0 < avg_range * 0.08 and r0 > avg_range * 0.4:
-        add("Doji", "neutral", "WAIT", 5 + (1 if at_sup or at_res else 0))
-
-    # Hammer  (long lower wick, small body, no upper wick, at bottom)
-    if b0 > 0 and lw0 >= b0 * 2 and uw0 <= b0 * 0.5 and r0 > avg_range * 0.4:
-        s = 6 + (2 if trend == "down" else 0) + (1 if at_sup else 0)
-        add("Hammer", "bullish", "LONG", s, "strong" if s >= 8 else "moderate")
-
-    # Shooting Star  (long upper wick, small body, at top)
-    if b0 > 0 and uw0 >= b0 * 2 and lw0 <= b0 * 0.5 and r0 > avg_range * 0.4:
-        s = 6 + (2 if trend == "up" else 0) + (1 if at_res else 0)
-        add("Shooting Star", "bearish", "SHORT", s, "strong" if s >= 8 else "moderate")
-
-    # Inverted Hammer  (at bottom, needs confirmation — still bullish bias)
-    if b0 > 0 and uw0 >= b0 * 2 and lw0 <= b0 * 0.5 and trend == "down" and at_sup:
-        add("Inverted Hammer", "bullish", "LONG", 6)
-
-    # Hanging Man  (at top)
-    if b0 > 0 and lw0 >= b0 * 2 and uw0 <= b0 * 0.5 and trend == "up" and at_res:
-        add("Hanging Man", "bearish", "SHORT", 6)
-
-    # Marubozu  (full body, almost no wicks — pure momentum)
-    if b0 > avg_body * 1.8 and uw0 < b0 * 0.05 and lw0 < b0 * 0.05:
-        if _bull(c0):
-            s = 7 + (1 if trend == "up" else 0)
-            add("Bullish Marubozu", "bullish", "LONG", s, "strong")
-        else:
-            s = 7 + (1 if trend == "down" else 0)
-            add("Bearish Marubozu", "bearish", "SHORT", s, "strong")
-
-    # Pin Bar  (any direction — large wick relative to total range)
-    if r0 > avg_range * 0.6:
-        dominant_wick = max(uw0, lw0)
-        if dominant_wick > r0 * 0.6 and b0 < r0 * 0.25:
-            if lw0 > uw0:
-                s = 7 + (1 if trend == "down" else 0) + (1 if at_sup else 0)
-                add("Bullish Pin Bar", "bullish", "LONG", s, "strong" if s >= 8 else "moderate")
-            else:
-                s = 7 + (1 if trend == "up" else 0) + (1 if at_res else 0)
-                add("Bearish Pin Bar", "bearish", "SHORT", s, "strong" if s >= 8 else "moderate")
-
-    # ── Two-candle ─────────────────────────────────────────────────────────────
-
-    # Bullish Engulfing
-    if (_bear(c1) and _bull(c0)
-            and _f(c0["open"]) <= _f(c1["close"])
-            and _f(c0["close"]) >= _f(c1["open"])
-            and b0 > b1):
-        s = 7 + (1 if trend == "down" else 0) + (1 if at_sup else 0)
-        add("Bullish Engulfing", "bullish", "LONG", s, "strong" if s >= 8 else "moderate")
-
-    # Bearish Engulfing
-    if (_bull(c1) and _bear(c0)
-            and _f(c0["open"]) >= _f(c1["close"])
-            and _f(c0["close"]) <= _f(c1["open"])
-            and b0 > b1):
-        s = 7 + (1 if trend == "up" else 0) + (1 if at_res else 0)
-        add("Bearish Engulfing", "bearish", "SHORT", s, "strong" if s >= 8 else "moderate")
-
-    # Bullish Harami  (small candle inside prior bearish)
-    if (_bear(c1) and _bull(c0)
-            and _f(c0["open"]) > _f(c1["close"])
-            and _f(c0["close"]) < _f(c1["open"])
-            and b0 < b1 * 0.6):
-        add("Bullish Harami", "bullish", "LONG", 6 + (1 if trend == "down" else 0))
-
-    # Bearish Harami
-    if (_bull(c1) and _bear(c0)
-            and _f(c0["open"]) < _f(c1["close"])
-            and _f(c0["close"]) > _f(c1["open"])
-            and b0 < b1 * 0.6):
-        add("Bearish Harami", "bearish", "SHORT", 6 + (1 if trend == "up" else 0))
-
-    # Tweezer Bottom  (same low, after down-move)
-    if (abs(_f(c0["low"]) - _f(c1["low"])) < avg_range * 0.03
-            and trend == "down" and at_sup):
-        add("Tweezer Bottom", "bullish", "LONG", 7, "moderate")
-
-    # Tweezer Top  (same high, after up-move)
-    if (abs(_f(c0["high"]) - _f(c1["high"])) < avg_range * 0.03
-            and trend == "up" and at_res):
-        add("Tweezer Top", "bearish", "SHORT", 7, "moderate")
-
-    # ── Three-candle ───────────────────────────────────────────────────────────
-
-    # Morning Star
-    if (_bear(c2) and b2 > avg_body
-            and b1 < avg_body * 0.5
-            and _bull(c0) and b0 > avg_body
+        add("Doji", "neutral", "WAIT", 5)
+    if b0 > 0 and lw0 >= b0*2 and uw0 <= b0*0.5 and r0 > avg_range*0.4:
+        add("Hammer", "bullish", "LONG", 6 + (2 if trend=="down" else 0) + (1 if at_sup else 0))
+    if b0 > 0 and uw0 >= b0*2 and lw0 <= b0*0.5 and r0 > avg_range*0.4:
+        add("Shooting Star", "bearish", "SHORT", 6 + (2 if trend=="up" else 0) + (1 if at_res else 0))
+    if b0 > avg_body*1.8 and uw0 < b0*0.05 and lw0 < b0*0.05:
+        if _bull(c0): add("Bullish Marubozu", "bullish", "LONG",  7 + (1 if trend=="up" else 0))
+        else:         add("Bearish Marubozu", "bearish", "SHORT", 7 + (1 if trend=="down" else 0))
+    if r0 > avg_range*0.6:
+        dw = max(uw0, lw0)
+        if dw > r0*0.6 and b0 < r0*0.25:
+            if lw0 > uw0: add("Bullish Pin Bar", "bullish", "LONG",  7 + (1 if trend=="down" else 0) + (1 if at_sup else 0))
+            else:          add("Bearish Pin Bar", "bearish", "SHORT", 7 + (1 if trend=="up"   else 0) + (1 if at_res else 0))
+    if _bear(c1) and _bull(c0) and _f(c0["open"]) <= _f(c1["close"]) and _f(c0["close"]) >= _f(c1["open"]) and b0 > b1:
+        add("Bullish Engulfing", "bullish", "LONG", 7 + (1 if trend=="down" else 0) + (1 if at_sup else 0))
+    if _bull(c1) and _bear(c0) and _f(c0["open"]) >= _f(c1["close"]) and _f(c0["close"]) <= _f(c1["open"]) and b0 > b1:
+        add("Bearish Engulfing", "bearish", "SHORT", 7 + (1 if trend=="up" else 0) + (1 if at_res else 0))
+    if (_bear(c2) and b2 > avg_body and b1 < avg_body*0.5 and _bull(c0) and b0 > avg_body
             and _f(c0["close"]) > (_f(c2["open"]) + _f(c2["close"])) / 2):
-        s = 8 + (1 if trend == "down" else 0)
-        add("Morning Star", "bullish", "LONG", s, "strong")
-
-    # Evening Star
-    if (_bull(c2) and b2 > avg_body
-            and b1 < avg_body * 0.5
-            and _bear(c0) and b0 > avg_body
+        add("Morning Star", "bullish", "LONG", 8 + (1 if trend=="down" else 0))
+    if (_bull(c2) and b2 > avg_body and b1 < avg_body*0.5 and _bear(c0) and b0 > avg_body
             and _f(c0["close"]) < (_f(c2["open"]) + _f(c2["close"])) / 2):
-        s = 8 + (1 if trend == "up" else 0)
-        add("Evening Star", "bearish", "SHORT", s, "strong")
-
-    # Three White Soldiers
-    if len(df) >= 4:
-        last3 = [df.iloc[-i] for i in range(1, 4)]
-        if (all(_bull(c) for c in last3)
-                and all(_body(c) > avg_body * 0.8 for c in last3)
-                and _f(df.iloc[-1]["close"]) > _f(df.iloc[-2]["close"]) > _f(df.iloc[-3]["close"])):
-            add("Three White Soldiers", "bullish", "LONG", 8, "strong")
-
-    # Three Black Crows
-    if len(df) >= 4:
-        last3 = [df.iloc[-i] for i in range(1, 4)]
-        if (all(_bear(c) for c in last3)
-                and all(_body(c) > avg_body * 0.8 for c in last3)
-                and _f(df.iloc[-1]["close"]) < _f(df.iloc[-2]["close"]) < _f(df.iloc[-3]["close"])):
-            add("Three Black Crows", "bearish", "SHORT", 8, "strong")
-
+        add("Evening Star", "bearish", "SHORT", 8 + (1 if trend=="up" else 0))
     return found
 
 
-# ── Enrich setup with price context ───────────────────────────────────────────
-
-def _enrich(patterns: list[dict], df: pd.DataFrame, ticker: str, market: str, interval: str) -> dict | None:
-    if not patterns:
-        return None
-    best = max(patterns, key=lambda p: p["score"])
-    last  = df.iloc[-1]
-    prev  = df.iloc[-2]
-    hi20  = float(df["high"].iloc[-20:].apply(_f).max())
-    lo20  = float(df["low"].iloc[-20:].apply(_f).min())
-    atr   = float((df["high"] - df["low"]).iloc[-14:].apply(
-                lambda r: _f(r["high"]) - _f(r["low"]) if hasattr(r, "__iter__") else r,
-            ).mean()) if False else float(
-                (df["high"].apply(_f) - df["low"].apply(_f)).iloc[-14:].mean()
-            )
-
-    price      = round(_f(last["close"]), 4)
-    prev_price = round(_f(prev["close"]), 4)
-    change_pct = round((price - prev_price) / prev_price * 100, 2) if prev_price else 0.0
-
-    return {
-        **best,
-        "ticker":     ticker,
-        "market":     market,
-        "interval":   interval,
-        "price":      price,
-        "change_pct": change_pct,
-        "resistance": round(hi20, 4),
-        "support":    round(lo20, 4),
-        "atr":        round(atr, 4),
-        "scanned_at": datetime.now(timezone.utc).isoformat(),
-    }
+def _yf_scan(market: str, interval: str = "1h",
+             watchlist: list[str] | None = None) -> list[dict]:
+    tickers = list(_YF_TICKERS.get(market, []))
+    if watchlist:
+        extras = [t.upper() for t in watchlist if t.upper() not in tickers]
+        tickers = extras + tickers
+    period = "5d" if interval in ("15m", "30m", "1h") else "30d"
+    setups = []
+    for ticker in tickers:
+        try:
+            df = _get_ohlcv(ticker, interval=interval, period=period)
+            if df is None:
+                continue
+            patterns = _detect_patterns_yf(df)
+            if not patterns:
+                continue
+            best = max(patterns, key=lambda p: p["score"])
+            if best["score"] < 6:
+                continue
+            last = df.iloc[-1]
+            prev = df.iloc[-2]
+            price      = round(_f(last["close"]), 4)
+            prev_price = round(_f(prev["close"]), 4)
+            hi20 = float(df["high"].apply(_f).iloc[-20:].max())
+            lo20 = float(df["low"].apply(_f).iloc[-20:].min())
+            atr  = float((df["high"].apply(_f) - df["low"].apply(_f)).iloc[-14:].mean())
+            setups.append({
+                **best,
+                "ticker":     ticker,
+                "market":     market,
+                "interval":   interval,
+                "price":      price,
+                "change_pct": round((price - prev_price) / prev_price * 100, 2) if prev_price else 0.0,
+                "resistance": round(hi20, 4),
+                "support":    round(lo20, 4),
+                "atr":        round(atr, 4),
+                "scanned_at": datetime.now(timezone.utc).isoformat(),
+            })
+        except Exception as e:
+            logger.debug(f"Skip {ticker}: {e}")
+        time.sleep(0.1)
+    setups.sort(key=lambda s: s["score"], reverse=True)
+    return setups
 
 
 # ── Market open check ──────────────────────────────────────────────────────────
 
 def market_status(market: str) -> dict:
-    """Return whether a market is currently open and session info."""
     now = datetime.now(timezone.utc)
-    wd  = now.weekday()   # 0=Mon … 6=Sun
+    wd  = now.weekday()
     t   = now.hour * 60 + now.minute
-
     if wd >= 5:
         return {"open": False, "label": "Weekend"}
-
     if market == "US":
-        open_ = 13 * 60 + 30 <= t < 20 * 60
+        open_ = 13*60+30 <= t < 20*60
         return {"open": open_, "label": "Open" if open_ else "Pre/After-Market"}
-    if market == "UK":
-        open_ = 8 * 60 <= t < 16 * 60 + 30
+    if market in ("UK", "EU"):
+        open_ = 8*60 <= t < 17*60+30
         return {"open": open_, "label": "Open" if open_ else "Closed"}
-    if market == "EU":
-        open_ = 8 * 60 <= t < 17 * 60 + 30
-        return {"open": open_, "label": "Open" if open_ else "Closed"}
-
     return {"open": True, "label": "Unknown"}
 
 
-# ── Core scan function ─────────────────────────────────────────────────────────
+# ── Public scan functions ──────────────────────────────────────────────────────
 
 def scan_market(market: str, interval: str = "1h",
                 watchlist: list[str] | None = None) -> list[dict]:
-    """
-    Scan all tickers for a market (+ optional watchlist extras).
-    Returns setups sorted by score desc, cached for _CACHE_TTL.
-    """
     cache_key = f"{market}:{interval}"
     now = time.time()
     if cache_key in _SCAN_CACHE:
@@ -365,45 +410,23 @@ def scan_market(market: str, interval: str = "1h",
             logger.info(f"Cache hit: {market}/{interval} ({len(c['results'])} setups)")
             return c["results"]
 
-    tickers = list(MARKETS[market]["tickers"])
-    if watchlist:
-        extras = [t.upper() for t in watchlist if t.upper() not in tickers]
-        tickers = extras + tickers
+    logger.info(f"Scanning {market}/{interval} via TradingView…")
+    setups = _tv_scan(market, interval)
 
-    period = "5d" if interval in ("15m", "30m", "1h") else "30d"
-    setups: list[dict] = []
-
-    logger.info(f"Scanning {len(tickers)} tickers [{market}, {interval}]…")
-
-    for ticker in tickers:
-        try:
-            df = _get_ohlcv(ticker, interval=interval, period=period)
-            if df is None:
-                continue
-            patterns = detect_patterns(df)
-            setup    = _enrich(patterns, df, ticker, market, interval)
-            if setup and setup["score"] >= 6:
-                setups.append(setup)
-        except Exception as e:
-            logger.debug(f"Skip {ticker}: {e}")
-        time.sleep(0.15)   # polite delay — keeps yfinance happy
+    if not setups:
+        logger.info(f"TradingView returned 0 results, falling back to yfinance [{market}]")
+        setups = _yf_scan(market, interval, watchlist)
+    elif watchlist:
+        # Merge watchlist tickers (yfinance for those specific tickers)
+        wl_setups = _yf_scan("US", interval, watchlist)
+        existing  = {s["ticker"] for s in setups}
+        setups   += [s for s in wl_setups if s["ticker"] not in existing]
 
     setups.sort(key=lambda s: s["score"], reverse=True)
     _SCAN_CACHE[cache_key] = {"ts": now, "results": setups}
-    logger.info(f"Scan done: {len(setups)} setups in {market}/{interval}")
+    logger.info(f"Scan done: {len(setups)} setups [{market}/{interval}]")
     return setups
 
 
 def scan_all(interval: str = "1h", watchlist: list[str] | None = None) -> dict:
-    """Scan all three markets. Returns {market: [setups]}."""
     return {m: scan_market(m, interval=interval, watchlist=watchlist) for m in MARKETS}
-
-
-def get_top_setups(n: int = 20, interval: str = "1h",
-                   watchlist: list[str] | None = None) -> list[dict]:
-    """Return top N setups across all markets, ranked by score."""
-    all_s = []
-    for ms in scan_all(interval=interval, watchlist=watchlist).values():
-        all_s.extend(ms)
-    all_s.sort(key=lambda s: s["score"], reverse=True)
-    return all_s[:n]
