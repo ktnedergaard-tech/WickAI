@@ -1452,11 +1452,13 @@
       color: var(--accent);
       font-size: 9px; font-weight: 800;
       display: inline-flex; align-items: center; justify-content: center;
-      cursor: default;
+      cursor: pointer;
       position: relative;
       flex-shrink: 0;
+      user-select: none;
     }
-    .mi-info-btn:hover .mi-tooltip { opacity: 1; pointer-events: auto; transform: translateY(0); }
+    .mi-info-btn:hover .mi-tooltip,
+    .mi-info-btn.active .mi-tooltip { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
     .mi-tooltip {
       position: absolute;
       bottom: calc(100% + 10px);
@@ -3011,6 +3013,19 @@
           if (fp) fp.textContent = data.count + '+';
         }
       } catch (_) {}
+    })();
+
+    // ── Market Intel info button — click/tap to toggle tooltip ──
+    (function () {
+      const btn = document.querySelector('.mi-info-btn');
+      if (!btn) return;
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        btn.classList.toggle('active');
+      });
+      document.addEventListener('click', function () {
+        btn.classList.remove('active');
+      });
     })();
 
     // ── Live market intelligence widget ──
