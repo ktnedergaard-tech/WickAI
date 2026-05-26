@@ -53,17 +53,49 @@ MARKETS = {
 _SCAN_CACHE: dict = {}
 _CACHE_TTL  = 15 * 60   # 15 minutes
 
-
 # ── OHLCV fetching ─────────────────────────────────────────────────────────────
 
-def _get_ohlcv(ticker: str, interval: str = "1h", period: str = "5d") -> Optional[pd.DataFrame]:
+def _make_yf_session():
+    """Browser-like session to avoid Yahoo Finance 403s on cloud IPs."""
+    import requests
+    s = requests.Session()
+    s.headers.update({
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/124.0.0.0 Safari/537.36"
+        ),
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.5",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Connection": "keep-alive",
+    })
+    # Seed Yahoo cookies so crumb requests succeed on cloud servers
     try:
-        import yfinance as yf
-        df = yf.download(ticker, interval=interval, period=period,
-                         progress=False, auto_adjust=True)
+        s.get("https://finance.yahoo.com", timeout=5)
+    except Exception:
+        pass
+    return s
+
+def _get_ohlcv(ticker: str, interval: str = "1h", period: str = "5d") -> Optional[pd.DataFrame]:
+    import yfinance as yf
+    session = _make_yf_session()
+    try:
+        # Use Ticker.history() — avoids the quoteSummary timezone call that 403s on cloud
+        t = yf.Ticker(ticker, session=session)
+        df = t.history(interval=interval, period=period, auto_adjust=True, raise_errors=False)
         if df is None or len(df) < 6:
             return None
-        # yfinance ≥0.2 returns MultiIndex columns even for single tickers
+        df.columns = [c.lower() for c in df.columns]
+        return df.dropna()
+    except Exception:
+        pass
+    # Fallback: yf.download (older API path)
+    try:
+        df = yf.download(ticker, interval=interval, period=period,
+                         progress=False, auto_adjust=True, session=session)
+        if df is None or len(df) < 6:
+            return None
         if isinstance(df.columns, pd.MultiIndex):
             df.columns = [col[0].lower() for col in df.columns]
         else:

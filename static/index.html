@@ -1439,7 +1439,55 @@
       color: var(--accent);
       margin-right: 20px;
       flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
+
+    /* Market Intel info tooltip */
+    .mi-info-btn {
+      width: 15px; height: 15px; border-radius: 50%;
+      background: rgba(77,150,255,0.15);
+      border: 1px solid rgba(77,150,255,0.3);
+      color: var(--accent);
+      font-size: 9px; font-weight: 800;
+      display: inline-flex; align-items: center; justify-content: center;
+      cursor: default;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .mi-info-btn:hover .mi-tooltip { opacity: 1; pointer-events: auto; transform: translateY(0); }
+    .mi-tooltip {
+      position: absolute;
+      bottom: calc(100% + 10px);
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      background: #0d1630;
+      border: 1px solid rgba(77,150,255,0.25);
+      border-radius: 10px;
+      padding: 14px 16px;
+      width: 280px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: 100;
+      text-transform: none;
+      letter-spacing: 0;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    }
+    .mi-tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%; left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: rgba(77,150,255,0.25);
+    }
+    .mi-tip-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-start; }
+    .mi-tip-row:last-child { margin-bottom: 0; }
+    .mi-tip-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+    .mi-tip-text { font-size: 11.5px; color: var(--text); line-height: 1.5; font-weight: 400; }
+    .mi-tip-text strong { color: var(--white); font-weight: 700; }
     .mi-block {
       display: flex;
       align-items: center;
@@ -1937,7 +1985,25 @@
 
     <!-- MARKET INTELLIGENCE BAR -->
     <div class="market-intel-bar" id="marketIntelBar">
-      <span class="mi-label">Market Intel</span>
+      <span class="mi-label">
+        Market Intel
+        <span class="mi-info-btn">!
+          <div class="mi-tooltip">
+            <div class="mi-tip-row">
+              <span class="mi-tip-icon">🕐</span>
+              <span class="mi-tip-text"><strong>Session</strong> — hvilken handelsession der er aktiv: Asian, London eller US. Viser hvornår der er mest likviditet og volumen.</span>
+            </div>
+            <div class="mi-tip-row">
+              <span class="mi-tip-icon">📊</span>
+              <span class="mi-tip-text"><strong>Sentiment (Fear &amp; Greed)</strong> — CNNs Fear &amp; Greed Index fra 0–100. Under 25 = ekstrem frygt (potentiel købsmulighed). Over 75 = ekstrem grådighed (pas på toppe).</span>
+            </div>
+            <div class="mi-tip-row">
+              <span class="mi-tip-icon">💡</span>
+              <span class="mi-tip-text"><strong>Noten til højre</strong> — live kontekst om hvad der typisk sker i denne session: hvilke par/indeks der er mest aktive og hvad man bør holde øje med.</span>
+            </div>
+          </div>
+        </span>
+      </span>
       <div class="mi-block">
         <span class="mi-session-dot active" id="miDot" style="background:#566a85"></span>
         <span class="mi-block-label">Session</span>
