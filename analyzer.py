@@ -217,7 +217,7 @@ def _analyze_gemini(image_bytes: bytes, media_type: str, prompt: str) -> dict:
     import google.generativeai as genai
     genai.configure(api_key=GEMINI_API_KEY)
     model = genai.GenerativeModel(
-        model_name="gemini-2.0-flash",
+        model_name="gemini-1.5-flash",
         system_instruction=prompt,
     )
     image_part = {
