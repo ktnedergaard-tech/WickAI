@@ -11,6 +11,11 @@ Free-tier optimised:
   - Saves a resume cache (scraper_cache.json) so a crash loses no work
   - Auto-commits new patterns to git after writing
 
+Dynamic source discovery:
+  - Each run Gemini analyses the existing pattern database
+  - Identifies gaps (missing categories, exotic patterns, etc.)
+  - Suggests new URLs to scrape — the list grows automatically over time
+
 Usage:
   python scraper.py                  # run and commit new patterns
   python scraper.py --dry-run        # preview without writing or committing
@@ -129,6 +134,47 @@ Return as a JSON array using the same structure. Return [] if nothing is new.
 
 DEDUP_BATCH_SIZE = 40   # max candidates per AI dedup call
 
+# Max extra URLs Gemini may suggest per run — keeps Gemini quota under control
+MAX_DISCOVERED_URLS = 15
+
+SOURCE_DISCOVERY_PROMPT = """You are building the world's most comprehensive trading pattern database.
+
+PATTERNS ALREADY IN DATABASE ({count} total — do NOT suggest sources that only cover these):
+{existing}
+
+URLS ALREADY SCRAPED (skip these entirely):
+{scraped}
+
+Your task: identify gaps in the pattern database and suggest up to {max_urls} specific URLs
+from reputable trading education websites that would add genuinely NEW patterns.
+
+Prioritise underrepresented areas such as:
+- Rare / exotic Japanese candlestick patterns
+- ICT (Inner Circle Trader) specific setups: Silver Bullet, Power of 3, Turtle Soup, OTE, etc.
+- Wyckoff method: Spring, Upthrust, Accumulation/Distribution phases, LPS, UTAD, etc.
+- Harmonic patterns: Gartley, Bat, Butterfly, Crab, Cypher, Shark, 5-0, Nen Star, etc.
+- Volume Spread Analysis (VSA): No Demand, No Supply, Stopping Volume, Test, etc.
+- Price action (Al Brooks / Nial Fuller): Inside Bar, Fakey, Pin Bar, NR7, Outside Bar, etc.
+- SMC / market structure: BOS, CHoCH, Liquidity Sweep, Mitigation Block, Propulsion Block, etc.
+- Elliott Wave sub-patterns: Impulse Wave, Diagonal, Zigzag, Flat, Triangle, etc.
+- Point & Figure / Renko / Heikin-Ashi patterns
+- Gap patterns: Breakaway Gap, Runaway Gap, Exhaustion Gap, Island Reversal
+
+Only suggest URLs from well-known, reputable sites such as:
+thepatternsite.com, school.stockcharts.com, investopedia.com, babypips.com,
+howtotrade.com, litefinance.org, fxopen.com, innercircletrader.net,
+strike.money, dailyfx.com, forex.com, avatrade.com, capital.com,
+tradingsim.com, mindmathmoney.com, alchemymarkets.com, the5ers.com,
+quantifiedstrategies.com, analyzingalpha.com, tradeguider.com,
+wyckoffanalytics.com, roboforex.com, naga.com, chartschool.stockcharts.com,
+ig.com, cmcmarkets.com, fxpro.com, axitrader.com, tickmill.com
+
+Return ONLY a valid JSON array — no markdown, no extra text:
+[{{"url": "https://...", "reason": "covers X patterns not yet in database"}}, ...]
+
+Return [] if no additional sources are needed.
+"""
+
 
 # ── Gemini helper ──────────────────────────────────────────────────────────────
 
@@ -202,6 +248,37 @@ def extract_patterns_from_text(text: str) -> list[dict]:
         return []
 
 
+def discover_sources(existing_names: list[str], already_scraped: set[str]) -> list[str]:
+    """Ask Gemini to suggest new URLs based on gaps in the current pattern database."""
+    logger.info("Asking Gemini to identify database gaps and suggest new sources…")
+    existing_sample = existing_names[:200]  # keep prompt size manageable
+    scraped_list = "\n".join(f"- {u}" for u in sorted(already_scraped)[:80])
+    prompt = SOURCE_DISCOVERY_PROMPT.format(
+        count=len(existing_names),
+        existing="\n".join(f"- {n}" for n in existing_sample),
+        scraped=scraped_list or "(none yet)",
+        max_urls=MAX_DISCOVERED_URLS,
+    )
+    try:
+        raw = _gemini_call(prompt)
+        suggestions = json.loads(raw)
+        if not isinstance(suggestions, list):
+            logger.warning("Source discovery returned non-list — skipping")
+            return []
+        urls = []
+        for item in suggestions:
+            url = item.get("url", "").strip()
+            reason = item.get("reason", "")
+            if url and url.startswith("http") and url not in already_scraped:
+                logger.info(f"  Discovered: {url}  ({reason})")
+                urls.append(url)
+        logger.info(f"Source discovery found {len(urls)} new URL(s) to scrape")
+        return urls
+    except Exception as e:
+        logger.warning(f"Source discovery failed: {e}")
+        return []
+
+
 def _normalise_name(name: str) -> str:
     """Lowercase + strip punctuation for fuzzy name comparison."""
     return re.sub(r"[^a-z0-9]", "", name.lower())
@@ -258,7 +335,7 @@ def load_cache() -> dict:
                 return json.load(f)
         except Exception:
             pass
-    return {"scraped_urls": [], "candidates": []}
+    return {"scraped_urls": [], "candidates": [], "discovered_urls": []}
 
 
 def save_cache(cache: dict) -> None:
@@ -370,8 +447,19 @@ def run(dry_run: bool = False, no_commit: bool = False) -> int:
             f"{len(all_candidates)} candidates buffered"
         )
 
+    # ── Dynamic source discovery ──────────────────────────────────────────────
+    # Only run discovery at the start of a fresh run (not when resuming mid-run)
+    discovered: list[str] = []
+    if not already_done:
+        discovered = discover_sources(existing_names, set(SOURCES))
+        if discovered:
+            cache["discovered_urls"] = discovered
+            save_cache(cache)
+
+    urls_to_scrape = SOURCES + (cache.get("discovered_urls") or discovered)
+
     # ── Scrape each source ────────────────────────────────────────────────────
-    for url in SOURCES:
+    for url in urls_to_scrape:
         if url in already_done:
             logger.info(f"Skipping (cached): {url}")
             continue
