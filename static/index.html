@@ -2124,8 +2124,8 @@
 
       <!-- Symbol tabs -->
       <div class="symbol-tabs">
-        <button class="symbol-tab active" onclick="changeSymbol('AMEX:QQQ','QQQ / Nasdaq 100',this)">Nasdaq 100</button>
-        <button class="symbol-tab" onclick="changeSymbol('AMEX:SPY','SPY / S&P 500',this)">S&P 500</button>
+        <button class="symbol-tab" onclick="changeSymbol('AMEX:QQQ','QQQ / Nasdaq 100',this)">Nasdaq 100</button>
+        <button class="symbol-tab active" onclick="changeSymbol('AMEX:SPY','SPY / S&P 500',this)">S&P 500</button>
         <button class="symbol-tab" onclick="changeSymbol('BINANCE:BTCUSDT','BTC/USDT',this)">BTC/USD</button>
         <button class="symbol-tab" onclick="changeSymbol('TVC:GOLD','Gold',this)">Gold</button>
         <button class="symbol-tab" onclick="changeSymbol('OANDA:EURUSD','EUR/USD',this)">EUR/USD</button>
@@ -2756,7 +2756,7 @@
 
     // ── Live chart controls ──
     let _tvWidget = null;
-    let _chartSymbol = 'AMEX:QQQ';
+    let _chartSymbol = 'AMEX:SPY';
     let _chartInterval = '15';
 
     function loadChart(symbol, interval) {
@@ -2913,7 +2913,7 @@
     // Initialise chart on load — wait for tv.js to be ready
     (function initChart() {
       if (typeof TradingView !== 'undefined') {
-        loadChart('AMEX:QQQ', '15');
+        loadChart('AMEX:SPY', '15');
       } else {
         setTimeout(initChart, 100);
       }
