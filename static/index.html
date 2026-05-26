@@ -1491,18 +1491,47 @@
 
     /* Market hours strip */
     .market-hours-strip {
-      display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px;
+      display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;
     }
     .mhours-item {
-      display: flex; align-items: center; gap: 8px;
-      background: rgba(255,255,255,0.03); border: 1px solid var(--border);
-      border-radius: 8px; padding: 6px 12px; font-size: 11.5px;
+      position: relative; overflow: hidden;
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(11,17,32,0.7);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 18px;
+      backdrop-filter: blur(12px);
+      transition: border-color var(--t), transform var(--t);
+      flex: 1; min-width: 160px;
     }
-    .mhours-flag { font-size: 14px; }
-    .mhours-name { font-weight: 700; color: var(--white); }
-    .mhours-time { color: var(--text-muted); }
-    .mhours-item.is-open { border-color: rgba(46,204,113,0.2); }
+    .mhours-item::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      border-radius: var(--radius) var(--radius) 0 0;
+      background: var(--border);
+      transition: background var(--t);
+    }
+    .mhours-item:hover { border-color: var(--border-light); transform: translateY(-2px); }
+    .mhours-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--text-muted); flex-shrink: 0;
+      transition: background var(--t), box-shadow var(--t);
+    }
+    .mhours-info { display: flex; flex-direction: column; gap: 2px; }
+    .mhours-name {
+      font-size: 12px; font-weight: 800; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .mhours-time { font-size: 13px; font-weight: 700; color: var(--white); }
+    .mhours-label { font-size: 10.5px; color: var(--text-muted); font-weight: 600; margin-top: 1px; }
+
+    .mhours-item.is-open { border-color: rgba(46,204,113,0.25); }
+    .mhours-item.is-open::before { background: linear-gradient(90deg, var(--green), transparent); }
+    .mhours-item.is-open .mhours-dot {
+      background: var(--green); box-shadow: 0 0 7px var(--green);
+      animation: blink 2s ease-in-out infinite;
+    }
     .mhours-item.is-open .mhours-name { color: var(--green); }
+    .mhours-item.is-open .mhours-time { color: var(--white); }
 
     /* Setup grid */
     .scanner-grid {
@@ -1746,19 +1775,28 @@
       <!-- Market hours strip -->
       <div class="market-hours-strip" id="marketHoursStrip">
         <div class="mhours-item" id="mhours-US">
-          <span class="mhours-flag">🇺🇸</span>
-          <span class="mhours-name">US</span>
-          <span class="mhours-time">14:30 – 21:00 CET</span>
+          <div class="mhours-dot"></div>
+          <div class="mhours-info">
+            <div class="mhours-name">🇺🇸 US</div>
+            <div class="mhours-time">14:30 – 21:00 CET</div>
+            <div class="mhours-label">NYSE / NASDAQ</div>
+          </div>
         </div>
         <div class="mhours-item" id="mhours-UK">
-          <span class="mhours-flag">🇬🇧</span>
-          <span class="mhours-name">UK</span>
-          <span class="mhours-time">09:00 – 17:30 CET</span>
+          <div class="mhours-dot"></div>
+          <div class="mhours-info">
+            <div class="mhours-name">🇬🇧 UK</div>
+            <div class="mhours-time">09:00 – 17:30 CET</div>
+            <div class="mhours-label">London Stock Exchange</div>
+          </div>
         </div>
         <div class="mhours-item" id="mhours-EU">
-          <span class="mhours-flag">🇪🇺</span>
-          <span class="mhours-name">EU</span>
-          <span class="mhours-time">09:00 – 17:30 CET</span>
+          <div class="mhours-dot"></div>
+          <div class="mhours-info">
+            <div class="mhours-name">🇪🇺 EU</div>
+            <div class="mhours-time">09:00 – 17:30 CET</div>
+            <div class="mhours-label">Frankfurt / Paris</div>
+          </div>
         </div>
       </div>
 
