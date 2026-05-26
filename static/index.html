@@ -2535,6 +2535,21 @@
 
     <!-- UPLOAD -->
     <section class="upload-section">
+      <!-- API key warning — shown if no key is configured -->
+      <div id="apiKeyBanner" style="display:none;background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.3);border-radius:12px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:flex-start;gap:14px;">
+        <span style="font-size:22px;flex-shrink:0;">🔑</span>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:700;color:#ff6b6b;margin-bottom:6px;">Ingen AI-nøgle konfigureret — analyse virker ikke</div>
+          <div style="font-size:13px;color:var(--text);line-height:1.7;">
+            Gør dette for at aktivere analyse (gratis, 2 min):
+            <ol style="margin:8px 0 0 18px;display:flex;flex-direction:column;gap:4px;">
+              <li>Gå til <a href="https://console.groq.com" target="_blank" style="color:#4d96ff;text-decoration:underline;">console.groq.com</a> → opret gratis konto → <strong style="color:var(--white);">API Keys</strong> → kopiér nøglen</li>
+              <li>Åbn <strong style="color:var(--white);">Render</strong> → dit service → <strong style="color:var(--white);">Environment</strong> → <strong style="color:var(--white);">Add environment variable</strong></li>
+              <li>Key: <code style="background:rgba(77,150,255,0.12);padding:2px 8px;border-radius:5px;color:#4d96ff;">GROQ_API_KEY</code> &nbsp; Value: din nøgle → <strong style="color:var(--white);">Save</strong></li>
+            </ol>
+          </div>
+        </div>
+      </div>
       <div class="upload-zone" id="uploadZone" role="button" tabindex="0" aria-label="Upload chart image">
 
         <div class="upload-placeholder" id="uploadPlaceholder">
@@ -3039,6 +3054,16 @@
     loadMarketIntel();
     setInterval(loadMarketIntel, 900000); // refresh Fear&Greed every 15 min
 
+    // ── Check if AI analysis is ready ─────────────────────────────────────────
+    (async () => {
+      try {
+        const res  = await fetch('/health');
+        const data = await res.json();
+        const banner = document.getElementById('apiKeyBanner');
+        if (banner) banner.style.display = data.analysis_ready ? 'none' : 'flex';
+      } catch (_) {}
+    })();
+
     // ── Red/Yellow/Green trading zones — calculated in browser using user's local timezone ──
     const ZONE_SCHEDULE = [
       { start:[9,30],  end:[9,35],  zone:'red',    label:'Opening Danger',
@@ -3327,7 +3352,7 @@
         const banner = document.createElement('div');
         banner.id = 'demoBanner';
         banner.style.cssText = 'background:rgba(201,148,58,0.08);border:1px solid rgba(201,148,58,0.25);border-radius:10px;padding:13px 17px;margin-bottom:16px;color:#c9a86a;font-size:13px;display:flex;align-items:center;gap:10px;';
-        banner.innerHTML = '<span>&#x26a0;</span><span><strong style="color:#d4b87a">Demo mode:</strong> No API key configured — this is sample data. Go to <strong style="color:#d4b87a">Render → your service → Environment</strong> and verify the key name is exactly <code style="background:rgba(201,148,58,0.12);padding:1px 6px;border-radius:4px;font-size:12px;">GEMINI_API_KEY</code>.</span>';
+        banner.innerHTML = '<span>⚠️</span><span><strong style="color:#d4b87a">Demo mode:</strong> Ingen API-nøgle sat — dette er eksempel-data. <a href="https://console.groq.com" target="_blank" style="color:#d4b87a;text-decoration:underline;">Få gratis Groq-nøgle</a> → Render → dit service → Environment → tilføj <code style="background:rgba(201,148,58,0.12);padding:1px 6px;border-radius:4px;font-size:12px;">GROQ_API_KEY</code>.</span>';
         results.insertBefore(banner, results.firstChild);
       }
 
