@@ -213,48 +213,58 @@ def _analyze_groq(image_bytes: bytes, media_type: str, prompt: str) -> dict:
 
 
 def _analyze_gemini(image_bytes: bytes, media_type: str, prompt: str) -> dict:
-    """Call Google Gemini via new google-genai SDK (uses stable v1 API)."""
+    """Call Google Gemini via google-genai SDK. Tries models in order until one works."""
     from google import genai
     from google.genai import types
 
     client = genai.Client(api_key=GEMINI_API_KEY)
-    b64 = base64.b64encode(image_bytes).decode("utf-8")
 
-    for attempt in range(3):
-        try:
-            response = client.models.generate_content(
-                model="gemini-1.5-flash",
-                contents=[
-                    types.Part.from_bytes(data=image_bytes, mime_type=media_type),
-                    "Analyse this candlestick chart and return the JSON trade recommendation.",
-                ],
-                config=types.GenerateContentConfig(
-                    system_instruction=prompt,
-                    temperature=0.2,
-                    max_output_tokens=1024,
-                ),
-            )
-            text = response.text.strip()
-            logger.info(f"Gemini response received ({len(text)} chars)")
-            return validate_and_normalize(parse_json_response(text))
+    # Try models in order — first one that responds wins
+    models_to_try = [
+        "gemini-2.0-flash-lite",
+        "gemini-2.0-flash",
+        "gemini-1.5-flash",
+        "gemini-1.5-flash-8b",
+        "gemini-1.5-flash-latest",
+    ]
 
-        except Exception as e:
-            err_str = str(e)
-            if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
-                match = re.search(r"seconds:\s*(\d+)", err_str)
-                delay = min(int(match.group(1)) if match else 60, 65)
-                logger.warning(f"Gemini rate limited (attempt {attempt+1}/3). Waiting {delay}s…")
-                if attempt < 2:
-                    time.sleep(delay)
-                    continue
-                raise ValueError(
-                    f"RATE_LIMIT:{delay}:Gemini free tier quota reached. "
-                    "Please wait about a minute and try again."
+    last_error = None
+    for model_name in models_to_try:
+        for attempt in range(2):
+            try:
+                response = client.models.generate_content(
+                    model=model_name,
+                    contents=[
+                        types.Part.from_bytes(data=image_bytes, mime_type=media_type),
+                        "Analyse this candlestick chart and return the JSON trade recommendation.",
+                    ],
+                    config=types.GenerateContentConfig(
+                        system_instruction=prompt,
+                        temperature=0.2,
+                        max_output_tokens=1024,
+                    ),
                 )
-            logger.error(f"Gemini error: {e}")
-            raise ValueError(f"Analysis failed: {e}")
+                text = response.text.strip()
+                logger.info(f"Gemini [{model_name}] response received ({len(text)} chars)")
+                return validate_and_normalize(parse_json_response(text))
 
-    raise ValueError("Gemini analysis failed after retries")
+            except Exception as e:
+                err_str = str(e)
+                if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
+                    delay = 30
+                    if attempt == 0:
+                        time.sleep(delay)
+                        continue
+                    raise ValueError(f"RATE_LIMIT:{delay}:Gemini quota reached. Wait a moment and try again.")
+                if "404" in err_str or "NOT_FOUND" in err_str:
+                    logger.debug(f"Model {model_name} not available, trying next…")
+                    last_error = e
+                    break  # try next model
+                logger.error(f"Gemini [{model_name}] error: {e}")
+                last_error = e
+                break
+
+    raise ValueError(f"No Gemini model available. Last error: {last_error}")
 
 
 def parse_json_response(text: str) -> dict:
