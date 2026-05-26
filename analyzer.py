@@ -219,7 +219,9 @@ def _analyze_gemini(image_bytes: bytes, media_type: str, prompt: str) -> dict:
 
     client = genai.Client(api_key=GEMINI_API_KEY)
 
-    for attempt in range(2):
+    retry_delays = [15, 30]
+
+    for attempt in range(3):
         try:
             response = client.models.generate_content(
                 model="gemini-2.0-flash-lite",
@@ -240,14 +242,16 @@ def _analyze_gemini(image_bytes: bytes, media_type: str, prompt: str) -> dict:
         except Exception as e:
             err_str = str(e)
             if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
-                if attempt == 0:
-                    time.sleep(15)
+                if attempt < len(retry_delays):
+                    delay = retry_delays[attempt]
+                    logger.warning(f"Gemini rate limited (attempt {attempt+1}/3). Waiting {delay}s…")
+                    time.sleep(delay)
                     continue
                 raise ValueError("RATE_LIMIT:15:Gemini kvote nået — vent 15 sek og prøv igen.")
             logger.error(f"Gemini error: {e}")
             raise ValueError(f"Analysis failed: {e}")
 
-    raise ValueError("Gemini analysis failed")
+    raise ValueError("Gemini analysis failed after retries")
 
 
 def parse_json_response(text: str) -> dict:
