@@ -213,58 +213,41 @@ def _analyze_groq(image_bytes: bytes, media_type: str, prompt: str) -> dict:
 
 
 def _analyze_gemini(image_bytes: bytes, media_type: str, prompt: str) -> dict:
-    """Call Google Gemini via google-genai SDK. Tries models in order until one works."""
+    """Call Google Gemini 2.0 Flash Lite — free tier, 30 RPM."""
     from google import genai
     from google.genai import types
 
     client = genai.Client(api_key=GEMINI_API_KEY)
 
-    # Try models in order — first one that responds wins
-    models_to_try = [
-        "gemini-2.0-flash-lite",
-        "gemini-2.0-flash",
-        "gemini-1.5-flash",
-        "gemini-1.5-flash-8b",
-        "gemini-1.5-flash-latest",
-    ]
+    for attempt in range(2):
+        try:
+            response = client.models.generate_content(
+                model="gemini-2.0-flash-lite",
+                contents=[
+                    types.Part.from_bytes(data=image_bytes, mime_type=media_type),
+                    "Analyse this candlestick chart and return the JSON trade recommendation.",
+                ],
+                config=types.GenerateContentConfig(
+                    system_instruction=prompt,
+                    temperature=0.2,
+                    max_output_tokens=1024,
+                ),
+            )
+            text = response.text.strip()
+            logger.info(f"Gemini response received ({len(text)} chars)")
+            return validate_and_normalize(parse_json_response(text))
 
-    last_error = None
-    for model_name in models_to_try:
-        for attempt in range(2):
-            try:
-                response = client.models.generate_content(
-                    model=model_name,
-                    contents=[
-                        types.Part.from_bytes(data=image_bytes, mime_type=media_type),
-                        "Analyse this candlestick chart and return the JSON trade recommendation.",
-                    ],
-                    config=types.GenerateContentConfig(
-                        system_instruction=prompt,
-                        temperature=0.2,
-                        max_output_tokens=1024,
-                    ),
-                )
-                text = response.text.strip()
-                logger.info(f"Gemini [{model_name}] response received ({len(text)} chars)")
-                return validate_and_normalize(parse_json_response(text))
+        except Exception as e:
+            err_str = str(e)
+            if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
+                if attempt == 0:
+                    time.sleep(15)
+                    continue
+                raise ValueError("RATE_LIMIT:15:Gemini kvote nået — vent 15 sek og prøv igen.")
+            logger.error(f"Gemini error: {e}")
+            raise ValueError(f"Analysis failed: {e}")
 
-            except Exception as e:
-                err_str = str(e)
-                if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
-                    delay = 30
-                    if attempt == 0:
-                        time.sleep(delay)
-                        continue
-                    raise ValueError(f"RATE_LIMIT:{delay}:Gemini quota reached. Wait a moment and try again.")
-                if "404" in err_str or "NOT_FOUND" in err_str:
-                    logger.debug(f"Model {model_name} not available, trying next…")
-                    last_error = e
-                    break  # try next model
-                logger.error(f"Gemini [{model_name}] error: {e}")
-                last_error = e
-                break
-
-    raise ValueError(f"No Gemini model available. Last error: {last_error}")
+    raise ValueError("Gemini analysis failed")
 
 
 def parse_json_response(text: str) -> dict:
