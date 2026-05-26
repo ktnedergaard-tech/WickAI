@@ -1511,6 +1511,145 @@
       gap: 14px;
     }
 
+    /* ── Market Sessions ── */
+    .sessions-section { margin-bottom: 40px; }
+
+    .sessions-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    @media (max-width: 720px) { .sessions-grid { grid-template-columns: 1fr; gap: 8px; } }
+
+    .session-card {
+      position: relative;
+      background: rgba(11,17,32,0.7);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      overflow: hidden;
+      backdrop-filter: blur(12px);
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .session-card:hover { transform: translateY(-2px); }
+    .session-card.sc-open { border-color: rgba(255,255,255,0.12); }
+
+    .sc-glow {
+      position: absolute;
+      top: -30px; right: -30px;
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      opacity: 0.12;
+      pointer-events: none;
+      transition: opacity 0.4s;
+      filter: blur(30px);
+    }
+    .session-card.sc-open .sc-glow { opacity: 0.22; }
+    .asia-glow   { background: #f0a500; }
+    .london-glow { background: #a78bfa; }
+    .us-glow     { background: #4d8bff; }
+
+    .sc-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .sc-icon { font-size: 22px; line-height: 1; flex-shrink: 0; margin-top: 2px; }
+    .sc-info { flex: 1; min-width: 0; }
+    .sc-name { font-size: 14px; font-weight: 700; color: var(--white); letter-spacing: -0.2px; }
+    .sc-mkts { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+    .sc-badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      padding: 3px 9px;
+      border-radius: 5px;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    .sc-badge.open   { background: rgba(46,204,113,0.15); color: #2ecc71; border: 1px solid rgba(46,204,113,0.3); }
+    .sc-badge.closed { background: rgba(255,255,255,0.04); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.07); }
+    .sc-badge.soon   { background: rgba(240,165,0,0.12); color: #f0a500; border: 1px solid rgba(240,165,0,0.3); }
+
+    .sc-times {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .sc-time-item { display: flex; flex-direction: column; gap: 2px; }
+    .sc-tlabel { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+    .sc-tval   { font-size: 16px; font-weight: 700; color: var(--white); letter-spacing: -0.5px; font-variant-numeric: tabular-nums; }
+    .sc-time-sep { color: var(--text-dim); font-size: 13px; margin: 0 2px; flex-shrink: 0; padding-top: 14px; }
+
+    .sc-footer { display: flex; flex-direction: column; gap: 6px; }
+    .sc-countdown { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+    .sc-countdown strong { color: var(--white); }
+    .sc-progress-bg {
+      height: 3px;
+      border-radius: 2px;
+      background: rgba(255,255,255,0.06);
+      overflow: hidden;
+    }
+    .sc-progress-fill { height: 100%; border-radius: 2px; transition: width 60s linear; }
+    .asia-fill   { background: linear-gradient(90deg, #c9943a, #f0a500); }
+    .london-fill { background: linear-gradient(90deg, #7b61ff, #a78bfa); }
+    .us-fill     { background: linear-gradient(90deg, #3d7eff, #4d8bff); }
+
+    .sc-overlap {
+      font-size: 10.5px; color: #2ecc71; font-weight: 600;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .sc-overlap::before {
+      content: ''; width: 5px; height: 5px; border-radius: 50%;
+      background: #2ecc71; box-shadow: 0 0 6px #2ecc71;
+      animation: blink 1.5s ease-in-out infinite;
+    }
+
+    /* ── 24h Timeline ── */
+    .tl-wrap {
+      background: rgba(11,17,32,0.6);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: var(--radius);
+      padding: 16px 20px 12px;
+      backdrop-filter: blur(8px);
+    }
+    .tl-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .tl-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.7px; color: var(--text-muted); }
+    .tl-tz    { font-size: 11px; color: var(--text-muted); }
+    .tl-bar {
+      position: relative; height: 28px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 6px; overflow: hidden; margin-bottom: 6px;
+    }
+    .tl-block { position: absolute; top: 0; height: 100%; border-radius: 0; opacity: 0.55; }
+    .tl-asia   { background: linear-gradient(90deg,#c9943a,#f0a500); }
+    .tl-london { background: linear-gradient(90deg,#7b61ff,#a78bfa); opacity: 0.5; }
+    .tl-us     { background: linear-gradient(90deg,#3d7eff,#4d8bff); opacity: 0.5; }
+    .tl-overlap { position: absolute; top: 0; height: 100%; background: linear-gradient(90deg,#2ecc71,#34a869); opacity: 0.75; }
+    .tl-now-line {
+      position: absolute; top: -2px; bottom: -2px; width: 2px;
+      background: #fff; border-radius: 2px;
+      box-shadow: 0 0 8px rgba(255,255,255,0.6); z-index: 10;
+    }
+    .tl-now-label {
+      position: absolute; top: -20px; transform: translateX(-50%);
+      font-size: 9px; font-weight: 700; color: var(--white); white-space: nowrap;
+    }
+    .tl-axis { position: relative; height: 16px; }
+    .tl-axis-label {
+      position: absolute; transform: translateX(-50%);
+      font-size: 10px; color: var(--text-muted);
+      font-variant-numeric: tabular-nums; white-space: nowrap;
+    }
+    .tl-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 10px; }
+    .tl-legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-muted); }
+    .tl-legend-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+
     .setup-card {
       background: rgba(11,17,32,0.7);
       border: 1px solid var(--border);
@@ -1719,6 +1858,122 @@
         <div class="stat-label">Platforms supported</div>
       </div>
     </div>
+
+    <!-- MARKET SESSIONS -->
+    <section class="sessions-section">
+      <div class="sessions-grid">
+
+        <!-- ASIA -->
+        <div class="session-card" id="scAsia">
+          <div class="sc-glow asia-glow"></div>
+          <div class="sc-top">
+            <span class="sc-icon">🌏</span>
+            <div class="sc-info">
+              <div class="sc-name">Asian Session</div>
+              <div class="sc-mkts">Tokyo &middot; Shanghai &middot; Sydney</div>
+            </div>
+            <span class="sc-badge closed" id="scAsiaBadge">Closed</span>
+          </div>
+          <div class="sc-times">
+            <div class="sc-time-item">
+              <span class="sc-tlabel">Opens</span>
+              <span class="sc-tval" id="scAsiaOpen">—</span>
+            </div>
+            <span class="sc-time-sep">→</span>
+            <div class="sc-time-item">
+              <span class="sc-tlabel">Closes</span>
+              <span class="sc-tval" id="scAsiaClose">—</span>
+            </div>
+          </div>
+          <div class="sc-footer">
+            <div class="sc-countdown" id="scAsiaCountdown"></div>
+            <div class="sc-progress-bg"><div class="sc-progress-fill asia-fill" id="scAsiaFill" style="width:0%"></div></div>
+          </div>
+        </div>
+
+        <!-- LONDON -->
+        <div class="session-card" id="scLondon">
+          <div class="sc-glow london-glow"></div>
+          <div class="sc-top">
+            <span class="sc-icon">🇬🇧</span>
+            <div class="sc-info">
+              <div class="sc-name">London Session</div>
+              <div class="sc-mkts">FTSE &middot; EUR/USD &middot; GBP/USD</div>
+            </div>
+            <span class="sc-badge closed" id="scLondonBadge">Closed</span>
+          </div>
+          <div class="sc-times">
+            <div class="sc-time-item">
+              <span class="sc-tlabel">Opens</span>
+              <span class="sc-tval" id="scLondonOpen">—</span>
+            </div>
+            <span class="sc-time-sep">→</span>
+            <div class="sc-time-item">
+              <span class="sc-tlabel">Closes</span>
+              <span class="sc-tval" id="scLondonClose">—</span>
+            </div>
+          </div>
+          <div class="sc-footer">
+            <div class="sc-countdown" id="scLondonCountdown"></div>
+            <div class="sc-progress-bg"><div class="sc-progress-fill london-fill" id="scLondonFill" style="width:0%"></div></div>
+          </div>
+        </div>
+
+        <!-- US -->
+        <div class="session-card" id="scUS">
+          <div class="sc-glow us-glow"></div>
+          <div class="sc-top">
+            <span class="sc-icon">🇺🇸</span>
+            <div class="sc-info">
+              <div class="sc-name">US Session</div>
+              <div class="sc-mkts">S&amp;P 500 &middot; Nasdaq &middot; Dow</div>
+            </div>
+            <span class="sc-badge closed" id="scUSBadge">Closed</span>
+          </div>
+          <div class="sc-times">
+            <div class="sc-time-item">
+              <span class="sc-tlabel">Opens</span>
+              <span class="sc-tval" id="scUSOpen">—</span>
+            </div>
+            <span class="sc-time-sep">→</span>
+            <div class="sc-time-item">
+              <span class="sc-tlabel">Closes</span>
+              <span class="sc-tval" id="scUSClose">—</span>
+            </div>
+          </div>
+          <div class="sc-footer">
+            <div class="sc-countdown" id="scUSCountdown"></div>
+            <div class="sc-progress-bg"><div class="sc-progress-fill us-fill" id="scUSFill" style="width:0%"></div></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 24H TIMELINE -->
+      <div class="tl-wrap">
+        <div class="tl-header">
+          <span class="tl-title">24h Market Sessions</span>
+          <span class="tl-tz" id="tlTzLabel"></span>
+        </div>
+        <div class="tl-bar" id="tlBar">
+          <div class="tl-block tl-asia"   id="tlAsia"></div>
+          <div class="tl-block tl-asia"   id="tlAsiaWrap"></div>
+          <div class="tl-block tl-london" id="tlLondon"></div>
+          <div class="tl-block tl-us"     id="tlUS"></div>
+          <div class="tl-overlap"         id="tlOverlap"></div>
+          <div class="tl-now-line"        id="tlNowLine">
+            <span class="tl-now-label" id="tlNowLabel">Now</span>
+          </div>
+        </div>
+        <div class="tl-axis" id="tlAxis"></div>
+        <div class="tl-legend">
+          <div class="tl-legend-item"><div class="tl-legend-dot" style="background:#f0a500"></div> Asia</div>
+          <div class="tl-legend-item"><div class="tl-legend-dot" style="background:#a78bfa"></div> London</div>
+          <div class="tl-legend-item"><div class="tl-legend-dot" style="background:#4d8bff"></div> US</div>
+          <div class="tl-legend-item"><div class="tl-legend-dot" style="background:#2ecc71"></div> London/NY Overlap</div>
+        </div>
+      </div>
+    </section>
 
     <!-- SCANNER -->
     <section class="scanner-section" id="scannerSection">
@@ -2964,6 +3219,122 @@
     }
 
     function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
+
+    // ── Market Session Clocks ────────────────────────────────────────────────
+    const SESSIONS_DEF = [
+      { id: 'Asia',   utcOpen: [0,0],   utcClose: [9,0],  fillId: 'scAsiaFill' },
+      { id: 'London', utcOpen: [7,0],   utcClose: [16,0], fillId: 'scLondonFill' },
+      { id: 'US',     utcOpen: [13,30], utcClose: [20,0], fillId: 'scUSFill' },
+    ];
+
+    function utcHMtoDate(utcH, utcM) {
+      const now = new Date();
+      return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), utcH, utcM));
+    }
+    function fmtLocalTime(utcH, utcM) {
+      return utcHMtoDate(utcH, utcM).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    function nowUTCMin() {
+      const n = new Date();
+      return n.getUTCHours() * 60 + n.getUTCMinutes();
+    }
+    function isOpen(utcOpen, utcClose) {
+      const now = nowUTCMin();
+      const o = utcOpen[0]*60 + utcOpen[1];
+      const c = utcClose[0]*60 + utcClose[1];
+      return o < c ? (now >= o && now < c) : (now >= o || now < c);
+    }
+    function minsUntilOpen(utcOpen) {
+      const now = nowUTCMin(), o = utcOpen[0]*60 + utcOpen[1];
+      let diff = o - now; if (diff <= 0) diff += 1440; return diff;
+    }
+    function minsUntilClose(utcClose) {
+      const now = nowUTCMin(), c = utcClose[0]*60 + utcClose[1];
+      let diff = c - now; if (diff <= 0) diff += 1440; return diff;
+    }
+    function sessionProgress(utcOpen, utcClose) {
+      if (!isOpen(utcOpen, utcClose)) return 0;
+      const now = nowUTCMin();
+      const o = utcOpen[0]*60 + utcOpen[1];
+      const c = utcClose[0]*60 + utcClose[1];
+      let dur = c - o; if (dur <= 0) dur += 1440;
+      let elapsed = now - o; if (elapsed < 0) elapsed += 1440;
+      return Math.min(100, Math.round(elapsed / dur * 100));
+    }
+    function fmtDuration(mins) {
+      const h = Math.floor(mins / 60), m = mins % 60;
+      if (h === 0) return `${m}m`;
+      return m === 0 ? `${h}h` : `${h}h ${m}m`;
+    }
+    function updateSessionCard(def) {
+      const id = def.id;
+      const open   = isOpen(def.utcOpen, def.utcClose);
+      const card   = document.getElementById(`sc${id}`);
+      const badge  = document.getElementById(`sc${id}Badge`);
+      const cdEl   = document.getElementById(`sc${id}Countdown`);
+      const fillEl = document.getElementById(def.fillId);
+      badge.className = 'sc-badge ' + (open ? 'open' : (minsUntilOpen(def.utcOpen) < 60 ? 'soon' : 'closed'));
+      badge.textContent = open ? 'Open' : 'Closed';
+      card.classList.toggle('sc-open', open);
+      if (open) {
+        cdEl.innerHTML = `Closes in <strong>${fmtDuration(minsUntilClose(def.utcClose))}</strong>`;
+        fillEl.style.width = sessionProgress(def.utcOpen, def.utcClose) + '%';
+      } else {
+        const eta = minsUntilOpen(def.utcOpen);
+        cdEl.innerHTML = `${eta < 60 ? '🟡 Opens in' : 'Opens in'} <strong>${fmtDuration(eta)}</strong>`;
+        fillEl.style.width = '0%';
+      }
+    }
+    function updateOverlapNote() {
+      const isOverlap = isOpen([7,0],[16,0]) && isOpen([13,30],[20,0]);
+      ['scLondon','scUS'].forEach(id => {
+        const el = document.getElementById(id);
+        let ov = el.querySelector('.sc-overlap');
+        if (isOverlap) {
+          if (!ov) {
+            ov = document.createElement('div');
+            ov.className = 'sc-overlap';
+            ov.textContent = 'London/NY Overlap — peak liquidity';
+            el.appendChild(ov);
+          }
+        } else { if (ov) ov.remove(); }
+      });
+    }
+    function buildTimeline() {
+      function pct(h, m) { return ((h * 60 + m) / 1440 * 100).toFixed(3) + '%'; }
+      function wid(h1,m1,h2,m2) { return (((h2*60+m2)-(h1*60+m1))/1440*100).toFixed(3)+'%'; }
+      document.getElementById('tlAsia').style.cssText     = `left:${pct(0,0)};width:${wid(0,0,9,0)}`;
+      document.getElementById('tlAsiaWrap').style.cssText = `left:${pct(22,0)};width:${wid(22,0,24,0)}`;
+      document.getElementById('tlLondon').style.cssText   = `left:${pct(7,0)};width:${wid(7,0,16,0)}`;
+      document.getElementById('tlUS').style.cssText       = `left:${pct(13,30)};width:${wid(13,30,20,0)}`;
+      document.getElementById('tlOverlap').style.cssText  = `left:${pct(13,30)};width:${wid(13,30,16,0)}`;
+      const nowPct = nowUTCMin() / 1440 * 100;
+      document.getElementById('tlNowLine').style.left = nowPct.toFixed(3) + '%';
+      document.getElementById('tlNowLabel').textContent = fmtLocalTime(new Date().getUTCHours(), new Date().getUTCMinutes());
+      const axis = document.getElementById('tlAxis');
+      axis.innerHTML = '';
+      [0,4,8,12,16,20].forEach(utcH => {
+        const span = document.createElement('span');
+        span.className = 'tl-axis-label';
+        span.style.left = (utcH / 24 * 100).toFixed(2) + '%';
+        span.textContent = fmtLocalTime(utcH, 0);
+        axis.appendChild(span);
+      });
+      document.getElementById('tlTzLabel').textContent = 'Your time · ' + Intl.DateTimeFormat().resolvedOptions().timeZone;
+    }
+    function updateSessions() {
+      document.getElementById('scAsiaOpen').textContent    = fmtLocalTime(0, 0);
+      document.getElementById('scAsiaClose').textContent   = fmtLocalTime(9, 0);
+      document.getElementById('scLondonOpen').textContent  = fmtLocalTime(7, 0);
+      document.getElementById('scLondonClose').textContent = fmtLocalTime(16, 0);
+      document.getElementById('scUSOpen').textContent      = fmtLocalTime(13, 30);
+      document.getElementById('scUSClose').textContent     = fmtLocalTime(20, 0);
+      SESSIONS_DEF.forEach(updateSessionCard);
+      updateOverlapNote();
+      buildTimeline();
+    }
+    updateSessions();
+    setInterval(updateSessions, 30000);
 
     // ── MARKET SCANNER ────────────────────────────────────────────────────────
 
