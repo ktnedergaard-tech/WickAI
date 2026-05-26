@@ -1489,6 +1489,21 @@
     .mstat-chip.open   { border-color: rgba(46,204,113,0.25); color: var(--green); }
     .mstat-chip.closed { color: var(--text-muted); }
 
+    /* Market hours strip */
+    .market-hours-strip {
+      display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px;
+    }
+    .mhours-item {
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+      border-radius: 8px; padding: 6px 12px; font-size: 11.5px;
+    }
+    .mhours-flag { font-size: 14px; }
+    .mhours-name { font-weight: 700; color: var(--white); }
+    .mhours-time { color: var(--text-muted); }
+    .mhours-item.is-open { border-color: rgba(46,204,113,0.2); }
+    .mhours-item.is-open .mhours-name { color: var(--green); }
+
     /* Setup grid */
     .scanner-grid {
       display: grid;
@@ -1727,6 +1742,25 @@
 
       <!-- Watchlist tags -->
       <div class="scanner-watchlist-tags" id="watchlistTags"></div>
+
+      <!-- Market hours strip -->
+      <div class="market-hours-strip" id="marketHoursStrip">
+        <div class="mhours-item" id="mhours-US">
+          <span class="mhours-flag">🇺🇸</span>
+          <span class="mhours-name">US</span>
+          <span class="mhours-time">14:30 – 21:00 CET</span>
+        </div>
+        <div class="mhours-item" id="mhours-UK">
+          <span class="mhours-flag">🇬🇧</span>
+          <span class="mhours-name">UK</span>
+          <span class="mhours-time">09:00 – 17:30 CET</span>
+        </div>
+        <div class="mhours-item" id="mhours-EU">
+          <span class="mhours-flag">🇪🇺</span>
+          <span class="mhours-name">EU</span>
+          <span class="mhours-time">09:00 – 17:30 CET</span>
+        </div>
+      </div>
 
       <!-- Market status + tab row -->
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:14px;">
@@ -3033,8 +3067,24 @@
         chip.className = `mstat-chip ${open ? 'open' : 'closed'}`;
         chip.innerHTML = `<div class="mstat-dot"></div>${info.flag || ''} ${info.label} · ${info.status ? info.status.label : ''}`;
         row.appendChild(chip);
+        // Highlight the matching hours item
+        const hoursEl = document.getElementById(`mhours-${market}`);
+        if (hoursEl) hoursEl.classList.toggle('is-open', !!open);
       });
     }
+
+    // Highlight market hours immediately on page load using /api/scan/status
+    (async () => {
+      try {
+        const res = await fetch('/api/scan/status');
+        if (!res.ok) return;
+        const data = await res.json();
+        Object.entries(data).forEach(([market, info]) => {
+          const el = document.getElementById(`mhours-${market}`);
+          if (el) el.classList.toggle('is-open', !!(info.status && info.status.open));
+        });
+      } catch (_) {}
+    })();
 
     async function runScan() {
       if (scanState.scanning) return;
