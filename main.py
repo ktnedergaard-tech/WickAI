@@ -248,12 +248,20 @@ async def get_market_context_endpoint():
 @app.get("/health")
 async def health_check():
     """Health check endpoint."""
-    api_key_set = bool(ANTHROPIC_API_KEY)
+    gemini = bool(os.getenv("GEMINI_API_KEY"))
+    groq   = bool(os.getenv("GROQ_API_KEY"))
+    if groq:
+        provider = "groq"
+    elif gemini:
+        provider = "gemini"
+    else:
+        provider = "demo"
     return {
-        "status": "ok",
-        "service": "WickAI",
-        "version": "1.0.0",
-        "api_key_configured": api_key_set,
+        "status":   "ok",
+        "service":  "WickAI",
+        "version":  "1.0.0",
+        "provider": provider,
+        "analysis_ready": groq or gemini,
     }
 
 
