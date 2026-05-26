@@ -2969,10 +2969,9 @@
         crop.toBlob(blob => {
           if (!blob) { showSnapError(); return; }
           const file = new File([blob], 'chart-snapshot.png', { type: 'image/png' });
-          // Hand off to existing upload flow
+          autoAnalyzeNext = true;
           handleFileSelect(file);
-          // Scroll to upload zone so user sees the preview
-          document.getElementById('uploadZone').scrollIntoView({ behavior: 'smooth', block: 'center' });
+          document.getElementById('uploadZone').scrollIntoView({ behavior: 'instant', block: 'center' });
         }, 'image/png', 0.95);
 
       } catch (err) {
@@ -3116,6 +3115,7 @@
     const loadingOverlay   = document.getElementById('loadingOverlay');
     const results          = document.getElementById('results');
     const loadingSteps     = document.querySelectorAll('.loading-step');
+    let   autoAnalyzeNext  = false;
 
     let selectedFile = null;
 
@@ -3153,6 +3153,10 @@
         previewContainer.classList.add('visible');
         uploadPlaceholder.classList.add('hidden');
         uploadZone.classList.add('has-image');
+        if (autoAnalyzeNext) {
+          autoAnalyzeNext = false;
+          analyzeBtn.click();
+        }
       };
       reader.readAsDataURL(file);
       analyzeBtn.disabled = false;
