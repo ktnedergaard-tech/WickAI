@@ -1,7 +1,9 @@
 """
 WickAI - AI Chart Analysis
-Uses Google Gemini (free tier) for candlestick chart analysis via vision.
-Falls back to demo mode if no API key is set.
+Supports two free vision AI providers:
+  1. Groq  (GROQ_API_KEY)   — Llama 4 Vision, free at console.groq.com
+  2. Gemini (GEMINI_API_KEY) — Gemini 2.0 Flash, free at aistudio.google.com
+Falls back to demo mode if neither key is set.
 """
 
 import base64
@@ -18,6 +20,7 @@ from market_intel import get_market_context, format_context_for_prompt
 logger = logging.getLogger(__name__)
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+GROQ_API_KEY   = os.getenv("GROQ_API_KEY")
 
 DEMO_RESPONSES = [
     {
@@ -139,70 +142,116 @@ You MUST respond with a valid JSON object (no markdown fences, no extra text —
 
 
 def analyze_chart(image_bytes: bytes, media_type: str) -> dict:
-    """Analyse a chart image. Uses Gemini if API key set, else demo mode."""
-    if not GEMINI_API_KEY:
-        logger.info("No GEMINI_API_KEY — returning demo analysis")
-        return random.choice(DEMO_RESPONSES)
-
-    # Fetch live market context and inject into prompt
-    market_ctx = get_market_context()
+    """
+    Analyse a chart image.
+    Priority: Groq (free) → Gemini (free) → demo mode.
+    """
+    market_ctx    = get_market_context()
     context_block = format_context_for_prompt(market_ctx)
     enriched_prompt = SYSTEM_PROMPT + "\n\n" + context_block
 
+    def attach_ctx(result: dict) -> dict:
+        result["market_context"] = {
+            "session":    market_ctx["session"],
+            "day":        market_ctx["day"],
+            "fear_greed": market_ctx.get("fear_greed"),
+        }
+        return result
+
+    if GROQ_API_KEY:
+        return attach_ctx(_analyze_groq(image_bytes, media_type, enriched_prompt))
+
+    if GEMINI_API_KEY:
+        return attach_ctx(_analyze_gemini(image_bytes, media_type, enriched_prompt))
+
+    logger.info("No API key set — returning demo analysis")
+    return random.choice(DEMO_RESPONSES)
+
+
+def _analyze_groq(image_bytes: bytes, media_type: str, prompt: str) -> dict:
+    """Call Groq Llama Vision (free tier at console.groq.com)."""
+    from groq import Groq
+    client = Groq(api_key=GROQ_API_KEY)
+    b64 = base64.b64encode(image_bytes).decode("utf-8")
+
+    for attempt in range(3):
+        try:
+            resp = client.chat.completions.create(
+                model="meta-llama/llama-4-scout-17b-16e-instruct",
+                messages=[
+                    {"role": "system", "content": prompt},
+                    {"role": "user", "content": [
+                        {"type": "text",
+                         "text": "Analyse this candlestick chart and return the JSON trade recommendation."},
+                        {"type": "image_url",
+                         "image_url": {"url": f"data:{media_type};base64,{b64}"}},
+                    ]},
+                ],
+                temperature=0.2,
+                max_tokens=1024,
+            )
+            text = resp.choices[0].message.content.strip()
+            logger.info(f"Groq response received ({len(text)} chars)")
+            return validate_and_normalize(parse_json_response(text))
+
+        except Exception as e:
+            err_str = str(e)
+            if "429" in err_str or "rate_limit" in err_str.lower():
+                delay = 30
+                logger.warning(f"Groq rate limited (attempt {attempt+1}/3). Waiting {delay}s…")
+                if attempt < 2:
+                    time.sleep(delay)
+                    continue
+                raise ValueError(
+                    f"RATE_LIMIT:{delay}:Groq free tier quota reached. "
+                    "Please wait a moment and try again."
+                )
+            logger.error(f"Groq error: {e}")
+            raise ValueError(f"Analysis failed: {e}")
+
+    raise ValueError("Groq analysis failed after retries")
+
+
+def _analyze_gemini(image_bytes: bytes, media_type: str, prompt: str) -> dict:
+    """Call Google Gemini 2.0 Flash (free tier at aistudio.google.com)."""
     import google.generativeai as genai
     genai.configure(api_key=GEMINI_API_KEY)
     model = genai.GenerativeModel(
         model_name="gemini-2.0-flash",
-        system_instruction=enriched_prompt,
+        system_instruction=prompt,
     )
     image_part = {
         "mime_type": media_type,
         "data": base64.b64encode(image_bytes).decode("utf-8"),
     }
 
-    last_error = None
     for attempt in range(3):
         try:
             response = model.generate_content([
                 image_part,
                 "Analyse this candlestick chart and return the JSON trade recommendation.",
             ])
-
-            response_text = response.text.strip()
-            logger.info(f"Gemini response received ({len(response_text)} chars)")
-
-            analysis = parse_json_response(response_text)
-            result = validate_and_normalize(analysis)
-            result["market_context"] = {
-                "session":    market_ctx["session"],
-                "day":        market_ctx["day"],
-                "fear_greed": market_ctx.get("fear_greed"),
-            }
-            return result
+            text = response.text.strip()
+            logger.info(f"Gemini response received ({len(text)} chars)")
+            return validate_and_normalize(parse_json_response(text))
 
         except Exception as e:
-            last_error = e
             err_str = str(e)
-
-            # Rate limit (429) — extract suggested retry delay and wait
             if "429" in err_str:
                 match = re.search(r"seconds:\s*(\d+)", err_str)
                 delay = min(int(match.group(1)) if match else 60, 65)
-                logger.warning(f"Rate limited (attempt {attempt+1}/3). Retrying in {delay}s…")
+                logger.warning(f"Gemini rate limited (attempt {attempt+1}/3). Waiting {delay}s…")
                 if attempt < 2:
                     time.sleep(delay)
                     continue
-                # After retries exhausted, raise friendly message
                 raise ValueError(
                     f"RATE_LIMIT:{delay}:Gemini free tier quota reached. "
                     "Please wait about a minute and try again."
                 )
-
-            # Any other error — don't retry
-            logger.error(f"Gemini analysis error: {e}")
+            logger.error(f"Gemini error: {e}")
             raise ValueError(f"Analysis failed: {e}")
 
-    raise ValueError(f"Analysis failed after retries: {last_error}")
+    raise ValueError("Gemini analysis failed after retries")
 
 
 def parse_json_response(text: str) -> dict:

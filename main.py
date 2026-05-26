@@ -31,13 +31,18 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Validate that the API key is set
-ANTHROPIC_API_KEY = os.getenv("GEMINI_API_KEY")
-if not ANTHROPIC_API_KEY:
+# Validate that at least one vision API key is set
+_gemini_key = os.getenv("GEMINI_API_KEY")
+_groq_key   = os.getenv("GROQ_API_KEY")
+if not _gemini_key and not _groq_key:
     logger.warning(
-        "GEMINI_API_KEY is not set. Analysis runs in demo mode. "
-        "Get a free key at aistudio.google.com"
+        "No vision API key set — running in demo mode. "
+        "Set GROQ_API_KEY (free: console.groq.com) or GEMINI_API_KEY (free: aistudio.google.com)"
     )
+elif _groq_key:
+    logger.info("Vision provider: Groq (Llama 4 Vision) — free tier")
+else:
+    logger.info("Vision provider: Google Gemini 2.0 Flash — free tier")
 
 # Max upload size: 10 MB
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB in bytes
