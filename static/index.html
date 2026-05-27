@@ -1452,11 +1452,13 @@
       color: var(--accent);
       font-size: 9px; font-weight: 800;
       display: inline-flex; align-items: center; justify-content: center;
-      cursor: default;
+      cursor: pointer;
       position: relative;
       flex-shrink: 0;
+      user-select: none;
     }
-    .mi-info-btn:hover .mi-tooltip { opacity: 1; pointer-events: auto; transform: translateY(0); }
+    .mi-info-btn:hover .mi-tooltip,
+    .mi-info-btn.active .mi-tooltip { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
     .mi-tooltip {
       position: absolute;
       bottom: calc(100% + 10px);
@@ -3013,6 +3015,19 @@
       } catch (_) {}
     })();
 
+    // ── Market Intel info button — click/tap to toggle tooltip ──
+    (function () {
+      const btn = document.querySelector('.mi-info-btn');
+      if (!btn) return;
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        btn.classList.toggle('active');
+      });
+      document.addEventListener('click', function () {
+        btn.classList.remove('active');
+      });
+    })();
+
     // ── Live market intelligence widget ──
     async function loadMarketIntel() {
       try {
@@ -3176,18 +3191,23 @@
     function showError(msg) { errorMessage.textContent = msg; errorBox.classList.remove('hidden'); }
     function hideError()    { errorBox.classList.add('hidden'); }
 
-    function showRateLimitError(text, seconds) {
+    function showRateLimitError(text, seconds, autoRetry = true) {
       errorBox.classList.remove('hidden');
       let remaining = seconds;
       const update = () => {
-        errorMessage.textContent = `⏳ ${text} Retrying in ${remaining}s…`;
+        errorMessage.textContent = `⏳ ${text} Prøver igen om ${remaining}s…`;
       };
       update();
       const iv = setInterval(() => {
         remaining--;
         if (remaining <= 0) {
           clearInterval(iv);
-          errorMessage.textContent = `${text} Please try again now.`;
+          if (autoRetry && selectedFile) {
+            errorBox.classList.add('hidden');
+            doAnalyze(false);
+          } else {
+            errorMessage.textContent = `${text} Prøv igen nu.`;
+          }
         } else {
           update();
         }
@@ -3226,7 +3246,7 @@
       };
     }
 
-    analyzeBtn.addEventListener('click', async () => {
+    async function doAnalyze(allowAutoRetry = true) {
       if (!selectedFile) return;
       analyzeBtn.disabled = true;
       btnSpinner.classList.add('visible');
@@ -3253,7 +3273,7 @@
         if (rlMatch) {
           const seconds = parseInt(rlMatch[1]);
           const text = rlMatch[2];
-          showRateLimitError(text, seconds);
+          showRateLimitError(text, seconds, allowAutoRetry);
         } else {
           // Strip raw API noise — show only the first sentence
           const clean = msg.replace(/\[links.*$/s, '').replace(/\{.*$/s, '').trim();
@@ -3265,7 +3285,9 @@
         btnSpinner.classList.remove('visible');
         document.querySelector('.btn-text').textContent = 'Analyze Chart';
       }
-    });
+    }
+
+    analyzeBtn.addEventListener('click', () => doAnalyze(true));
 
     function renderResults(data) {
       document.getElementById('patternNameDisplay').textContent = data.pattern_name || 'Unknown Pattern';
